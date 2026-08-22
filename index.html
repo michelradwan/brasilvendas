@@ -208,6 +208,12 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
+                            <div class="flex items-center justify-center space-x-2 mt-2">
+                                <button type="button" onclick="openTamanhosModal()" class="inline-flex items-center space-x-1.5 text-xs text-brand-accent hover:text-yellow-300 transition-colors font-medium cursor-pointer">
+                                    <span>📏</span>
+                                    <span class="underline">Ver Tabela de Medidas em cm</span>
+                                </button>
+                            </div>
                             <p id="tamanho-erro" class="text-xs text-red-400 font-medium mt-2 hidden">⚠️ Por favor, selecione o tamanho antes de continuar.</p>
                         </div>
 
@@ -403,43 +409,111 @@
         </div>
     </section>
 
-    <!-- Newsletter -->
+    <!-- FAQ - Perguntas Frequentes (Quebra de Objeções) -->
     <section class="py-16 relative">
-        <div class="container mx-auto px-4 max-w-xl">
-            <div class="glass-panel rounded-3xl p-8 text-center border-brand-accent/20">
-                <h3 class="font-outfit text-2xl font-bold mb-3 text-white">📩 Receba ofertas exclusivas</h3>
-                <p class="text-gray-400 mb-6 text-sm">Seja o primeiro a saber sobre novos produtos e promoções.</p>
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center space-x-2 bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full mb-3 shadow-md">
+                    <span class="text-brand-green text-xs font-bold uppercase tracking-wider">❓ Tire suas dúvidas</span>
+                </div>
+                <h3 class="font-outfit text-3xl md:text-4xl font-bold text-white">
+                    Perguntas Frequentes
+                </h3>
+            </div>
 
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <input type="email" placeholder="Seu melhor e-mail" class="flex-1 bg-brand-dark/50 border border-brand-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent focus:outline-none transition-colors">
-                    <button class="bg-brand-accent hover:bg-yellow-400 text-brand-dark font-bold px-6 py-3 rounded-xl transition-colors shadow-lg shadow-brand-accent/20">Cadastrar</button>
+            <div class="space-y-4">
+                <!-- Pergunta 1 -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
+                    <button onclick="toggleFaq(1)" class="w-full p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-base md:text-lg hover:text-brand-accent transition-colors">
+                        <span class="flex items-center space-x-3">
+                            <span class="text-xl">🚚</span>
+                            <span>Como acompanho o rastreamento do meu pedido?</span>
+                        </span>
+                        <span id="faq-icon-1" class="text-brand-accent text-xl transition-transform duration-300">＋</span>
+                    </button>
+                    <div id="faq-answer-1" class="hidden px-5 pb-5 text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-4">
+                        Assim que seu pagamento via PIX for aprovado, seu Kit Patriota entra em processo de separação prioritária. Em até 24 horas úteis, você receberá o código de rastreamento dos Correios diretamente no seu WhatsApp e E-mail cadastrados.
+                    </div>
+                </div>
+
+                <!-- Pergunta 2 -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
+                    <button onclick="toggleFaq(2)" class="w-full p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-base md:text-lg hover:text-brand-accent transition-colors">
+                        <span class="flex items-center space-x-3">
+                            <span class="text-xl">👕</span>
+                            <span>E se o tamanho da camiseta não servir em mim?</span>
+                        </span>
+                        <span id="faq-icon-2" class="text-brand-accent text-xl transition-transform duration-300">＋</span>
+                    </button>
+                    <div id="faq-answer-2" class="hidden px-5 pb-5 text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-4">
+                        Fique 100% tranquilo! Você tem 7 dias de garantia incondicional após receber a encomenda. Se precisar de outro tamanho, basta entrar em contato com o nosso suporte que realizamos a troca sem nenhum custo adicional.
+                    </div>
+                </div>
+
+                <!-- Pergunta 3 -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
+                    <button onclick="toggleFaq(3)" class="w-full p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-base md:text-lg hover:text-brand-accent transition-colors">
+                        <span class="flex items-center space-x-3">
+                            <span class="text-xl">🇧🇷</span>
+                            <span>O Frete é Grátis para o meu estado?</span>
+                        </span>
+                        <span id="faq-icon-3" class="text-brand-accent text-xl transition-transform duration-300">＋</span>
+                    </button>
+                    <div id="faq-answer-3" class="hidden px-5 pb-5 text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-4">
+                        Sim! Entregamos com Frete Grátis pelos Correios para qualquer cidade e estado do Brasil. Se você tiver urgência em receber, também oferecemos a opção Full Express (3 dias úteis) na finalização do pedido.
+                    </div>
+                </div>
+
+                <!-- Pergunta 4 -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
+                    <button onclick="toggleFaq(4)" class="w-full p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-base md:text-lg hover:text-brand-accent transition-colors">
+                        <span class="flex items-center space-x-3">
+                            <span class="text-xl">⚡</span>
+                            <span>Como funciona o pagamento via PIX? É seguro?</span>
+                        </span>
+                        <span id="faq-icon-4" class="text-brand-accent text-xl transition-transform duration-300">＋</span>
+                    </button>
+                    <div id="faq-answer-4" class="hidden px-5 pb-5 text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-4">
+                        É totalmente seguro! Nosso checkout gera o QR Code e o código Copia e Cola oficiais registrados diretamente no Banco Central. A aprovação é imediata no sistema e seu comprovante é emitido na mesma hora.
+                    </div>
+                </div>
+
+                <!-- Pergunta 5 -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
+                    <button onclick="toggleFaq(5)" class="w-full p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-base md:text-lg hover:text-brand-accent transition-colors">
+                        <span class="flex items-center space-x-3">
+                            <span class="text-xl">📦</span>
+                            <span>O que exatamente vem na caixa do Kit Patriota?</span>
+                        </span>
+                        <span id="faq-icon-5" class="text-brand-accent text-xl transition-transform duration-300">＋</span>
+                    </button>
+                    <div id="faq-answer-5" class="hidden px-5 pb-5 text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-4">
+                        Você receberá os 4 itens completos: 1x Camiseta "Eu sou patriota" (100% Algodão Premium), 1x Boné Exclusivo com bordado em alto relevo, 1x Bandeira do Brasil Oficial (1,50m) e 1x Garrafinha Térmica de 500ml.
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Rodapé -->
+    <!-- Rodapé Limpo & Seguro -->
     <footer class="bg-brand-dark border-t border-brand-border pt-12 pb-8">
         <div class="container mx-auto px-4 max-w-5xl">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8">
-                <div class="flex flex-col items-center md:items-start space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8 items-center">
+                <div class="flex flex-col items-center md:items-start space-y-3">
                     <img src="images/IB3yGye.png" alt="Kit Patriota" class="h-12 w-auto object-contain">
-                    <p class="text-gray-500 text-sm max-w-xs">Apoiando as manifestações nacionais por um Brasil livre.</p>
+                    <p class="text-gray-400 text-xs max-w-xs">Apoiando o movimento patriota por um Brasil soberano, justo e democrático.</p>
                 </div>
 
-                <div>
-                    <h4 class="font-outfit text-lg font-bold mb-4 text-white">Contato</h4>
-                    <p class="text-gray-400 text-sm mb-2 hover:text-brand-accent transition-colors">📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6a5a3a6b9a4a2b396bdbfa2a6b7a2a4bfb9a2b7f8b5b9bb">[emailprotected]</a></p>
-                    <p class="text-gray-400 text-sm">🕒 Seg. à Sáb. das 10h às 19h</p>
+                <div class="text-center">
+                    <p class="text-brand-green font-bold text-sm mb-1">🔒 Ambiente 100% Criptografado</p>
+                    <p class="text-gray-400 text-xs">Seus dados protegidos por SSL 256 bits e Banco Central</p>
                 </div>
 
-                <div>
-                    <h4 class="font-outfit text-lg font-bold mb-4 text-white">Redes Sociais</h4>
-                    <div class="flex flex-col space-y-2 items-center md:items-start">
-                        <a href="#" class="text-gray-400 hover:text-brand-accent transition-colors text-sm flex items-center space-x-2"><span>📘</span> <span>Facebook</span></a>
-                        <a href="#" class="text-gray-400 hover:text-brand-accent transition-colors text-sm flex items-center space-x-2"><span>📷</span> <span>Instagram</span></a>
-                        <a href="#" class="text-gray-400 hover:text-brand-accent transition-colors text-sm flex items-center space-x-2"><span>🐦</span> <span>Twitter</span></a>
-                    </div>
+                <div class="flex flex-col items-center md:items-end space-y-2">
+                    <button onclick="document.getElementById('comprar-btn').scrollIntoView({behavior: 'smooth', block: 'center'})" class="bg-brand-accent hover:bg-yellow-400 text-brand-dark font-outfit font-black text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider transition-colors shadow-md">
+                        Garantir Meu Kit ➔
+                    </button>
+                    <p class="text-gray-500 text-[11px]">Entrega em todo o Brasil</p>
                 </div>
             </div>
 
@@ -668,11 +742,152 @@
         </div>
     </div>
 
+    <!-- Modal da Tabela de Medidas da Camiseta -->
+    <div id="tamanhos-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[99999] hidden">
+        <div class="bg-[#0e1017] border border-white/10 w-full max-w-md rounded-3xl p-6 shadow-2xl relative text-white">
+            <button onclick="closeTamanhosModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl transition-colors">✕</button>
+            
+            <div class="flex items-center space-x-3 mb-4">
+                <span class="text-2xl">📏</span>
+                <div>
+                    <h4 class="font-outfit text-xl font-bold text-white">Tabela de Medidas (cm)</h4>
+                    <p class="text-xs text-gray-400">Camiseta Oficial 100% Algodão Premium</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-white/10 mb-4">
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-[#161a27] text-brand-accent uppercase font-bold">
+                        <tr>
+                            <th class="p-3">Tamanho</th>
+                            <th class="p-3">Comprimento</th>
+                            <th class="p-3">Largura / Tórax</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-gray-200">
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">PP</td><td class="p-2.5">66 cm</td><td class="p-2.5">48 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">P</td><td class="p-2.5">68 cm</td><td class="p-2.5">50 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">M</td><td class="p-2.5">70 cm</td><td class="p-2.5">52 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">G</td><td class="p-2.5">72 cm</td><td class="p-2.5">54 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">GG</td><td class="p-2.5">74 cm</td><td class="p-2.5">56 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">XG</td><td class="p-2.5">76 cm</td><td class="p-2.5">58 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">XXG</td><td class="p-2.5">78 cm</td><td class="p-2.5">62 cm</td></tr>
+                        <tr class="hover:bg-white/[0.02]"><td class="p-2.5 font-bold text-white">XXXG</td><td class="p-2.5">82 cm</td><td class="p-2.5">66 cm</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="text-[11px] text-gray-400 text-center mb-4">💡 <em>Modelagem padrão brasileira confortável. Em caso de dúvida, escolha um tamanho maior.</em></p>
+            
+            <button onclick="closeTamanhosModal()" class="w-full bg-brand-accent hover:bg-yellow-400 text-brand-dark font-outfit font-bold py-3 rounded-xl transition-colors">
+                Entendido, escolher tamanho
+            </button>
+        </div>
+    </div>
+
+    <!-- Pop-up de Urgência & Escassez (30s) -->
+    <div id="urgency-popup" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-[99998] hidden">
+        <div class="bg-[#0d0f17] border-2 border-brand-accent/60 w-full max-w-md rounded-3xl p-6 md:p-8 shadow-[0_0_50px_rgba(250,204,21,0.25)] relative text-white text-center">
+            <button onclick="closeUrgencyPopup()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl transition-colors">✕</button>
+
+            <div class="inline-flex items-center space-x-2 bg-red-500/10 border border-red-500/30 px-3.5 py-1.5 rounded-full mb-4">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                <span class="text-red-400 font-bold text-xs uppercase tracking-wider">⚠️ ALERTA DE ESTOQUE BAIXO</span>
+            </div>
+
+            <h3 class="font-outfit text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
+                Restam apenas <span class="text-brand-accent">7 unidades</span> com Frete Grátis!
+            </h3>
+
+            <p class="text-xs md:text-sm text-gray-300 mb-5 leading-relaxed">
+                A alta procura pelas manifestações está esgotando os últimos kits deste lote promocional de <strong>R$ 89,90</strong>.
+            </p>
+
+            <!-- Barra de Progresso do Estoque -->
+            <div class="bg-brand-dark p-3 rounded-2xl border border-white/10 mb-6">
+                <div class="flex justify-between text-xs font-semibold mb-1.5">
+                    <span class="text-gray-400">Status do Lote 2026:</span>
+                    <span class="text-brand-accent font-bold">89% Vendido</span>
+                </div>
+                <div class="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-gradient-to-r from-brand-green via-yellow-400 to-brand-accent h-full rounded-full w-[89%]"></div>
+                </div>
+            </div>
+
+            <!-- Botão de Ação -->
+            <button onclick="triggerUrgencyBuy()" class="w-full bg-brand-accent hover:bg-yellow-400 text-brand-dark font-outfit font-black text-base md:text-lg py-4 rounded-xl shadow-xl shadow-brand-accent/20 transition-all active:scale-[0.98] uppercase tracking-wider mb-3">
+                GARANTIR MINHA UNIDADE AGORA ➔
+            </button>
+
+            <button onclick="closeUrgencyPopup()" class="text-xs text-gray-500 hover:text-gray-400 transition-colors">
+                Continuar navegando e arriscar ficar sem
+            </button>
+        </div>
+    </div>
+
     <script data-cfasync="false" src="js/email-decode.min.js"></script>
     <script>
         let currentTransactionId = null;
         let pixCheckInterval = null;
         let selectedShipping = 'free'; // 'free' (R$ 89,90) ou 'express' (R$ 99,89)
+
+        // Funções de FAQ
+        function toggleFaq(id) {
+            const answer = document.getElementById(`faq-answer-${id}`);
+            const icon = document.getElementById(`faq-icon-${id}`);
+            if (answer.classList.contains('hidden')) {
+                answer.classList.remove('hidden');
+                icon.textContent = '✕';
+                icon.classList.add('rotate-90');
+            } else {
+                answer.classList.add('hidden');
+                icon.textContent = '＋';
+                icon.classList.remove('rotate-90');
+            }
+        }
+
+        // Funções da Tabela de Medidas
+        function openTamanhosModal() {
+            document.getElementById('tamanhos-modal').classList.remove('hidden');
+        }
+
+        function closeTamanhosModal() {
+            document.getElementById('tamanhos-modal').classList.add('hidden');
+        }
+
+        // Funções do Pop-up de Urgência (30s)
+        function openUrgencyPopup() {
+            const popup = document.getElementById('urgency-popup');
+            const pixModal = document.getElementById('pix-checkout-modal');
+            const alreadySeen = sessionStorage.getItem('urgency_popup_seen');
+
+            // Não abre se o checkout estiver aberto ou se já tiver fechado o popup
+            if (popup && (!pixModal || pixModal.classList.contains('hidden')) && !alreadySeen) {
+                popup.classList.remove('hidden');
+            }
+        }
+
+        function closeUrgencyPopup() {
+            document.getElementById('urgency-popup').classList.add('hidden');
+            sessionStorage.setItem('urgency_popup_seen', 'true');
+        }
+
+        function triggerUrgencyBuy() {
+            closeUrgencyPopup();
+            document.getElementById('comprar-btn').click();
+        }
+
+        // Dispara o pop-up de urgência após 30 segundos
+        setTimeout(() => {
+            openUrgencyPopup();
+        }, 30000);
+
+        // Exit-intent no desktop (quando o mouse sai pela barra superior)
+        document.addEventListener('mouseleave', (e) => {
+            if (e.clientY <= 10) {
+                openUrgencyPopup();
+            }
+        });
 
         // 1. Alternância Dinâmica de Frete
         function handleShippingChange(type) {
