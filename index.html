@@ -1161,6 +1161,7 @@
             const modal = document.getElementById('pix-checkout-modal');
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
+            if (typeof pingPresenca === 'function') pingPresenca('No Checkout PIX');
         });
 
         document.getElementById('tamanho').addEventListener('change', function() {
@@ -1174,6 +1175,7 @@
             modal.classList.add('hidden');
             modal.style.display = 'none';
             if (pixCheckInterval) clearInterval(pixCheckInterval);
+            if (typeof pingPresenca === 'function') pingPresenca('Visualizando Página');
         }
 
         // 6. Submissão do PIX com Validação Estrita & Endereço

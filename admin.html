@@ -64,7 +64,41 @@
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
-            <!-- Cards de Métricas -->
+            <!-- Banner / Card de Tráfego Ao Vivo -->
+            <div class="bg-gradient-to-r from-[#102419] via-[#11141e] to-[#11141e] border border-emerald-500/30 p-5 rounded-2xl mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xl">
+                <div class="flex items-center space-x-3">
+                    <div class="relative flex items-center justify-center">
+                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 animate-ping absolute"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 relative"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-outfit font-black text-xl text-white" id="live-visitantes-count">0</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Visitantes navegando no site agora</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400" id="live-visitantes-subtitle">Aguardando novos cliques do Meta Ads...</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <button onclick="carregarVisitantesAoVivo()" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors flex items-center space-x-1.5">
+                        <span>⚡ Atualizar Ao Vivo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feed de Visitantes Online (Últimos 45s) -->
+            <div id="live-stream-container" class="bg-[#11141e] border border-white/10 rounded-2xl p-4 mb-8 hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-xs font-bold uppercase tracking-wider text-gray-300">👥 Pessoas no seu site em tempo real:</p>
+                    <span class="text-[10px] text-emerald-400 animate-pulse font-medium">● Sincronizado a cada 3s</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="live-stream-list">
+                    <!-- Itens inseridos via JS -->
+                </div>
+            </div>
+
+            <!-- Cards de Métricas de Vendas -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div class="bg-[#11141e] border border-white/5 p-5 rounded-2xl">
                     <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total de Pedidos Gerados</p>
@@ -162,6 +196,56 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
             carregarPedidos();
+            carregarVisitantesAoVivo();
+            setInterval(carregarVisitantesAoVivo, 4000);
+            setInterval(carregarPedidos, 15000);
+        }
+
+        async function carregarVisitantesAoVivo() {
+            try {
+                const res = await fetch('/api/visitantes');
+                if (res.ok) {
+                    const data = await res.json();
+                    const total = data.total_online || 0;
+                    const visitantes = data.visitantes || [];
+
+                    const counter = document.getElementById('live-visitantes-count');
+                    if (counter) counter.textContent = total;
+
+                    const subtitle = document.getElementById('live-visitantes-subtitle');
+                    const container = document.getElementById('live-stream-container');
+                    const list = document.getElementById('live-stream-list');
+
+                    if (total > 0 && container && list) {
+                        subtitle.textContent = `${total} pessoa(s) conectada(s) agora no site`;
+                        container.classList.remove('hidden');
+                        list.innerHTML = '';
+
+                        visitantes.forEach(v => {
+                            const card = document.createElement('div');
+                            card.className = "bg-[#181c2a] border border-white/5 p-3 rounded-xl flex flex-col justify-between text-xs";
+                            card.innerHTML = `
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="font-bold text-white flex items-center space-x-1">
+                                        <span>📍 ${v.cidade || 'Brasil'} / ${v.estado || 'BR'}</span>
+                                    </span>
+                                    <span class="text-[10px] text-gray-400 font-mono">${v.dispositivo || '📱 Celular'}</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${v.etapa === 'No Checkout PIX' ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' : 'bg-emerald-500/20 text-emerald-400'}">
+                                        ${v.etapa || 'Visualizando'}
+                                    </span>
+                                    <span class="text-[10px] text-gray-500">ativo há ${v.tempo_online_segundos || 5}s</span>
+                                </div>
+                            `;
+                            list.appendChild(card);
+                        });
+                    } else if (container && subtitle) {
+                        subtitle.textContent = "Aguardando novos cliques do Meta Ads...";
+                        container.classList.add('hidden');
+                    }
+                }
+            } catch(e) {}
         }
 
         async function carregarPedidos() {
