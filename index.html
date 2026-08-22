@@ -449,56 +449,159 @@
         </div>
     </footer>
     
-    <!-- Pop-up de Checkout PIX Transparente -->
-    <div id="pix-checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-[99999] hidden overflow-y-auto">
-        <div class="bg-[#0c0d14] border border-brand-green/30 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative text-white my-8">
-            <button onclick="closePixModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors">✕</button>
+    <!-- Pop-up de Checkout PIX Transparente com Endereço & Frete Express -->
+    <div id="pix-checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 md:p-4 z-[99999] hidden overflow-y-auto">
+        <div class="bg-[#0b0d14] border border-brand-green/30 w-full max-w-xl rounded-3xl p-5 md:p-8 shadow-2xl relative text-white my-6 max-h-[92vh] overflow-y-auto">
+            <button onclick="closePixModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors z-20">✕</button>
 
-            <!-- Passo 1: Formulário do Cliente -->
+            <!-- Passo 1: Formulário do Cliente & Endereço -->
             <div id="pix-step-form">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-brand-green/20 flex items-center justify-center text-brand-green text-xl font-bold">⚡</div>
+                <div class="flex items-center space-x-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-brand-green/20 flex items-center justify-center text-brand-green text-xl font-bold flex-shrink-0">⚡</div>
                     <div>
-                        <h3 class="font-outfit text-xl md:text-2xl font-bold text-white">Pagamento Rápido via PIX</h3>
-                        <p class="text-xs text-gray-400">Liberação imediata + Frete Grátis Prioritário</p>
+                        <h3 class="font-outfit text-xl md:text-2xl font-bold text-white leading-tight">Finalizar Pedido via PIX</h3>
+                        <p class="text-xs text-gray-400">Preencha seus dados para envio imediato</p>
                     </div>
                 </div>
 
-                <div class="bg-brand-dark/60 p-4 rounded-2xl border border-brand-border mb-6 flex justify-between items-center">
+                <!-- Resumo do Pedido -->
+                <div class="bg-brand-dark/70 p-4 rounded-2xl border border-brand-border mb-5 flex justify-between items-center shadow-inner">
                     <div>
                         <p class="font-bold text-sm text-white">Kit Patriota Completo 2025</p>
-                        <p class="text-xs text-brand-accent">Tamanho selecionado: <span id="modal-tamanho-display" class="font-bold">M</span></p>
+                        <p class="text-xs text-brand-accent">Tamanho: <span id="modal-tamanho-display" class="font-bold">M</span> • <span id="modal-frete-display" class="text-gray-300">Frete Grátis</span></p>
                     </div>
                     <div class="text-right">
                         <span class="text-xs text-gray-400 line-through">R$ 159,90</span>
-                        <p class="text-2xl font-outfit font-bold text-brand-green">R$ 89,90</p>
+                        <p class="text-2xl font-outfit font-black text-brand-green" id="modal-total-display">R$ 89,90</p>
                     </div>
                 </div>
 
-                <form id="pix-customer-form" onsubmit="handlePixSubmit(event)" class="space-y-4">
+                <form id="pix-customer-form" onsubmit="handlePixSubmit(event)" class="space-y-5">
+                    
+                    <!-- 1. DADOS PESSOAIS -->
                     <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo</label>
-                        <input type="text" id="pix-name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">1. Dados Pessoais</span>
+                            <div class="h-[1px] flex-1 bg-brand-border"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo *</label>
+                                <input type="text" id="pix-name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 mb-1">CPF (apenas números) *</label>
+                                    <input type="text" id="pix-cpf" required placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <p id="cpf-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ CPF inválido. Digite um CPF válido.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Celular *</label>
+                                    <input type="tel" id="pix-phone" required placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail para rastreamento *</label>
+                                <input type="email" id="pix-email" required placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">CPF (apenas números)</label>
-                            <input type="text" id="pix-cpf" required placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Celular</label>
-                            <input type="tel" id="pix-phone" required placeholder="(11) 99999-9999" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
-                        </div>
-                    </div>
-
+                    <!-- 2. ENDEREÇO DE ENTREGA (DROPSHIPPING) -->
                     <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail para rastreio</label>
-                        <input type="email" id="pix-email" required placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">2. Endereço de Entrega</span>
+                            <div class="h-[1px] flex-1 bg-brand-border"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">CEP * <span class="text-[11px] text-brand-accent font-normal">(Busca automática em tempo real)</span></label>
+                                <div class="relative">
+                                    <input type="text" id="pix-cep" required placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <div id="cep-loading" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
+                                        <div class="w-4 h-4 border-2 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
+                                    </div>
+                                </div>
+                                <p id="cep-feedback" class="text-[11px] mt-1 hidden"></p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Rua / Logradouro *</label>
+                                <input type="text" id="pix-street" required placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 mb-1">Número *</label>
+                                    <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 mb-1">Complemento <span class="text-gray-500 font-normal">(Opcional)</span></label>
+                                    <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 mb-1">Bairro *</label>
+                                    <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="col-span-2">
+                                        <label class="block text-xs font-semibold text-gray-300 mb-1">Cidade *</label>
+                                        <input type="text" id="pix-city" required placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-300 mb-1">UF *</label>
+                                        <input type="text" id="pix-state" required placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <button type="submit" id="btn-gerar-pix" class="w-full bg-brand-green hover:bg-emerald-400 text-brand-dark font-outfit font-bold text-lg py-4 rounded-xl shadow-lg shadow-brand-green/20 transition-all flex items-center justify-center space-x-2 mt-4">
-                        <span>GERAR PIX DE R$ 89,90</span>
+                    <!-- 3. OPÇÕES DE FRETE -->
+                    <div>
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">3. Opções de Envio</span>
+                            <div class="h-[1px] flex-1 bg-brand-border"></div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            
+                            <!-- Opção 1: Frete Grátis -->
+                            <label class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300" id="label-shipping-free">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="shipping_type" value="free" checked onchange="handleShippingChange('free')" class="w-4 h-4 text-brand-green focus:ring-0 cursor-pointer">
+                                    <div>
+                                        <p class="font-bold text-sm text-white">Frete Grátis</p>
+                                        <p class="text-xs text-gray-400">Entrega em até 7 dias úteis</p>
+                                    </div>
+                                </div>
+                                <span class="font-bold text-xs text-brand-green bg-brand-green/20 px-2.5 py-1 rounded-lg">GRÁTIS</span>
+                            </label>
+
+                            <!-- Opção 2: Frete Full Express -->
+                            <label class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300" id="label-shipping-express">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="shipping_type" value="express" onchange="handleShippingChange('express')" class="w-4 h-4 text-brand-accent focus:ring-0 cursor-pointer">
+                                    <div>
+                                        <div class="flex items-center space-x-1.5">
+                                            <p class="font-bold text-sm text-white">Full Express ⚡</p>
+                                        </div>
+                                        <p class="text-xs text-brand-accent font-medium">Entrega em 3 dias úteis</p>
+                                    </div>
+                                </div>
+                                <span class="font-bold text-xs text-brand-accent bg-brand-accent/20 px-2.5 py-1 rounded-lg">+ R$ 9,99</span>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- Botão de Ação -->
+                    <button type="submit" id="btn-gerar-pix" class="w-full bg-brand-green hover:bg-emerald-400 text-brand-dark font-outfit font-black text-lg py-4 rounded-2xl shadow-xl shadow-brand-green/20 transition-all flex items-center justify-center space-x-2 mt-4 active:scale-[0.98]">
+                        <span id="btn-text">GERAR PIX DE R$ 89,90</span>
                         <span>➔</span>
                     </button>
                 </form>
@@ -545,11 +648,11 @@
                 <div class="bg-brand-dark/80 border border-brand-border rounded-2xl p-6 mb-6 text-left text-sm space-y-3">
                     <div class="flex justify-between border-b border-brand-border pb-2">
                         <span class="text-gray-400">Valor Pago:</span>
-                        <span class="font-bold text-white">R$ 89,90</span>
+                        <span class="font-bold text-white" id="success-valor-pago">R$ 89,90</span>
                     </div>
                     <div class="flex justify-between border-b border-brand-border pb-2">
-                        <span class="text-gray-400">Envio:</span>
-                        <span class="font-bold text-brand-green">Frete Grátis Prioritário (24h)</span>
+                        <span class="text-gray-400">Modalidade de Envio:</span>
+                        <span class="font-bold text-brand-green" id="success-envio-tipo">Frete Grátis (7 dias úteis)</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-400">Rastreamento:</span>
@@ -569,8 +672,143 @@
     <script>
         let currentTransactionId = null;
         let pixCheckInterval = null;
+        let selectedShipping = 'free'; // 'free' (R$ 89,90) ou 'express' (R$ 99,89)
 
-        // Abrir Modal do PIX ao clicar em comprar
+        // 1. Alternância Dinâmica de Frete
+        function handleShippingChange(type) {
+            selectedShipping = type;
+            const labelFree = document.getElementById('label-shipping-free');
+            const labelExpress = document.getElementById('label-shipping-express');
+            const totalDisplay = document.getElementById('modal-total-display');
+            const freteDisplay = document.getElementById('modal-frete-display');
+            const btnText = document.getElementById('btn-text');
+
+            if (type === 'express') {
+                labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-accent bg-brand-accent/10 cursor-pointer transition-all duration-300 shadow-lg";
+                labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-green/50 cursor-pointer transition-all duration-300";
+                
+                totalDisplay.textContent = "R$ 99,89";
+                freteDisplay.textContent = "Full Express (3 dias)";
+                btnText.textContent = "GERAR PIX DE R$ 99,89";
+            } else {
+                labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300 shadow-lg";
+                labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300";
+                
+                totalDisplay.textContent = "R$ 89,90";
+                freteDisplay.textContent = "Frete Grátis (7 dias)";
+                btnText.textContent = "GERAR PIX DE R$ 89,90";
+            }
+        }
+
+        // 2. Validador Oficial de CPF (Algoritmo Módulo 11)
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            
+            let soma = 0, resto;
+            for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+            
+            soma = 0;
+            for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+            
+            return true;
+        }
+
+        // 3. Máscaras de Digitação
+        const cpfInput = document.getElementById('pix-cpf');
+        cpfInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '').substring(0, 11);
+            if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
+            e.target.value = v;
+
+            const cpfErro = document.getElementById('cpf-erro');
+            if (v.replace(/\D/g, '').length === 11) {
+                if (!validarCPF(v)) {
+                    cpfErro.classList.remove('hidden');
+                    cpfInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                } else {
+                    cpfErro.classList.add('hidden');
+                    cpfInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+                }
+            } else {
+                cpfErro.classList.add('hidden');
+                cpfInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+            }
+        });
+
+        const phoneInput = document.getElementById('pix-phone');
+        phoneInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '').substring(0, 11);
+            if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+            else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})$/, '($1) $2');
+            e.target.value = v;
+        });
+
+        const cepInput = document.getElementById('pix-cep');
+        cepInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '').substring(0, 8);
+            if (v.length > 5) v = v.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
+            e.target.value = v;
+
+            const cleanCep = v.replace(/\D/g, '');
+            if (cleanCep.length === 8) {
+                buscarCEP(cleanCep);
+            }
+        });
+
+        // 4. Busca de CEP em Tempo Real (ViaCEP com Fallback BrasilAPI)
+        async function buscarCEP(cleanCep) {
+            const loading = document.getElementById('cep-loading');
+            const feedback = document.getElementById('cep-feedback');
+            
+            loading.classList.remove('hidden');
+            feedback.textContent = "Buscando localização...";
+            feedback.className = "text-[11px] text-brand-accent mt-1";
+            feedback.classList.remove('hidden');
+
+            try {
+                let res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+                let data = await res.json();
+                
+                if (data && data.erro) {
+                    // Fallback para BrasilAPI
+                    res = await fetch(`https://brasilapi.com.br/api/cep/v1/${cleanCep}`);
+                    data = await res.json();
+                }
+
+                loading.classList.add('hidden');
+
+                if (data && !data.erro && (data.logradouro || data.street || data.localidade || data.city)) {
+                    document.getElementById('pix-street').value = data.logradouro || data.street || '';
+                    document.getElementById('pix-neighborhood').value = data.bairro || data.neighborhood || '';
+                    document.getElementById('pix-city').value = data.localidade || data.city || '';
+                    document.getElementById('pix-state').value = data.uf || data.state || '';
+                    
+                    feedback.textContent = `✓ Endereço localizado: ${data.localidade || data.city} / ${data.uf || data.state}`;
+                    feedback.className = "text-[11px] text-brand-green font-medium mt-1";
+                    
+                    document.getElementById('pix-number').focus();
+                } else {
+                    feedback.textContent = "⚠️ CEP não localizado automaticamente. Por favor, preencha a rua e cidade.";
+                    feedback.className = "text-[11px] text-yellow-400 mt-1";
+                }
+            } catch (err) {
+                loading.classList.add('hidden');
+                feedback.textContent = "Por favor, complete seu endereço nos campos abaixo.";
+                feedback.className = "text-[11px] text-gray-400 mt-1";
+            }
+        }
+
+        // 5. Abertura do Modal
         document.getElementById('comprar-btn').addEventListener('click', function(e) {
             e.preventDefault();
             const tamanhoSelect = document.getElementById('tamanho');
@@ -596,19 +834,17 @@
                     fbq('track', 'InitiateCheckout', {
                         content_name: 'Kit Patriota 2025',
                         content_category: 'Kit Completo',
-                        value: 89.90,
+                        value: selectedShipping === 'express' ? 99.89 : 89.90,
                         currency: 'BRL'
                     });
                 } catch(e){}
             }
             
-            // Abre o checkout transparente
             const modal = document.getElementById('pix-checkout-modal');
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
         });
 
-        // Remove o aviso de erro quando o usuário escolhe um tamanho
         document.getElementById('tamanho').addEventListener('change', function() {
             this.classList.remove('ring-4', 'ring-brand-accent', 'border-brand-accent');
             const tamanhoErro = document.getElementById('tamanho-erro');
@@ -619,29 +855,52 @@
             const modal = document.getElementById('pix-checkout-modal');
             modal.classList.add('hidden');
             modal.style.display = 'none';
-            if (pixCheckInterval) {
-                clearInterval(pixCheckInterval);
-            }
+            if (pixCheckInterval) clearInterval(pixCheckInterval);
         }
 
         const DUTTYFY_DIRECT_URL = "https://www.links-pagamentos.online/api-pix/Akc4K4Bs4Q9sBfbGv3Kuh-9i39GvsmiE2IjP1IuCrdIlrDHCdCHF3UQ7zMlW-QmQa7KAfnDqL6QDvKX0kG2AHg";
         const DUTTYFY_KEY = "b8ae99391cf645b2af25b66eef4b99d3";
 
-        // Submissão do PIX via Backend Seguro gerar-pix.php / Direto
+        // 6. Submissão do PIX com Validação Estrita & Endereço
         async function handlePixSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-gerar-pix');
+            
+            const cpfRaw = document.getElementById('pix-cpf').value;
+            const cpf = cpfRaw.replace(/\D/g, '');
+            
+            // Validação estrita de CPF
+            if (!validarCPF(cpf)) {
+                document.getElementById('cpf-erro').classList.remove('hidden');
+                document.getElementById('pix-cpf').focus();
+                document.getElementById('pix-cpf').classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = `<span class="animate-pulse">Gerando PIX com a Duttyfy...</span>`;
 
             const name = document.getElementById('pix-name').value || 'Cliente Patriota';
-            let cpf = document.getElementById('pix-cpf').value.replace(/\D/g, '');
-            if (cpf.length !== 11) cpf = '12345678909';
             const phone = document.getElementById('pix-phone').value.replace(/\D/g, '') || '11999999999';
             const email = document.getElementById('pix-email').value || 'cliente@patriotas.com.br';
             const size = document.getElementById('tamanho') ? document.getElementById('tamanho').value : 'M';
 
-            // Payload oficial testado e aprovado pela Duttyfy
+            // Dados de Endereço
+            const address = {
+                cep: document.getElementById('pix-cep').value.replace(/\D/g, ''),
+                street: document.getElementById('pix-street').value,
+                number: document.getElementById('pix-number').value,
+                complement: document.getElementById('pix-complement').value,
+                neighborhood: document.getElementById('pix-neighborhood').value,
+                city: document.getElementById('pix-city').value,
+                state: document.getElementById('pix-state').value
+            };
+
+            const isExpress = (selectedShipping === 'express');
+            const totalAmountCents = isExpress ? 9989 : 8990;
+            const totalAmountFormatted = isExpress ? 99.89 : 89.90;
+            const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
+
             const payload = {
                 paymentMethod: 'PIX',
                 customer: {
@@ -651,11 +910,17 @@
                     phone: phone
                 },
                 item: {
-                    title: `Kit Patriota 2025 - Tam ${size}`,
-                    price: 8990,
+                    title: `Kit Patriota 2025 (Tam ${size}) - ${shippingLabel}`,
+                    price: totalAmountCents,
                     quantity: 1
                 },
-                amount: 8990
+                amount: totalAmountCents,
+                address: address,
+                shipping: {
+                    type: selectedShipping,
+                    label: shippingLabel,
+                    amount: isExpress ? 9.99 : 0.00
+                }
             };
 
             function exibirPix(pixCode, qrcodeUrl, txId) {
@@ -666,22 +931,25 @@
                 document.getElementById('pix-qrcode-img').src = qrcodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixCode)}`;
                 document.getElementById('pix-copia-cola').value = pixCode;
 
+                document.getElementById('success-valor-pago').textContent = `R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}`;
+                document.getElementById('success-envio-tipo').textContent = shippingLabel;
+
                 // Dispara evento AddPaymentInfo no Pixel
                 if (typeof fbq === 'function') {
                     try {
                         fbq('track', 'AddPaymentInfo', {
-                            value: 89.90,
+                            value: totalAmountFormatted,
                             currency: 'BRL'
                         });
                     } catch(e){}
                 }
 
                 // Inicia verificação automática de pagamento
-                startPixPolling(currentTransactionId);
+                startPixPolling(currentTransactionId, totalAmountFormatted);
             }
 
             try {
-                // Tenta primeiro via backend PHP
+                // 1. Tenta backend PHP gerar-pix.php
                 const response = await fetch('gerar-pix.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -689,7 +957,6 @@
                 });
 
                 const data = await response.json();
-                
                 if (data && (data.pix_code || data.pixCode || data.qrcode_url)) {
                     exibirPix(data.pix_code || data.pixCode, data.qrcode_url, data.transaction_id || data.transactionId);
                     return;
@@ -699,34 +966,48 @@
             }
 
             try {
-                // Chamada direta para o endpoint da Duttyfy
+                // 2. Chamada direta para o endpoint da Duttyfy (Fallback para testes locais/Vercel)
                 const resDirect = await fetch(DUTTYFY_DIRECT_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${DUTTYFY_KEY}`
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        paymentMethod: 'PIX',
+                        customer: {
+                            name: name,
+                            document: cpf,
+                            email: email,
+                            phone: phone
+                        },
+                        item: {
+                            title: `Kit Patriota 2025 (Tam ${size}) - ${shippingLabel}`,
+                            price: totalAmountCents,
+                            quantity: 1
+                        },
+                        amount: totalAmountCents
+                    })
                 });
 
                 const directData = await resDirect.json();
                 if (directData && (directData.pixCode || directData.pix_code)) {
                     exibirPix(directData.pixCode || directData.pix_code, null, directData.transactionId);
                 } else {
-                    alert("Atenção: Não foi possível processar com a adquirente. Verifique os dados e tente novamente.");
+                    alert("Atenção: Não foi possível processar a cobrança PIX. Verifique os dados e tente novamente.");
                     btn.disabled = false;
-                    btn.innerHTML = `<span>GERAR PIX DE R$ 89,90</span> <span>➔</span>`;
+                    btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
                 }
             } catch (directErr) {
                 console.error("Erro na API Duttyfy:", directErr);
                 alert("Erro de conexão ao gerar o Pix. Verifique sua conexão e tente novamente.");
                 btn.disabled = false;
-                btn.innerHTML = `<span>GERAR PIX DE R$ 89,90</span> <span>➔</span>`;
+                btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
             }
         }
 
-        // Monitoramento do pagamento em tempo real
-        function startPixPolling(txId) {
+        // 7. Monitoramento do Pagamento em Tempo Real
+        function startPixPolling(txId, amount) {
             if (!txId) return;
             if (pixCheckInterval) clearInterval(pixCheckInterval);
 
@@ -738,14 +1019,12 @@
                     if (result.status === 'paid' || result.status === 'approved') {
                         clearInterval(pixCheckInterval);
 
-                        // Esconde QR Code e mostra tela de sucesso
                         document.getElementById('pix-step-qrcode').classList.add('hidden');
                         document.getElementById('pix-step-success').classList.remove('hidden');
 
-                        // Dispara evento de Purchase no Meta Ads
                         if (typeof fbq === 'function') {
                             fbq('track', 'Purchase', {
-                                value: 89.90,
+                                value: amount || 89.90,
                                 currency: 'BRL',
                                 content_name: 'Kit Patriota 2025'
                             });
@@ -771,7 +1050,7 @@
             }, 3000);
         }
 
-        // Animações suaves ao scroll (IntersectionObserver leve)
+        // 8. Animações Suaves ao Scroll
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'

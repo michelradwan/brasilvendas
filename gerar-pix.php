@@ -26,18 +26,34 @@ if (!$inputData) {
     $inputData = $_POST;
 }
 
-$name = isset($inputData['customer']['name']) ? trim($inputData['customer']['name']) : (isset($inputData['name']) ? trim($inputData['name']) : 'Cliente Patriota');
-$cpf = isset($inputData['customer']['cpf']) ? preg_replace('/\D/', '', $inputData['customer']['cpf']) : (isset($inputData['cpf']) ? preg_replace('/\D/', '', $inputData['cpf']) : '');
-$phone = isset($inputData['customer']['phone']) ? preg_replace('/\D/', '', $inputData['customer']['phone']) : (isset($inputData['phone']) ? preg_replace('/\D/', '', $inputData['phone']) : '11999999999');
-$email = isset($inputData['customer']['email']) ? trim($inputData['customer']['email']) : (isset($inputData['email']) ? trim($inputData['email']) : 'cliente@patriotas.com.br');
+// Dados do Cliente
+$name = isset($inputData['customer']['name']) ? trim($inputData['customer']['name']) : 'Cliente Patriota';
+$cpf = isset($inputData['customer']['document']) ? preg_replace('/\D/', '', $inputData['customer']['document']) : '';
+if (empty($cpf) && isset($inputData['customer']['cpf'])) {
+    $cpf = preg_replace('/\D/', '', $inputData['customer']['cpf']);
+}
+$phone = isset($inputData['customer']['phone']) ? preg_replace('/\D/', '', $inputData['customer']['phone']) : '11999999999';
+$email = isset($inputData['customer']['email']) ? trim($inputData['customer']['email']) : 'cliente@patriotas.com.br';
 $size = isset($inputData['size']) ? trim($inputData['size']) : 'M';
 
-// Garantir CPF válido caso venha vazio
-if (strlen($cpf) !== 11) {
-    $cpf = '12345678909';
-}
+// Dados de Entrega / Dropshipping
+$address = isset($inputData['address']) ? $inputData['address'] : [];
+$cep = isset($address['cep']) ? preg_replace('/\D/', '', $address['cep']) : '';
+$street = isset($address['street']) ? trim($address['street']) : '';
+$number = isset($address['number']) ? trim($address['number']) : 'S/N';
+$complement = isset($address['complement']) ? trim($address['complement']) : '';
+$neighborhood = isset($address['neighborhood']) ? trim($address['neighborhood']) : '';
+$city = isset($address['city']) ? trim($address['city']) : '';
+$state = isset($address['state']) ? strtoupper(trim($address['state'])) : '';
 
-$amountInCents = 8990; // R$ 89,90 em centavos
+// Frete e Cálculo de Valores
+$shippingType = isset($inputData['shipping']['type']) ? $inputData['shipping']['type'] : 'free';
+$isExpress = ($shippingType === 'express');
+
+// 8990 centavos (R$ 89,90) ou 9989 centavos (R$ 99,89)
+$amountInCents = $isExpress ? 9989 : 8990;
+$amountFormatted = $isExpress ? 99.89 : 89.90;
+$shippingLabel = $isExpress ? 'Frete Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
 // Montar payload exato exigido pela API Duttyfy
 $payload = [
@@ -49,7 +65,7 @@ $payload = [
         'phone' => $phone
     ],
     'item' => [
-        'title' => 'Kit Patriota 2025 - Tam ' . $size,
+        'title' => 'Kit Patriota 2025 (Tam ' . $size . ') - ' . $shippingLabel,
         'price' => $amountInCents,
         'quantity' => 1
     ],
@@ -77,9 +93,9 @@ curl_close($ch);
 
 $data = json_decode($response, true);
 
-if ($data && isset($data['pixCode'])) {
-    $pixCode = $data['pixCode'];
-    $transactionId = $data['transactionId'];
+if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
+    $pixCode = isset($data['pixCode']) ? $data['pixCode'] : $data['pix_code'];
+    $transactionId = isset($data['transactionId']) ? $data['transactionId'] : (isset($data['transaction_id']) ? $data['transaction_id'] : 'tx_' . uniqid());
     $qrcodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($pixCode);
 
     echo json_encode([
@@ -87,7 +103,12 @@ if ($data && isset($data['pixCode'])) {
         'transaction_id' => $transactionId,
         'pix_code' => $pixCode,
         'qrcode_url' => $qrcodeUrl,
-        'amount' => 89.90,
+        'amount' => $amountFormatted,
+        'shipping' => [
+            'type' => $shippingType,
+            'label' => $shippingLabel,
+            'amount' => $isExpress ? 9.99 : 0.00
+        ],
         'status' => 'PENDING',
         'raw' => $data
     ]);
