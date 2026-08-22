@@ -2,7 +2,7 @@
 session_start();
 
 // SENHA DE ACESSO AO PAINEL (Altere aqui se desejar)
-define('ADMIN_PASSWORD', 'patriota2025');
+define('ADMIN_PASSWORD', 'patriota2026');
 
 // Processar Logout
 if (isset($_GET['logout'])) {
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
     }
 }
 
-// Suporte a acesso direto via token de URL (ex: admin-pedidos.php?token=patriota2025)
+// Suporte a acesso direto via token de URL (ex: admin-pedidos.php?token=patriota2026)
 if (isset($_GET['token']) && $_GET['token'] === ADMIN_PASSWORD) {
     $_SESSION['admin_logged'] = true;
 }

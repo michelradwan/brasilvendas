@@ -65,7 +65,7 @@ $payload = [
         'phone' => $phone
     ],
     'item' => [
-        'title' => 'Kit Patriota 2025 (Tam ' . $size . ') - ' . $shippingLabel,
+        'title' => 'Kit Patriota 2026 (Tam ' . $size . ') - ' . $shippingLabel,
         'price' => $amountInCents,
         'quantity' => 1
     ],

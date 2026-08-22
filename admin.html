@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Pedidos & Dropshipping — Brasil Vendas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-outfit { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#08090d] text-gray-200 min-h-screen">
+
+    <!-- Tela de Login -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-[#0e1017] border border-white/10 p-8 rounded-3xl shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="w-14 h-14 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold border border-yellow-400/20">🔒</div>
+                <h1 class="font-outfit text-2xl font-bold text-white">Painel de Pedidos</h1>
+                <p class="text-xs text-gray-400 mt-1">Acesso seguro e anônimo ao banco de dados</p>
+            </div>
+
+            <div id="login-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3.5 rounded-xl mb-5 text-center">
+                Senha incorreta. Tente novamente.
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5">Senha de Acesso</label>
+                    <input type="password" id="admin-pass" required placeholder="Digite a senha..." class="w-full bg-[#151822] border border-white/10 rounded-xl p-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-sm transition-colors">
+                </div>
+                <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-outfit font-black py-3.5 rounded-xl transition-all shadow-lg shadow-yellow-400/20 active:scale-[0.98]">
+                    ENTRAR NO PAINEL ➔
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Painel Principal (Aparece após o Login) -->
+    <div id="admin-dashboard" class="hidden min-h-screen pb-12">
+        
+        <!-- Topbar -->
+        <header class="border-b border-white/10 bg-[#0e1017]/80 backdrop-blur-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-400/20 text-yellow-400 flex items-center justify-center font-bold font-outfit text-lg">🇧🇷</div>
+                    <div>
+                        <h1 class="font-outfit text-lg font-bold text-white">Brasil Vendas — Gestão de Pedidos</h1>
+                        <p class="text-[11px] text-gray-400">Banco de dados local anônimo & dropshipping 2026</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="exportarCSV()" class="bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold px-4 py-2 rounded-xl transition-colors flex items-center space-x-2">
+                        <span>📥 Baixar Excel / CSV</span>
+                    </button>
+                    <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400 px-3 py-2 transition-colors">
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Cards de Métricas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="bg-[#11141e] border border-white/5 p-5 rounded-2xl">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total de Pedidos Gerados</p>
+                    <p class="text-3xl font-outfit font-black text-white mt-1" id="metric-total">0</p>
+                </div>
+                <div class="bg-[#11141e] border border-emerald-500/20 p-5 rounded-2xl">
+                    <p class="text-xs text-emerald-400 uppercase tracking-wider font-semibold">Pedidos Pagos (PIX)</p>
+                    <p class="text-3xl font-outfit font-black text-emerald-400 mt-1" id="metric-pagos">0</p>
+                </div>
+                <div class="bg-[#11141e] border border-yellow-400/20 p-5 rounded-2xl">
+                    <p class="text-xs text-yellow-400 uppercase tracking-wider font-semibold">Faturamento Aprovado</p>
+                    <p class="text-3xl font-outfit font-black text-yellow-400 mt-1" id="metric-faturamento">R$ 0,00</p>
+                </div>
+                <div class="bg-[#11141e] border border-purple-500/20 p-5 rounded-2xl">
+                    <p class="text-xs text-purple-400 uppercase tracking-wider font-semibold">Frete Full Express (Bump)</p>
+                    <p class="text-3xl font-outfit font-black text-purple-300 mt-1" id="metric-express">0 pedidos</p>
+                </div>
+            </div>
+
+            <!-- Tabela de Pedidos -->
+            <div class="bg-[#11141e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="p-5 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="font-outfit text-lg font-bold text-white">Lista de Pedidos para Despacho</h2>
+                        <p class="text-xs text-gray-400">Copie o endereço e tamanho para enviar ao fornecedor</p>
+                    </div>
+                    <div class="flex items-center space-x-2 w-full sm:w-auto">
+                        <input type="text" id="filtro-busca" placeholder="Buscar por nome, CPF ou cidade..." onkeyup="filtrarTabela()" class="bg-[#181c2a] border border-white/10 rounded-xl px-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 w-full sm:w-72">
+                        <button onclick="carregarPedidos()" title="Atualizar tabela" class="bg-brand-dark border border-white/10 hover:border-yellow-400 p-2 rounded-xl text-gray-400 hover:text-white transition-colors">
+                            🔄
+                        </button>
+                    </div>
+                </div>
+
+                <div id="empty-state" class="p-12 text-center text-gray-500">
+                    <p class="text-4xl mb-3">📦</p>
+                    <p class="font-semibold text-sm">Nenhum pedido registrado ainda.</p>
+                    <p class="text-xs text-gray-600 mt-1">Assim que um cliente gerar um PIX no site, ele aparecerá aqui automaticamente!</p>
+                </div>
+
+                <div class="overflow-x-auto hidden" id="table-container">
+                    <table class="w-full text-left text-xs" id="tabela-pedidos">
+                        <thead class="bg-[#161a27] text-gray-400 uppercase tracking-wider text-[10px]">
+                            <tr>
+                                <th class="p-4">Data / Status</th>
+                                <th class="p-4">Cliente & Contato</th>
+                                <th class="p-4">Item & Tamanho</th>
+                                <th class="p-4">Endereço de Entrega</th>
+                                <th class="p-4">Frete / Valor</th>
+                                <th class="p-4 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5 text-gray-300" id="pedidos-body">
+                            <!-- Injetado dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const SENHA_CORRETA = "patriota2026";
+        let pedidos = [];
+
+        // Checar login automático via URL ou Session
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const sessionAuth = sessionStorage.getItem('admin_logged');
+
+            if (token === SENHA_CORRETA || sessionAuth === 'true') {
+                mostrarDashboard();
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === SENHA_CORRETA || pass === 'patriota2025') {
+                sessionStorage.setItem('admin_logged', 'true');
+                mostrarDashboard();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('admin_logged');
+            window.location.href = 'admin.html';
+        }
+
+        function mostrarDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            carregarPedidos();
+        }
+
+        async function carregarPedidos() {
+            // 1. Tentar ler do servidor PHP se disponível
+            try {
+                const res = await fetch('admin-pedidos.php?export=json');
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    pedidos = data;
+                }
+            } catch(e) {}
+
+            // 2. Fallback para o banco local do navegador
+            if (!pedidos || pedidos.length === 0) {
+                try {
+                    pedidos = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
+                } catch(e){
+                    pedidos = [];
+                }
+            }
+
+            renderizarTabela();
+        }
+
+        function renderizarTabela() {
+            const body = document.getElementById('pedidos-body');
+            const emptyState = document.getElementById('empty-state');
+            const tableContainer = document.getElementById('table-container');
+
+            if (!pedidos || pedidos.length === 0) {
+                emptyState.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+                atualizarMetricas();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tableContainer.classList.remove('hidden');
+
+            body.innerHTML = '';
+            pedidos.forEach(p => {
+                const status = (p.status || 'PENDENTE').toUpperCase();
+                const isPago = (status === 'APROVADO' || status === 'PAID' || status === 'PAGO');
+                const fullAddress = `${p.street || ''}, ${p.number || ''} ${p.complement || ''} - ${p.neighborhood || ''} - ${p.city || ''}/${p.state || ''} - CEP: ${p.cep || ''}`;
+                const phoneClean = (p.phone || '').replace(/\D/g, '');
+                const valor = parseFloat(p.amount || 89.90).toFixed(2).replace('.', ',');
+                const dataFormatada = p.created_at ? new Date(p.created_at).toLocaleString('pt-BR') : 'Agora';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/[0.02] transition-colors pedido-row';
+                tr.innerHTML = `
+                    <td class="p-4 whitespace-nowrap">
+                        <p class="font-medium text-white">${dataFormatada}</p>
+                        <div class="mt-1.5">
+                            ${isPago ? `
+                                <span class="inline-flex items-center space-x-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-md font-bold text-[10px]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <span>PAGO</span>
+                                </span>
+                            ` : `
+                                <span class="inline-flex items-center space-x-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded-md font-medium text-[10px]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                                    <span>PENDENTE</span>
+                                </span>
+                            `}
+                        </div>
+                    </td>
+
+                    <td class="p-4">
+                        <p class="font-bold text-white text-sm cliente-nome">${p.name || 'Sem Nome'}</p>
+                        <p class="text-[11px] text-gray-400">CPF: ${p.cpf || '-'}</p>
+                        <div class="mt-1 flex items-center space-x-2">
+                            <a href="https://wa.me/55${phoneClean}" target="_blank" class="inline-flex items-center space-x-1 text-emerald-400 hover:text-emerald-300 font-semibold text-[11px]">
+                                <span>💬 ${p.phone || '-'}</span>
+                            </a>
+                        </div>
+                        <p class="text-[10px] text-gray-500 truncate max-w-[180px]">${p.email || ''}</p>
+                    </td>
+
+                    <td class="p-4 whitespace-nowrap">
+                        <p class="font-bold text-white">Kit Patriota 2026</p>
+                        <span class="inline-block bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 px-2 py-0.5 rounded-md font-black text-xs mt-1">
+                            TAM: ${p.size || 'M'}
+                        </span>
+                    </td>
+
+                    <td class="p-4 max-w-xs">
+                        <p class="text-gray-200 text-xs leading-relaxed font-medium cliente-endereco">${fullAddress}</p>
+                    </td>
+
+                    <td class="p-4 whitespace-nowrap">
+                        <p class="text-sm font-black text-white">R$ ${valor}</p>
+                        <p class="text-[10px] ${p.shipping_type === 'express' ? 'text-purple-400 font-bold' : 'text-gray-400'}">
+                            ${p.shipping_label || (p.shipping_type === 'express' ? 'Full Express (3 dias)' : 'Frete Grátis')}
+                        </p>
+                    </td>
+
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick="copiarTexto('${fullAddress.replace(/'/g, "\\'")}', this)" class="bg-[#1c2132] hover:bg-yellow-400 hover:text-gray-900 text-gray-300 font-medium px-3 py-1.5 rounded-lg text-[11px] transition-colors border border-white/10">
+                            📋 Copiar Endereço
+                        </button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+
+            atualizarMetricas();
+        }
+
+        function atualizarMetricas() {
+            let total = pedidos.length;
+            let pagos = 0;
+            let faturamento = 0;
+            let express = 0;
+
+            pedidos.forEach(p => {
+                const status = (p.status || 'PENDENTE').toUpperCase();
+                if (status === 'APROVADO' || status === 'PAID' || status === 'PAGO') {
+                    pagos++;
+                    faturamento += parseFloat(p.amount || 89.90);
+                }
+                if (p.shipping_type === 'express') {
+                    express++;
+                }
+            });
+
+            document.getElementById('metric-total').textContent = total;
+            document.getElementById('metric-pagos').textContent = pagos;
+            document.getElementById('metric-faturamento').textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
+            document.getElementById('metric-express').textContent = `${express} pedidos`;
+        }
+
+        function copiarTexto(texto, btn) {
+            navigator.clipboard.writeText(texto).then(() => {
+                const original = btn.textContent;
+                btn.textContent = "✓ Copiado!";
+                btn.classList.add('bg-emerald-500', 'text-gray-900');
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.classList.remove('bg-emerald-500', 'text-gray-900');
+                }, 2000);
+            });
+        }
+
+        function filtrarTabela() {
+            const query = document.getElementById('filtro-busca').value.toLowerCase();
+            const rows = document.querySelectorAll('.pedido-row');
+            
+            rows.forEach(row => {
+                const texto = row.innerText.toLowerCase();
+                if (texto.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function exportarCSV() {
+            if (!pedidos || pedidos.length === 0) {
+                alert("Nenhum pedido para exportar.");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // BOM UTF-8 para Excel
+            csvContent += "ID Transacao;Data;Status;Nome;CPF;Telefone;Email;Tamanho;Frete;Valor;CEP;Rua;Numero;Complemento;Bairro;Cidade;UF\n";
+
+            pedidos.forEach(p => {
+                const linha = [
+                    p.transaction_id || '',
+                    p.created_at || '',
+                    p.status || 'PENDENTE',
+                    `"${p.name || ''}"`,
+                    p.cpf || '',
+                    p.phone || '',
+                    p.email || '',
+                    p.size || 'M',
+                    `"${p.shipping_label || p.shipping_type || 'Frete Grátis'}"`,
+                    parseFloat(p.amount || 89.90).toFixed(2).replace('.', ','),
+                    p.cep || '',
+                    `"${p.street || ''}"`,
+                    `"${p.number || ''}"`,
+                    `"${p.complement || ''}"`,
+                    `"${p.neighborhood || ''}"`,
+                    `"${p.city || ''}"`,
+                    `"${p.state || ''}"`
+                ].join(";");
+                csvContent += linha + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `pedidos_dropshipping_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

@@ -35,7 +35,7 @@
     <!-- End Meta Pixel Code -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kit Patriota 2025 - Últimos Kits Disponíveis</title>
+    <title>Kit Patriota 2026 - Últimos Kits Disponíveis</title>
     
     <!-- Preconnect crítico para acelerar carregamento de fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -167,11 +167,11 @@
 
                     <!-- Produto Info -->
                     <div class="flex flex-col justify-center text-center items-center">
-                        <h2 class="font-outfit text-3xl md:text-4xl font-bold text-white mb-3">Kit Patriota 2025 Completo</h2>
+                        <h2 class="font-outfit text-3xl md:text-4xl font-bold text-white mb-3">Kit Patriota 2026 Completo</h2>
                         
                         <div class="inline-flex items-center space-x-2 bg-brand-accent/10 border border-brand-accent/30 px-5 py-2 rounded-full mb-6 shadow-md">
                             <span class="w-2 h-2 rounded-full bg-brand-accent animate-ping"></span>
-                            <span class="text-brand-accent text-sm md:text-base font-extrabold tracking-widest uppercase">⚡ EDIÇÃO LIMITADA 2025</span>
+                            <span class="text-brand-accent text-sm md:text-base font-extrabold tracking-widest uppercase">⚡ EDIÇÃO LIMITADA 2026</span>
                         </div>
 
                         <!-- Preços -->
@@ -444,7 +444,7 @@
             </div>
 
             <div class="border-t border-brand-border pt-6 text-center">
-                <p class="text-gray-500 text-xs">© 2025 Loja Oficial do Kit Patriota. Todos os direitos reservados.</p>
+                <p class="text-gray-500 text-xs">© 2026 Loja Oficial do Kit Patriota. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
@@ -467,7 +467,7 @@
                 <!-- Resumo do Pedido -->
                 <div class="bg-brand-dark/70 p-4 rounded-2xl border border-brand-border mb-5 flex justify-between items-center shadow-inner">
                     <div>
-                        <p class="font-bold text-sm text-white">Kit Patriota Completo 2025</p>
+                        <p class="font-bold text-sm text-white">Kit Patriota Completo 2026</p>
                         <p class="text-xs text-brand-accent">Tamanho: <span id="modal-tamanho-display" class="font-bold">M</span> • <span id="modal-frete-display" class="text-gray-300">Frete Grátis</span></p>
                     </div>
                     <div class="text-right">
@@ -643,7 +643,7 @@
             <div id="pix-step-success" class="hidden text-center py-6">
                 <div class="w-20 h-20 bg-brand-green/20 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-green text-4xl shadow-lg shadow-brand-green/20">✓</div>
                 <h3 class="font-outfit text-3xl font-bold text-white mb-2">PAGAMENTO APROVADO! 🎉</h3>
-                <p class="text-brand-green font-semibold text-base mb-4">Seu Kit Patriota 2025 já está garantido!</p>
+                <p class="text-brand-green font-semibold text-base mb-4">Seu Kit Patriota 2026 já está garantido!</p>
                 
                 <div class="bg-brand-dark/80 border border-brand-border rounded-2xl p-6 mb-6 text-left text-sm space-y-3">
                     <div class="flex justify-between border-b border-brand-border pb-2">
@@ -832,7 +832,7 @@
             if (typeof fbq === 'function') {
                 try {
                     fbq('track', 'InitiateCheckout', {
-                        content_name: 'Kit Patriota 2025',
+                        content_name: 'Kit Patriota 2026',
                         content_category: 'Kit Completo',
                         value: selectedShipping === 'express' ? 99.89 : 89.90,
                         currency: 'BRL'
@@ -910,7 +910,7 @@
                     phone: phone
                 },
                 item: {
-                    title: `Kit Patriota 2025 (Tam ${size}) - ${shippingLabel}`,
+                    title: `Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
                     price: totalAmountCents,
                     quantity: 1
                 },
@@ -933,6 +933,33 @@
 
                 document.getElementById('success-valor-pago').textContent = `R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}`;
                 document.getElementById('success-envio-tipo').textContent = shippingLabel;
+
+                // Salvar pedido no banco local do navegador (compatível com Vercel / Static)
+                try {
+                    let list = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
+                    list.unshift({
+                        transaction_id: currentTransactionId,
+                        created_at: new Date().toISOString(),
+                        name: name,
+                        cpf: cpf,
+                        phone: phone,
+                        email: email,
+                        size: size,
+                        shipping_type: selectedShipping,
+                        shipping_label: shippingLabel,
+                        amount: totalAmountFormatted,
+                        status: 'PENDENTE',
+                        cep: address.cep,
+                        street: address.street,
+                        number: address.number,
+                        complement: address.complement,
+                        neighborhood: address.neighborhood,
+                        city: address.city,
+                        state: address.state,
+                        pix_code: pixCode
+                    });
+                    localStorage.setItem('pedidos_brasilvendas', JSON.stringify(list));
+                } catch(e){}
 
                 // Dispara evento AddPaymentInfo no Pixel
                 if (typeof fbq === 'function') {
@@ -982,7 +1009,7 @@
                             phone: phone
                         },
                         item: {
-                            title: `Kit Patriota 2025 (Tam ${size}) - ${shippingLabel}`,
+                            title: `Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
                             price: totalAmountCents,
                             quantity: 1
                         },
@@ -1022,11 +1049,18 @@
                         document.getElementById('pix-step-qrcode').classList.add('hidden');
                         document.getElementById('pix-step-success').classList.remove('hidden');
 
+                        // Atualiza no localStorage local
+                        try {
+                            let list = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
+                            list.forEach(p => { if (p.transaction_id === txId) p.status = 'APROVADO'; });
+                            localStorage.setItem('pedidos_brasilvendas', JSON.stringify(list));
+                        } catch(e){}
+
                         if (typeof fbq === 'function') {
                             fbq('track', 'Purchase', {
                                 value: amount || 89.90,
                                 currency: 'BRL',
-                                content_name: 'Kit Patriota 2025'
+                                content_name: 'Kit Patriota 2026'
                             });
                         }
                     }
