@@ -58,6 +58,10 @@ $amountInCents = intval(($quantity * 8990) + ($isExpress ? 999 : 0));
 $amountFormatted = ($quantity * 89.90) + ($isExpress ? 9.99 : 0.00);
 $shippingLabel = $isExpress ? 'Frete Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
+// UTMs e Rastreamento para UTMify
+$tracking = isset($inputData['tracking_parameters']) ? $inputData['tracking_parameters'] : [];
+$metadata = isset($inputData['metadata']) ? $inputData['metadata'] : [];
+
 // Montar payload para a Duttyfy
 $payload = [
     'paymentMethod' => 'PIX',
@@ -72,7 +76,9 @@ $payload = [
         'price' => $amountInCents,
         'quantity' => $quantity
     ],
-    'amount' => $amountInCents
+    'amount' => $amountInCents,
+    'tracking_parameters' => $tracking,
+    'metadata' => $metadata
 ];
 
 // Fazer chamada cURL para a API Duttyfy

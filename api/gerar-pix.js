@@ -52,7 +52,9 @@ module.exports = async (req, res) => {
                 price: amountInCents,
                 quantity: quantity
             },
-            amount: amountInCents
+            amount: amountInCents,
+            tracking_parameters: body.tracking_parameters || {},
+            metadata: body.metadata || {}
         });
 
         const parsed = new URL(API_URL);

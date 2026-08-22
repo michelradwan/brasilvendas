@@ -165,25 +165,71 @@
         }
 
         async function carregarPedidos() {
-            // 1. Tentar ler do servidor PHP se disponível
+            let combined = [];
+
+            // 1. Tentar ler da API Serverless Centralizada (/api/pedidos)
             try {
-                const res = await fetch('admin-pedidos.php?export=json');
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    pedidos = data;
+                const resApi = await fetch('/api/pedidos');
+                if (resApi.ok) {
+                    const dataApi = await resApi.json();
+                    if (dataApi && Array.isArray(dataApi.pedidos)) {
+                        combined = combined.concat(dataApi.pedidos);
+                    }
                 }
             } catch(e) {}
 
-            // 2. Fallback para o banco local do navegador
-            if (!pedidos || pedidos.length === 0) {
-                try {
-                    pedidos = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
-                } catch(e){
-                    pedidos = [];
+            // 2. Tentar ler do servidor PHP (admin-pedidos.php)
+            try {
+                const resPhp = await fetch('admin-pedidos.php?export=json');
+                const dataPhp = await resPhp.json();
+                if (Array.isArray(dataPhp)) {
+                    combined = combined.concat(dataPhp);
+                }
+            } catch(e) {}
+
+            // 3. Fallback/Merge com localStorage local
+            try {
+                const local = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
+                if (Array.isArray(local)) {
+                    combined = combined.concat(local);
+                }
+            } catch(e){}
+
+            // Desduplicar pedidos por transaction_id
+            const map = new Map();
+            combined.forEach(p => {
+                const key = p.transaction_id || p.id || (p.name + p.created_at);
+                if (!map.has(key)) {
+                    map.set(key, p);
+                } else {
+                    const existing = map.get(key);
+                    if ((p.status || '').toUpperCase() === 'APROVADO') map.set(key, p);
+                }
+            });
+
+            pedidos = Array.from(map.values());
+            renderizarTabela();
+
+            // 4. Checagem Automática de Status ao Vivo na Duttyfy
+            checarStatusAoVivo();
+        }
+
+        async function checarStatusAoVivo() {
+            for (let p of pedidos) {
+                const status = (p.status || 'PENDENTE').toUpperCase();
+                if (status !== 'APROVADO' && status !== 'PAID' && status !== 'PAGO' && p.transaction_id) {
+                    try {
+                        const res = await fetch(`/api/status-pix?id=${encodeURIComponent(p.transaction_id)}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && (data.status === 'paid' || data.status === 'approved')) {
+                                p.status = 'APROVADO';
+                                renderizarTabela();
+                            }
+                        }
+                    } catch(e){}
                 }
             }
-
-            renderizarTabela();
         }
 
         function renderizarTabela() {

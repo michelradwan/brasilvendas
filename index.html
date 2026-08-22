@@ -827,6 +827,41 @@
 
     <script data-cfasync="false" src="js/email-decode.min.js"></script>
     <script>
+        // ==============================================================================
+        // MOTOR DE CAPTURA DE UTMs & TRACKING (UTMIFY & META ADS)
+        // ==============================================================================
+        function capturarUTMs() {
+            const params = new URLSearchParams(window.location.search);
+            const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'src', 'sck', 'fbclid', 'gclid'];
+            let utms = {};
+
+            try {
+                utms = JSON.parse(sessionStorage.getItem('brasilvendas_utms') || localStorage.getItem('brasilvendas_utms') || '{}');
+            } catch(e) {
+                utms = {};
+            }
+
+            let encontrouNova = false;
+            utmKeys.forEach(key => {
+                const val = params.get(key);
+                if (val) {
+                    utms[key] = val;
+                    encontrouNova = true;
+                }
+            });
+
+            if (encontrouNova || Object.keys(utms).length > 0) {
+                try {
+                    sessionStorage.setItem('brasilvendas_utms', JSON.stringify(utms));
+                    localStorage.setItem('brasilvendas_utms', JSON.stringify(utms));
+                } catch(e) {}
+            }
+
+            return utms;
+        }
+
+        const initialUTMs = capturarUTMs();
+
         let currentTransactionId = null;
         let pixCheckInterval = null;
         let selectedShipping = 'free'; // 'free' (R$ 89,90) ou 'express' (R$ 99,89)
@@ -1176,6 +1211,7 @@
             const totalAmountCents = Math.round((currentQuantity * 8990) + (isExpress ? 999 : 0));
             const totalAmountFormatted = (currentQuantity * 89.90) + (isExpress ? 9.99 : 0);
             const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
+            const utms = capturarUTMs();
 
             const payload = {
                 paymentMethod: 'PIX',
@@ -1198,6 +1234,27 @@
                     type: currentShipping,
                     label: shippingLabel,
                     amount: isExpress ? 9.99 : 0.00
+                },
+                tracking_parameters: {
+                    src: utms.src || utms.utm_source || 'direct',
+                    sck: utms.sck || '',
+                    utm_source: utms.utm_source || 'direct',
+                    utm_medium: utms.utm_medium || '',
+                    utm_campaign: utms.utm_campaign || '',
+                    utm_content: utms.utm_content || '',
+                    utm_term: utms.utm_term || ''
+                },
+                metadata: {
+                    utm_source: utms.utm_source || 'direct',
+                    utm_medium: utms.utm_medium || '',
+                    utm_campaign: utms.utm_campaign || '',
+                    utm_content: utms.utm_content || '',
+                    utm_term: utms.utm_term || '',
+                    src: utms.src || '',
+                    sck: utms.sck || '',
+                    fbclid: utms.fbclid || '',
+                    page_url: window.location.href,
+                    referrer: document.referrer || ''
                 }
             };
 
@@ -1212,31 +1269,44 @@
                 document.getElementById('success-valor-pago').textContent = `R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}`;
                 document.getElementById('success-envio-tipo').textContent = shippingLabel;
 
-                // Salvar pedido no banco local do navegador (compatível com Vercel / Static)
+                const pedidoObj = {
+                    transaction_id: currentTransactionId,
+                    created_at: new Date().toISOString(),
+                    name: name,
+                    cpf: cpf,
+                    phone: phone,
+                    email: email,
+                    size: size,
+                    quantity: currentQuantity,
+                    shipping_type: currentShipping,
+                    shipping_label: shippingLabel,
+                    amount: totalAmountFormatted,
+                    status: 'PENDENTE',
+                    cep: address.cep,
+                    street: address.street,
+                    number: address.number,
+                    complement: address.complement,
+                    neighborhood: address.neighborhood,
+                    city: address.city,
+                    state: address.state,
+                    pix_code: pixCode,
+                    utms: utms
+                };
+
+                // 1. Salvar pedido no localStorage do navegador
                 try {
                     let list = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
-                    list.unshift({
-                        transaction_id: currentTransactionId,
-                        created_at: new Date().toISOString(),
-                        name: name,
-                        cpf: cpf,
-                        phone: phone,
-                        email: email,
-                        size: size,
-                        shipping_type: selectedShipping,
-                        shipping_label: shippingLabel,
-                        amount: totalAmountFormatted,
-                        status: 'PENDENTE',
-                        cep: address.cep,
-                        street: address.street,
-                        number: address.number,
-                        complement: address.complement,
-                        neighborhood: address.neighborhood,
-                        city: address.city,
-                        state: address.state,
-                        pix_code: pixCode
-                    });
+                    list.unshift(pedidoObj);
                     localStorage.setItem('pedidos_brasilvendas', JSON.stringify(list));
+                } catch(e){}
+
+                // 2. Sincronizar com o backend central /api/pedidos (Vercel)
+                try {
+                    fetch('/api/pedidos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(pedidoObj)
+                    }).catch(()=>{});
                 } catch(e){}
 
                 // Dispara evento AddPaymentInfo no Pixel
