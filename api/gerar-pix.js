@@ -27,7 +27,8 @@ module.exports = async (req, res) => {
         const address = body.address || {};
         const shipping = body.shipping || {};
         const size = body.size || 'M';
-        const quantity = Math.max(1, parseInt(body.quantity || (body.item && body.item.quantity) || 1));
+        // Limite de 1 a 10 unidades (mantendo o valor abaixo de 1k)
+        const quantity = Math.min(10, Math.max(1, parseInt(body.quantity || (body.item && body.item.quantity) || 1)));
 
         const name = (customer.name || 'Cliente Patriota').trim();
         const cpf = (customer.document || customer.cpf || '').replace(/\D/g, '');
@@ -39,6 +40,7 @@ module.exports = async (req, res) => {
         const amountFormatted = (quantity * 89.90) + (isExpress ? 9.99 : 0);
         const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
+        // Payload estrito exigido pela API da Duttyfy
         const payload = JSON.stringify({
             paymentMethod: 'PIX',
             customer: {
@@ -52,9 +54,7 @@ module.exports = async (req, res) => {
                 price: amountInCents,
                 quantity: quantity
             },
-            amount: amountInCents,
-            tracking_parameters: body.tracking_parameters || {},
-            metadata: body.metadata || {}
+            amount: amountInCents
         });
 
         const parsed = new URL(API_URL);

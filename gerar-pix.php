@@ -47,7 +47,9 @@ $city = isset($address['city']) ? trim($address['city']) : '';
 $state = isset($address['state']) ? strtoupper(trim($address['state'])) : '';
 
 // Quantidade
-$quantity = isset($inputData['quantity']) ? max(1, intval($inputData['quantity'])) : (isset($inputData['item']['quantity']) ? max(1, intval($inputData['item']['quantity'])) : 1);
+// Limite de 1 a 10 unidades (mantendo valor abaixo de 1k)
+$rawQtd = isset($inputData['quantity']) ? intval($inputData['quantity']) : (isset($inputData['item']['quantity']) ? intval($inputData['item']['quantity']) : 1);
+$quantity = min(10, max(1, $rawQtd));
 
 // Frete e Cálculo de Valores
 $shippingType = isset($inputData['shipping']['type']) ? $inputData['shipping']['type'] : 'free';
@@ -58,11 +60,7 @@ $amountInCents = intval(($quantity * 8990) + ($isExpress ? 999 : 0));
 $amountFormatted = ($quantity * 89.90) + ($isExpress ? 9.99 : 0.00);
 $shippingLabel = $isExpress ? 'Frete Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
-// UTMs e Rastreamento para UTMify
-$tracking = isset($inputData['tracking_parameters']) ? $inputData['tracking_parameters'] : [];
-$metadata = isset($inputData['metadata']) ? $inputData['metadata'] : [];
-
-// Montar payload para a Duttyfy
+// Montar payload estrito para a Duttyfy
 $payload = [
     'paymentMethod' => 'PIX',
     'customer' => [
@@ -76,9 +74,7 @@ $payload = [
         'price' => $amountInCents,
         'quantity' => $quantity
     ],
-    'amount' => $amountInCents,
-    'tracking_parameters' => $tracking,
-    'metadata' => $metadata
+    'amount' => $amountInCents
 ];
 
 // Fazer chamada cURL para a API Duttyfy

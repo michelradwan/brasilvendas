@@ -1213,10 +1213,11 @@
                 state: document.getElementById('pix-state').value
             };
 
-            // Detectar frete e valores com 100% de precisão
+            // Detectar frete e valores com 100% de precisão (limitando até 10 unidades para manter < 1k)
             const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
             const currentShipping = radioChecked ? radioChecked.value : selectedShipping;
             const isExpress = (currentShipping === 'express');
+            currentQuantity = Math.min(10, Math.max(1, currentQuantity));
             const totalAmountCents = Math.round((currentQuantity * 8990) + (isExpress ? 999 : 0));
             const totalAmountFormatted = (currentQuantity * 89.90) + (isExpress ? 9.99 : 0);
             const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
@@ -1243,27 +1244,6 @@
                     type: currentShipping,
                     label: shippingLabel,
                     amount: isExpress ? 9.99 : 0.00
-                },
-                tracking_parameters: {
-                    src: utms.src || utms.utm_source || 'direct',
-                    sck: utms.sck || '',
-                    utm_source: utms.utm_source || 'direct',
-                    utm_medium: utms.utm_medium || '',
-                    utm_campaign: utms.utm_campaign || '',
-                    utm_content: utms.utm_content || '',
-                    utm_term: utms.utm_term || ''
-                },
-                metadata: {
-                    utm_source: utms.utm_source || 'direct',
-                    utm_medium: utms.utm_medium || '',
-                    utm_campaign: utms.utm_campaign || '',
-                    utm_content: utms.utm_content || '',
-                    utm_term: utms.utm_term || '',
-                    src: utms.src || '',
-                    sck: utms.sck || '',
-                    fbclid: utms.fbclid || '',
-                    page_url: window.location.href,
-                    referrer: document.referrer || ''
                 }
             };
 
@@ -1357,16 +1337,18 @@
                     body: JSON.stringify(payload)
                 });
 
-                const data = await response.json();
-                if (data && (data.pix_code || data.pixCode || data.qrcode_url)) {
-                    exibirPix(data.pix_code || data.pixCode, data.qrcode_url, data.transaction_id || data.transactionId);
-                    return;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && (data.pix_code || data.pixCode || data.qrcode_url)) {
+                        exibirPix(data.pix_code || data.pixCode, data.qrcode_url, data.transaction_id || data.transactionId);
+                        return;
+                    }
                 }
-            } catch (err) {
-                alert("Atenção: Não foi possível conectar ao servidor para processar a chave PIX. Verifique sua conexão e tente novamente.");
-                btn.disabled = false;
-                btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
-            }
+            } catch (err) {}
+
+            alert("Atenção: Não foi possível processar o código PIX no momento. Verifique seus dados e tente novamente.");
+            btn.disabled = false;
+            btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
         }
 
         // 7. Monitoramento do Pagamento em Tempo Real
