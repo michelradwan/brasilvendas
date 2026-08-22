@@ -37,6 +37,31 @@ if ($response) {
     $data = json_decode($response, true);
     if (isset($data['status']) && in_array(strtolower($data['status']), ['paid', 'approved', 'pago', 'completed'])) {
         $status = 'paid';
+
+        // Atualizar status no banco de dados local SQLite / JSON
+        try {
+            $dbFile = __DIR__ . '/storage/pedidos.sqlite';
+            if (file_exists($dbFile)) {
+                $pdo = new PDO('sqlite:' . $dbFile);
+                $stmt = $pdo->prepare("UPDATE pedidos SET status = 'APROVADO' WHERE transaction_id = :tx");
+                $stmt->execute([':tx' => $txId]);
+            }
+        } catch (Exception $e) {}
+
+        try {
+            $jsonFile = __DIR__ . '/storage/pedidos.json';
+            if (file_exists($jsonFile)) {
+                $pedidosList = json_decode(file_get_contents($jsonFile), true);
+                if (is_array($pedidosList)) {
+                    foreach ($pedidosList as &$p) {
+                        if (isset($p['transaction_id']) && $p['transaction_id'] === $txId) {
+                            $p['status'] = 'APROVADO';
+                        }
+                    }
+                    file_put_contents($jsonFile, json_encode($pedidosList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                }
+            }
+        } catch(Exception $ex) {}
     }
 }
 
