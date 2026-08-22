@@ -27,6 +27,7 @@ module.exports = async (req, res) => {
         const address = body.address || {};
         const shipping = body.shipping || {};
         const size = body.size || 'M';
+        const quantity = Math.max(1, parseInt(body.quantity || (body.item && body.item.quantity) || 1));
 
         const name = (customer.name || 'Cliente Patriota').trim();
         const cpf = (customer.document || customer.cpf || '').replace(/\D/g, '');
@@ -34,8 +35,8 @@ module.exports = async (req, res) => {
         const email = (customer.email || 'cliente@patriotas.com.br').trim();
 
         const isExpress = (shipping.type === 'express');
-        const amountInCents = isExpress ? 9989 : 8990;
-        const amountFormatted = isExpress ? 99.89 : 89.90;
+        const amountInCents = Math.round((quantity * 8990) + (isExpress ? 999 : 0));
+        const amountFormatted = (quantity * 89.90) + (isExpress ? 9.99 : 0);
         const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
         const payload = JSON.stringify({
@@ -47,9 +48,9 @@ module.exports = async (req, res) => {
                 phone: phone
             },
             item: {
-                title: `Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
+                title: `${quantity}x Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
                 price: amountInCents,
-                quantity: 1
+                quantity: quantity
             },
             amount: amountInCents
         });

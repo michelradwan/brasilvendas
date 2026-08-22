@@ -102,29 +102,18 @@
 </head>
 
 <body class="bg-brand-dark text-gray-200 font-inter overflow-x-hidden selection:bg-brand-accent selection:text-brand-dark">
-    <!-- Header Fixo com Blur -->
-    <header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-brand-dark/60 border-b border-brand-border">
-        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <!-- Header Fixo com Blur e Carrinho Funcional -->
+    <header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-brand-dark/80 border-b border-brand-border">
+        <div class="container mx-auto px-4 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <img src="images/IB3yGye.png" alt="Kit Patriota" class="h-14 w-auto object-contain">
+                <img src="images/IB3yGye.png" alt="Kit Patriota" class="h-11 sm:h-12 w-auto object-contain">
             </div>
 
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-                <a href="#" class="text-gray-300 hover:text-brand-accent transition-colors">Minha Loja</a>
-                <a href="#" class="text-gray-300 hover:text-brand-accent transition-colors">Login</a>
-                <div class="relative">
-                    <button class="flex items-center space-x-2 text-gray-300 hover:text-brand-accent transition-colors">
-                        <span>🛒</span>
-                        <span>Carrinho</span>
-                        <div class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center ring-2 ring-brand-dark">3</div>
-                    </button>
-                </div>
-            </nav>
-
-            <button class="md:hidden text-gray-300 hover:text-brand-accent transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
+            <!-- Botão de Carrinho Funcional Integrado -->
+            <button type="button" onclick="handleCartClick()" class="flex items-center space-x-2.5 bg-brand-accent/10 hover:bg-brand-accent/20 border border-brand-accent/30 text-white px-4 py-2 rounded-xl transition-all cursor-pointer shadow-md group active:scale-95">
+                <span class="text-lg group-hover:scale-110 transition-transform">🛒</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-accent hidden sm:inline">Meu Pedido</span>
+                <span id="header-cart-badge" class="bg-brand-accent text-brand-dark font-extrabold text-xs px-2 py-0.5 rounded-full shadow">1</span>
             </button>
         </div>
     </header>
@@ -138,7 +127,7 @@
             </div>
             
             <h2 class="font-outfit text-[7.5vw] sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight text-white drop-shadow-2xl whitespace-nowrap leading-none flex items-center justify-center space-x-2 sm:space-x-4">
-                <span>IMPEACHMENT</span>
+                <span>GARANTA</span>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-yellow-200">JÁ!</span>
             </h2>
             <p class="text-base md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -535,15 +524,29 @@
                     </div>
                 </div>
 
-                <!-- Resumo do Pedido -->
-                <div class="bg-brand-dark/70 p-4 rounded-2xl border border-brand-border mb-5 flex justify-between items-center shadow-inner">
-                    <div>
-                        <p class="font-bold text-sm text-white">Kit Patriota Completo 2026</p>
-                        <p class="text-xs text-brand-accent">Tamanho: <span id="modal-tamanho-display" class="font-bold">M</span> • <span id="modal-frete-display" class="text-gray-300">Frete Grátis</span></p>
+                <!-- Resumo do Pedido com Seletor de Quantidade -->
+                <div class="bg-brand-dark/70 p-4 rounded-2xl border border-brand-border mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner">
+                    <div class="flex items-center space-x-3">
+                        <img src="images/DopeXsu.png" alt="Kit" class="w-12 h-12 rounded-xl object-contain bg-brand-dark border border-white/10 flex-shrink-0">
+                        <div>
+                            <p class="font-bold text-sm text-white">Kit Patriota Completo 2026</p>
+                            <p class="text-xs text-brand-accent">Tam: <span id="modal-tamanho-display" class="font-bold">M</span> • <span id="modal-frete-display" class="text-gray-300">Frete Grátis</span></p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-xs text-gray-400 line-through">R$ 159,90</span>
-                        <p class="text-2xl font-outfit font-black text-brand-green" id="modal-total-display">R$ 89,90</p>
+                    
+                    <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-4">
+                        <!-- Seletor de Quantidade -->
+                        <div class="flex items-center bg-black/50 border border-brand-border rounded-xl p-1">
+                            <button type="button" onclick="changeQuantity(-1)" class="w-7 h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90">－</button>
+                            <span id="modal-qtd-display" class="w-8 text-center font-outfit font-black text-sm text-white">1</span>
+                            <button type="button" onclick="changeQuantity(1)" class="w-7 h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90">＋</button>
+                        </div>
+
+                        <!-- Preço Total -->
+                        <div class="text-right">
+                            <span id="modal-original-price" class="text-[11px] text-gray-400 line-through block">R$ 159,90</span>
+                            <p class="text-xl sm:text-2xl font-outfit font-black text-brand-green" id="modal-total-display">R$ 89,90</p>
+                        </div>
                     </div>
                 </div>
 
@@ -886,6 +889,66 @@
             }
         });
 
+        let currentQuantity = 1;
+
+        // Função do Carrinho no Topo
+        function handleCartClick() {
+            const tamanhoSelect = document.getElementById('tamanho');
+            const tamanhoSelecionado = tamanhoSelect ? tamanhoSelect.value : '';
+            
+            if (!tamanhoSelecionado) {
+                if (tamanhoSelect) {
+                    tamanhoSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    tamanhoSelect.classList.add('ring-4', 'ring-brand-accent', 'border-brand-accent');
+                    tamanhoSelect.focus();
+                    const erro = document.getElementById('tamanho-erro');
+                    if (erro) erro.classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('comprar-btn').click();
+            }
+        }
+
+        // Seletor de Quantidade
+        function changeQuantity(delta) {
+            currentQuantity = Math.max(1, Math.min(10, currentQuantity + delta));
+            recalculateTotals();
+        }
+
+        // Recálculo Dinâmico de Valores
+        function recalculateTotals() {
+            const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
+            const isExpress = radioChecked ? (radioChecked.value === 'express') : (selectedShipping === 'express');
+            const shippingFee = isExpress ? 9.99 : 0.00;
+            const unitPrice = 89.90;
+            const originalUnitPrice = 159.90;
+            
+            const totalFormatted = (currentQuantity * unitPrice) + shippingFee;
+            const originalTotal = currentQuantity * originalUnitPrice;
+
+            const qtdDisplay = document.getElementById('modal-qtd-display');
+            if (qtdDisplay) qtdDisplay.textContent = currentQuantity;
+
+            const cartBadge = document.getElementById('header-cart-badge');
+            if (cartBadge) cartBadge.textContent = currentQuantity;
+
+            const totalDisplay = document.getElementById('modal-total-display');
+            if (totalDisplay) totalDisplay.textContent = `R$ ${totalFormatted.toFixed(2).replace('.', ',')}`;
+
+            const originalDisplay = document.getElementById('modal-original-price');
+            if (originalDisplay) originalDisplay.textContent = `R$ ${originalTotal.toFixed(2).replace('.', ',')}`;
+
+            const freteDisplay = document.getElementById('modal-frete-display');
+            if (freteDisplay) {
+                freteDisplay.textContent = isExpress ? 'Full Express (3 dias)' : 'Frete Grátis (7 dias)';
+            }
+
+            const btnText = document.getElementById('btn-text');
+            if (btnText) {
+                btnText.textContent = `GERAR PIX DE R$ ${totalFormatted.toFixed(2).replace('.', ',')}`;
+            }
+        }
+
         // 1. Alternância Dinâmica de Frete
         function handleShippingChange(type) {
             selectedShipping = type;
@@ -896,25 +959,16 @@
 
             const labelFree = document.getElementById('label-shipping-free');
             const labelExpress = document.getElementById('label-shipping-express');
-            const totalDisplay = document.getElementById('modal-total-display');
-            const freteDisplay = document.getElementById('modal-frete-display');
-            const btnText = document.getElementById('btn-text');
 
             if (type === 'express') {
                 if (labelExpress) labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-accent bg-brand-accent/10 cursor-pointer transition-all duration-300 shadow-lg select-none";
                 if (labelFree) labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-green/50 cursor-pointer transition-all duration-300 select-none";
-                
-                if (totalDisplay) totalDisplay.textContent = "R$ 99,89";
-                if (freteDisplay) freteDisplay.textContent = "Full Express (3 dias)";
-                if (btnText) btnText.textContent = "GERAR PIX DE R$ 99,89";
             } else {
                 if (labelFree) labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300 shadow-lg select-none";
                 if (labelExpress) labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300 select-none";
-                
-                if (totalDisplay) totalDisplay.textContent = "R$ 89,90";
-                if (freteDisplay) freteDisplay.textContent = "Frete Grátis (7 dias)";
-                if (btnText) btnText.textContent = "GERAR PIX DE R$ 89,90";
             }
+
+            recalculateTotals();
         }
 
         // 2. Validador Oficial de CPF (Algoritmo Módulo 11)
@@ -1045,16 +1099,18 @@
             if (tamanhoErro) tamanhoErro.classList.add('hidden');
             document.getElementById('modal-tamanho-display').textContent = tamanhoSelecionado;
             
-            // Garante que abre sempre selecionado no Frete Grátis R$ 89,90
-            handleShippingChange('free');
+            // Recalcula totais
+            recalculateTotals();
 
             // Dispara InitiateCheckout no Meta Pixel
             if (typeof fbq === 'function') {
                 try {
+                    const isExp = (selectedShipping === 'express');
+                    const totalVal = (currentQuantity * 89.90) + (isExp ? 9.99 : 0);
                     fbq('track', 'InitiateCheckout', {
                         content_name: 'Kit Patriota 2026',
                         content_category: 'Kit Completo',
-                        value: 89.90,
+                        value: totalVal,
                         currency: 'BRL'
                     });
                 } catch(e){}
@@ -1113,12 +1169,12 @@
                 state: document.getElementById('pix-state').value
             };
 
-            // Detectar frete selecionado com 100% de precisão
+            // Detectar frete e valores com 100% de precisão
             const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
             const currentShipping = radioChecked ? radioChecked.value : selectedShipping;
             const isExpress = (currentShipping === 'express');
-            const totalAmountCents = isExpress ? 9989 : 8990;
-            const totalAmountFormatted = isExpress ? 99.89 : 89.90;
+            const totalAmountCents = Math.round((currentQuantity * 8990) + (isExpress ? 999 : 0));
+            const totalAmountFormatted = (currentQuantity * 89.90) + (isExpress ? 9.99 : 0);
             const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
             const payload = {
@@ -1130,11 +1186,13 @@
                     phone: phone
                 },
                 item: {
-                    title: `Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
+                    title: `${currentQuantity}x Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
                     price: totalAmountCents,
-                    quantity: 1
+                    quantity: currentQuantity
                 },
                 amount: totalAmountCents,
+                quantity: currentQuantity,
+                size: size,
                 address: address,
                 shipping: {
                     type: currentShipping,

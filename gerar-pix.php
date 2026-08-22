@@ -46,13 +46,16 @@ $neighborhood = isset($address['neighborhood']) ? trim($address['neighborhood'])
 $city = isset($address['city']) ? trim($address['city']) : '';
 $state = isset($address['state']) ? strtoupper(trim($address['state'])) : '';
 
+// Quantidade
+$quantity = isset($inputData['quantity']) ? max(1, intval($inputData['quantity'])) : (isset($inputData['item']['quantity']) ? max(1, intval($inputData['item']['quantity'])) : 1);
+
 // Frete e Cálculo de Valores
 $shippingType = isset($inputData['shipping']['type']) ? $inputData['shipping']['type'] : 'free';
 $isExpress = ($shippingType === 'express');
 
-// 8990 centavos (R$ 89,90) ou 9989 centavos (R$ 99,89)
-$amountInCents = $isExpress ? 9989 : 8990;
-$amountFormatted = $isExpress ? 99.89 : 89.90;
+// Preço proporcional por quantidade + Frete
+$amountInCents = intval(($quantity * 8990) + ($isExpress ? 999 : 0));
+$amountFormatted = ($quantity * 89.90) + ($isExpress ? 9.99 : 0.00);
 $shippingLabel = $isExpress ? 'Frete Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
 
 // Montar payload para a Duttyfy
@@ -65,9 +68,9 @@ $payload = [
         'phone' => $phone
     ],
     'item' => [
-        'title' => 'Kit Patriota 2026 (Tam ' . $size . ') - ' . $shippingLabel,
+        'title' => "{$quantity}x Kit Patriota 2026 (Tam {$size}) - {$shippingLabel}",
         'price' => $amountInCents,
-        'quantity' => 1
+        'quantity' => $quantity
     ],
     'amount' => $amountInCents
 ];
