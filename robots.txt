@@ -1,0 +1,55 @@
+# ==============================================================================
+# ROBOTS.TXT - BLINDAGEM DE PRIVACIDADE E BLOQUEIO DE IA / RASPAGEM
+# ==============================================================================
+
+# Bloquear IAs e Bots de Coleta / Raspagem de Dados
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Proteger áreas administrativas e arquivos de dados
+User-agent: *
+Disallow: /admin.html
+Disallow: /admin-pedidos.php
+Disallow: /storage/
+Disallow: /api/
+Disallow: /gerar-pix.php
+Disallow: /status-pix.php
+Disallow: /*.sqlite$
+Disallow: /*.json$
+
+Allow: /
+Allow: /images/
+Allow: /js/

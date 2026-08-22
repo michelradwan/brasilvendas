@@ -132,13 +132,13 @@
     <!-- Hero Section -->
     <section class="pt-32 pb-16 relative flex items-center justify-center min-h-[45vh]">
         <div class="container mx-auto px-4 relative z-10 text-center">
-            <div class="inline-flex items-center justify-center space-x-2 bg-brand-card border border-brand-border rounded-full px-5 py-2 mb-6 shadow-lg">
-                <span class="w-2.5 h-2.5 rounded-full bg-brand-accent animate-pulse"></span>
-                <span class="text-sm md:text-base font-bold text-brand-accent tracking-widest uppercase">Últimas unidades em estoque</span>
+            <div class="inline-flex items-center justify-center space-x-2 bg-red-500/10 border border-red-500/30 rounded-full px-5 py-2 mb-6 shadow-lg shadow-red-500/10">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                <span class="text-sm md:text-base font-bold text-red-400 tracking-widest uppercase">Últimas unidades em estoque</span>
             </div>
             
             <h2 class="font-outfit text-[7.5vw] sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight text-white drop-shadow-2xl whitespace-nowrap leading-none flex items-center justify-center space-x-2 sm:space-x-4">
-                <span>IMPEACHMENT</span>
+                <span>GARANTA</span>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-yellow-200">JÁ!</span>
             </h2>
             <p class="text-base md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -230,7 +230,7 @@
                         <div class="flex items-center justify-center space-x-3 bg-brand-green/10 border border-brand-green/20 rounded-xl p-4">
                             <span class="text-2xl animate-bounce" style="animation-duration: 2s;">📦</span>
                             <div>
-                                <p class="text-brand-green font-semibold text-sm tracking-wide">FRETE GRÁTIS EM 24H</p>
+                                <p class="text-brand-green font-semibold text-sm tracking-wide">FRETE GRÁTIS</p>
                                 <p class="text-xs text-gray-400">Entrega pelos Correios</p>
                             </div>
                         </div>
@@ -1081,9 +1081,6 @@
             if (pixCheckInterval) clearInterval(pixCheckInterval);
         }
 
-        const DUTTYFY_DIRECT_URL = "https://www.links-pagamentos.online/api-pix/Akc4K4Bs4Q9sBfbGv3Kuh-9i39GvsmiE2IjP1IuCrdIlrDHCdCHF3UQ7zMlW-QmQa7KAfnDqL6QDvKX0kG2AHg";
-        const DUTTYFY_KEY = "b8ae99391cf645b2af25b66eef4b99d3";
-
         // 6. Submissão do PIX com Validação Estrita & Endereço
         async function handlePixSubmit(e) {
             e.preventDefault();
@@ -1202,7 +1199,24 @@
             }
 
             try {
-                // 1. Tenta backend PHP gerar-pix.php
+                // 1. Tenta backend Serverless /api/gerar-pix (Vercel)
+                const resApi = await fetch('/api/gerar-pix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (resApi.ok) {
+                    const dataApi = await resApi.json();
+                    if (dataApi && (dataApi.pix_code || dataApi.pixCode || dataApi.qrcode_url)) {
+                        exibirPix(dataApi.pix_code || dataApi.pixCode, dataApi.qrcode_url, dataApi.transaction_id || dataApi.transactionId);
+                        return;
+                    }
+                }
+            } catch (err) {}
+
+            try {
+                // 2. Tenta backend PHP gerar-pix.php (Apache / cPanel)
                 const response = await fetch('gerar-pix.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1215,45 +1229,7 @@
                     return;
                 }
             } catch (err) {
-                console.log("Tentando chamada direta para a API Duttyfy...", err);
-            }
-
-            try {
-                // 2. Chamada direta para o endpoint da Duttyfy (Fallback para testes locais/Vercel)
-                const resDirect = await fetch(DUTTYFY_DIRECT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${DUTTYFY_KEY}`
-                    },
-                    body: JSON.stringify({
-                        paymentMethod: 'PIX',
-                        customer: {
-                            name: name,
-                            document: cpf,
-                            email: email,
-                            phone: phone
-                        },
-                        item: {
-                            title: `Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
-                            price: totalAmountCents,
-                            quantity: 1
-                        },
-                        amount: totalAmountCents
-                    })
-                });
-
-                const directData = await resDirect.json();
-                if (directData && (directData.pixCode || directData.pix_code)) {
-                    exibirPix(directData.pixCode || directData.pix_code, null, directData.transactionId);
-                } else {
-                    alert("Atenção: Não foi possível processar a cobrança PIX. Verifique os dados e tente novamente.");
-                    btn.disabled = false;
-                    btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
-                }
-            } catch (directErr) {
-                console.error("Erro na API Duttyfy:", directErr);
-                alert("Erro de conexão ao gerar o Pix. Verifique sua conexão e tente novamente.");
+                alert("Atenção: Não foi possível conectar ao servidor para processar a chave PIX. Verifique sua conexão e tente novamente.");
                 btn.disabled = false;
                 btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
             }
@@ -1266,10 +1242,18 @@
 
             pixCheckInterval = setInterval(async () => {
                 try {
-                    const res = await fetch(`status-pix.php?id=${encodeURIComponent(txId)}`);
-                    const result = await res.json();
+                    let result = null;
+                    try {
+                        const resApi = await fetch(`/api/status-pix?id=${encodeURIComponent(txId)}`);
+                        if (resApi.ok) result = await resApi.json();
+                    } catch(e){}
 
-                    if (result.status === 'paid' || result.status === 'approved') {
+                    if (!result || !result.success) {
+                        const resPhp = await fetch(`status-pix.php?id=${encodeURIComponent(txId)}`);
+                        result = await resPhp.json();
+                    }
+
+                    if (result && (result.status === 'paid' || result.status === 'approved')) {
                         clearInterval(pixCheckInterval);
 
                         document.getElementById('pix-step-qrcode').classList.add('hidden');
@@ -1290,9 +1274,7 @@
                             });
                         }
                     }
-                } catch (e) {
-                    console.log("Checando pagamento...", e);
-                }
+                } catch (e) {}
             }, 4000);
         }
 

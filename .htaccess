@@ -1,41 +1,27 @@
 # ==============================================================================
-# SEGURANÇA E PERFORMANCE - KIT PATRIOTA 2025
+# BLINDAGEM DE SEGURANÇA E PRIVACIDADE DE DADOS (.HTACCESS)
 # ==============================================================================
 
-# 1. HEADERS DE SEGURANÇA (OWASP / Zero-Trust)
-<IfModule mod_headers.c>
-    Header always set X-Content-Type-Options "nosniff"
-    Header always set X-Frame-Options "SAMEORIGIN"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-</IfModule>
+# 1. Desabilitar Listagem de Diretórios
+Options -Indexes
 
-# 2. COMPRESSÃO GZIP / DEFLATE (Performance Extrema)
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
-    AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
-    AddOutputFilterByType DEFLATE image/svg+xml
-</IfModule>
-
-# 3. CACHE DE ARQUIVOS ESTÁTICOS (Browser Caching)
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresDefault "access plus 1 month"
-    ExpiresByType text/html "access plus 0 seconds"
-    ExpiresByType image/jpg "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-</IfModule>
-
-# 4. PROTEGER ARQUIVOS SENSÍVEIS
-<FilesMatch "^\.">
+# 2. Bloquear Acesso Direto a Bancos de Dados e Arquivos Críticos
+<FilesMatch "\.(sqlite|sqlite3|db|json|md|log|env|git)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+# 3. Headers de Segurança e Proteção de Frames
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 4. Bloquear User-Agents Maliciosos / Bots de Espionagem
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_USER_AGENT} (GPTBot|ChatGPT-User|ClaudeBot|PerplexityBot|Bytespider|CCBot|SemrushBot|AhrefsBot) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
