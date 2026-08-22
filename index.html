@@ -570,22 +570,22 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             
-                            <!-- Opção 1: Frete Grátis -->
-                            <label class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300" id="label-shipping-free">
-                                <div class="flex items-center space-x-3">
-                                    <input type="radio" name="shipping_type" value="free" checked onchange="handleShippingChange('free')" class="w-4 h-4 text-brand-green focus:ring-0 cursor-pointer">
+                            <!-- Opção 1: Frete Grátis (R$ 89,90) -->
+                            <div class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300 select-none shadow-md" id="label-shipping-free" onclick="handleShippingChange('free')">
+                                <div class="flex items-center space-x-3 pointer-events-none">
+                                    <input type="radio" id="radio-shipping-free" name="shipping_type" value="free" checked class="w-4 h-4 text-brand-green focus:ring-0 cursor-pointer">
                                     <div>
                                         <p class="font-bold text-sm text-white">Frete Grátis</p>
                                         <p class="text-xs text-gray-400">Entrega em até 7 dias úteis</p>
                                     </div>
                                 </div>
-                                <span class="font-bold text-xs text-brand-green bg-brand-green/20 px-2.5 py-1 rounded-lg">GRÁTIS</span>
-                            </label>
+                                <span class="font-bold text-xs text-brand-green bg-brand-green/20 px-2.5 py-1 rounded-lg pointer-events-none">GRÁTIS</span>
+                            </div>
 
-                            <!-- Opção 2: Frete Full Express -->
-                            <label class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300" id="label-shipping-express">
-                                <div class="flex items-center space-x-3">
-                                    <input type="radio" name="shipping_type" value="express" onchange="handleShippingChange('express')" class="w-4 h-4 text-brand-accent focus:ring-0 cursor-pointer">
+                            <!-- Opção 2: Frete Full Express (+R$ 9,99) -->
+                            <div class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300 select-none" id="label-shipping-express" onclick="handleShippingChange('express')">
+                                <div class="flex items-center space-x-3 pointer-events-none">
+                                    <input type="radio" id="radio-shipping-express" name="shipping_type" value="express" class="w-4 h-4 text-brand-accent focus:ring-0 cursor-pointer">
                                     <div>
                                         <div class="flex items-center space-x-1.5">
                                             <p class="font-bold text-sm text-white">Full Express ⚡</p>
@@ -593,8 +593,8 @@
                                         <p class="text-xs text-brand-accent font-medium">Entrega em 3 dias úteis</p>
                                     </div>
                                 </div>
-                                <span class="font-bold text-xs text-brand-accent bg-brand-accent/20 px-2.5 py-1 rounded-lg">+ R$ 9,99</span>
-                            </label>
+                                <span class="font-bold text-xs text-brand-accent bg-brand-accent/20 px-2.5 py-1 rounded-lg pointer-events-none">+ R$ 9,99</span>
+                            </div>
 
                         </div>
                     </div>
@@ -677,6 +677,11 @@
         // 1. Alternância Dinâmica de Frete
         function handleShippingChange(type) {
             selectedShipping = type;
+            const radioFree = document.getElementById('radio-shipping-free');
+            const radioExpress = document.getElementById('radio-shipping-express');
+            if (radioFree) radioFree.checked = (type === 'free');
+            if (radioExpress) radioExpress.checked = (type === 'express');
+
             const labelFree = document.getElementById('label-shipping-free');
             const labelExpress = document.getElementById('label-shipping-express');
             const totalDisplay = document.getElementById('modal-total-display');
@@ -684,19 +689,19 @@
             const btnText = document.getElementById('btn-text');
 
             if (type === 'express') {
-                labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-accent bg-brand-accent/10 cursor-pointer transition-all duration-300 shadow-lg";
-                labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-green/50 cursor-pointer transition-all duration-300";
+                if (labelExpress) labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-accent bg-brand-accent/10 cursor-pointer transition-all duration-300 shadow-lg select-none";
+                if (labelFree) labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-green/50 cursor-pointer transition-all duration-300 select-none";
                 
-                totalDisplay.textContent = "R$ 99,89";
-                freteDisplay.textContent = "Full Express (3 dias)";
-                btnText.textContent = "GERAR PIX DE R$ 99,89";
+                if (totalDisplay) totalDisplay.textContent = "R$ 99,89";
+                if (freteDisplay) freteDisplay.textContent = "Full Express (3 dias)";
+                if (btnText) btnText.textContent = "GERAR PIX DE R$ 99,89";
             } else {
-                labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300 shadow-lg";
-                labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300";
+                if (labelFree) labelFree.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all duration-300 shadow-lg select-none";
+                if (labelExpress) labelExpress.className = "shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all duration-300 select-none";
                 
-                totalDisplay.textContent = "R$ 89,90";
-                freteDisplay.textContent = "Frete Grátis (7 dias)";
-                btnText.textContent = "GERAR PIX DE R$ 89,90";
+                if (totalDisplay) totalDisplay.textContent = "R$ 89,90";
+                if (freteDisplay) freteDisplay.textContent = "Frete Grátis (7 dias)";
+                if (btnText) btnText.textContent = "GERAR PIX DE R$ 89,90";
             }
         }
 
@@ -828,13 +833,16 @@
             if (tamanhoErro) tamanhoErro.classList.add('hidden');
             document.getElementById('modal-tamanho-display').textContent = tamanhoSelecionado;
             
+            // Garante que abre sempre selecionado no Frete Grátis R$ 89,90
+            handleShippingChange('free');
+
             // Dispara InitiateCheckout no Meta Pixel
             if (typeof fbq === 'function') {
                 try {
                     fbq('track', 'InitiateCheckout', {
                         content_name: 'Kit Patriota 2026',
                         content_category: 'Kit Completo',
-                        value: selectedShipping === 'express' ? 99.89 : 89.90,
+                        value: 89.90,
                         currency: 'BRL'
                     });
                 } catch(e){}
@@ -896,7 +904,10 @@
                 state: document.getElementById('pix-state').value
             };
 
-            const isExpress = (selectedShipping === 'express');
+            // Detectar frete selecionado com 100% de precisão
+            const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
+            const currentShipping = radioChecked ? radioChecked.value : selectedShipping;
+            const isExpress = (currentShipping === 'express');
             const totalAmountCents = isExpress ? 9989 : 8990;
             const totalAmountFormatted = isExpress ? 99.89 : 89.90;
             const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
@@ -917,7 +928,7 @@
                 amount: totalAmountCents,
                 address: address,
                 shipping: {
-                    type: selectedShipping,
+                    type: currentShipping,
                     label: shippingLabel,
                     amount: isExpress ? 9.99 : 0.00
                 }
