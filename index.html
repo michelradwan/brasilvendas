@@ -886,7 +886,7 @@
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="animate-pulse">Gerando PIX com a Duttyfy...</span>`;
+            btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando o PIX...</span></span>`;
 
             const name = document.getElementById('pix-name').value || 'Cliente Patriota';
             const phone = document.getElementById('pix-phone').value.replace(/\D/g, '') || '11999999999';
