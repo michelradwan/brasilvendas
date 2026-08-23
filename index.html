@@ -72,7 +72,7 @@
                             darker: '#040508',
                             card: '#0e121a',
                             border: 'rgba(255, 255, 255, 0.08)',
-                            borderLight: 'rgba(255, 255, 255, 0.15)',
+                            borderLight: 'rgba(255, 255, 255, 0.12)',
                             accent: '#FACC15',
                             accentHover: '#EAB308',
                             green: '#10B981',
@@ -81,8 +81,8 @@
                         }
                     },
                     boxShadow: {
-                        'glow-accent': '0 0 25px rgba(250, 204, 21, 0.4)',
-                        'glow-green': '0 0 25px rgba(16, 185, 129, 0.4)',
+                        'glow-accent': '0 0 25px rgba(250, 204, 21, 0.35)',
+                        'glow-green': '0 0 25px rgba(16, 185, 129, 0.35)',
                         'card-depth': '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
                     }
                 }
@@ -108,8 +108,8 @@
 
         /* Pulse glow suave para o botão principal sem travar o processador */
         @keyframes pulseCta {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(250, 204, 21, 0.35); }
-            50% { transform: scale(1.02); box-shadow: 0 0 32px rgba(250, 204, 21, 0.6); }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(250, 204, 21, 0.3); }
+            50% { transform: scale(1.015); box-shadow: 0 0 30px rgba(250, 204, 21, 0.5); }
         }
         .cta-pulse {
             animation: pulseCta 2.8s ease-in-out infinite;
@@ -135,10 +135,10 @@
 
 <body class="bg-brand-dark text-gray-200 font-inter antialiased selection:bg-brand-accent selection:text-brand-dark pb-28 sm:pb-32 md:pb-0">
 
-    <!-- 1. Barra de Notificação Superior (Confiança e Benefício Imediato) -->
-    <div class="bg-gradient-to-r from-brand-emerald via-green-600 to-brand-emerald text-white text-center py-2 px-3 text-xs font-bold tracking-wide shadow-md flex items-center justify-center space-x-2">
-        <span class="text-sm">🇧🇷</span>
-        <span class="leading-tight">FRETE GRÁTIS PARA TODO O BRASIL • PAGAMENTO VIA PIX COM DESPACHO EM 24H</span>
+    <!-- 1. Barra de Notificação Superior (Discreta, Elegante e Direta) -->
+    <div class="bg-emerald-950/90 border-b border-emerald-500/20 text-emerald-300 text-center py-1.5 px-3 text-[11px] sm:text-xs font-semibold tracking-wide flex items-center justify-center space-x-2">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></span>
+        <span>FRETE GRÁTIS PARA TODO O BRASIL • PAGAMENTO VIA PIX COM DESPACHO EM ATÉ 24H ÚTEIS</span>
     </div>
 
     <!-- 2. Header Fixo com Blur e Acesso Rápido -->
@@ -168,47 +168,35 @@
     </header>
 
     <main>
-        <!-- 3. PRIMEIRA DOBRA (HERO SECTION - MOBILE FIRST DE ALTA CONVERSÃO) -->
-        <section class="pt-5 pb-10 md:pt-10 md:pb-16 relative overflow-hidden">
-            <!-- Background Glow Decorativo -->
-            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-green/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute top-1/3 right-10 w-72 h-72 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none"></div>
-
+        <!-- 3. PRIMEIRA DOBRA (HERO SECTION - LIMPA, DIRETA E DE ALTA CONVERSÃO) -->
+        <section class="pt-5 pb-8 sm:pb-12 md:pt-8 md:pb-16 relative overflow-hidden">
             <div class="container mx-auto px-3 sm:px-4 max-w-5xl relative z-10">
                 
-                <!-- Headline e Proposta de Valor -->
-                <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
-                    <div class="inline-flex items-center space-x-2 bg-brand-green/15 border border-brand-green/30 rounded-full px-3.5 sm:px-4 py-1.5 mb-3.5 sm:mb-4 shadow-sm">
-                        <span class="w-2 h-2 rounded-full bg-brand-green"></span>
-                        <span class="text-[11px] sm:text-xs font-bold text-brand-green uppercase tracking-wider">Edição Oficial Completa • Pronta Entrega</span>
-                    </div>
-
-                    <h1 class="font-outfit text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-3 sm:mb-4 break-words">
-                        Mostre Seu Amor Pelo Brasil com o <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-yellow-200">Kit Patriota Oficial</span>
+                <!-- Headline e Proposta de Valor Objetiva -->
+                <div class="text-center max-w-2xl mx-auto mb-5 sm:mb-7">
+                    <span class="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-brand-green mb-1.5 block">
+                        Edição Oficial Completa • 4 Itens
+                    </span>
+                    <h1 class="font-outfit text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight tracking-tight mb-2">
+                        Kit Patriota Completo por <span class="text-brand-accent">R$ 89,90 no PIX</span>
                     </h1>
-
-                    <p class="text-sm sm:text-base md:text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                        <strong>4 Itens Premium em Uma Só Caixa:</strong> Camiseta 100% Algodão + Boné Bordado 3D + Bandeira Oficial 1,5m + Garrafa Térmica 500ml.
+                    <p class="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto leading-relaxed">
+                        Tudo em uma única caixa: Camiseta 100% Algodão, Boné Bordado, Bandeira Oficial 1,50m e Garrafa Térmica 500ml com Frete Grátis.
                     </p>
                 </div>
 
                 <!-- Box de Compra Principal com Imagem e Seletor -->
-                <div class="glass-panel rounded-3xl p-4 sm:p-8 md:p-10 shadow-2xl border border-brand-border">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+                <div class="glass-panel rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-brand-border">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-center">
                         
-                        <!-- Coluna da Foto Principal com Badges -->
+                        <!-- Coluna da Foto Principal (Com 1 Único Badge de Destaque) -->
                         <div class="lg:col-span-6 relative">
                             <div class="relative rounded-2xl overflow-hidden bg-brand-dark/60 border border-white/10 shadow-inner group">
                                 <img src="images/DopeXsu.png" alt="Kit Patriota Completo - Camiseta, Boné, Bandeira e Garrafa" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105" loading="eager" width="600" height="600">
                                 
-                                <div class="absolute top-3 left-3 bg-brand-dark/90 backdrop-blur-md border border-brand-accent/40 text-brand-accent text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1.5">
+                                <div class="absolute top-3 left-3 bg-brand-dark/90 backdrop-blur-md border border-brand-accent/40 text-brand-accent text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1.5">
                                     <span>⭐</span>
                                     <span>KIT COMPLETO (4 ITENS)</span>
-                                </div>
-
-                                <div class="absolute bottom-3 right-3 bg-brand-green/90 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1">
-                                    <span>📦</span>
-                                    <span>Frete Grátis Brasil</span>
                                 </div>
                             </div>
                         </div>
@@ -216,74 +204,70 @@
                         <!-- Coluna de Ação & Preço -->
                         <div class="lg:col-span-6 flex flex-col justify-center">
                             
-                            <!-- Lista Rápida dos Itens -->
-                            <div class="bg-white/[0.03] border border-white/5 rounded-2xl p-3.5 sm:p-4 mb-4 sm:mb-5">
-                                <p class="text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">O que você recebe na caixa:</p>
-                                <ul class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-200">
+                            <!-- O Que Vem no Kit (Lista Escaneável e Leve) -->
+                            <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 mb-4">
+                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">O que você recebe na caixa:</p>
+                                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-200">
                                     <li class="flex items-center space-x-2">
-                                        <span class="text-brand-green font-bold text-base">✓</span>
-                                        <span><strong>1x Camiseta "Eu Sou Patriota"</strong> (100% Algodão Premium)</span>
+                                        <span class="text-brand-green font-bold">✓</span>
+                                        <span>1x Camiseta "Eu Sou Patriota"</span>
                                     </li>
                                     <li class="flex items-center space-x-2">
-                                        <span class="text-brand-green font-bold text-base">✓</span>
-                                        <span><strong>1x Boné Oficial Brasil</strong> (Bordado em Alto Relevo)</span>
+                                        <span class="text-brand-green font-bold">✓</span>
+                                        <span>1x Boné Bordado Brasil</span>
                                     </li>
                                     <li class="flex items-center space-x-2">
-                                        <span class="text-brand-green font-bold text-base">✓</span>
-                                        <span><strong>1x Bandeira do Brasil Grande</strong> (1,50m x 0,90m)</span>
+                                        <span class="text-brand-green font-bold">✓</span>
+                                        <span>1x Bandeira 1,50m × 0,90m</span>
                                     </li>
                                     <li class="flex items-center space-x-2">
-                                        <span class="text-brand-green font-bold text-base">✓</span>
-                                        <span><strong>1x Garrafa Térmica 500ml</strong> (Verde Patriota Fosco)</span>
+                                        <span class="text-brand-green font-bold">✓</span>
+                                        <span>1x Garrafa Térmica 500ml</span>
                                     </li>
                                 </ul>
                             </div>
 
-                            <!-- Preço Transparente (SOMENTE PIX) -->
-                            <div class="bg-gradient-to-br from-brand-card to-brand-dark p-4 sm:p-5 rounded-2xl border border-brand-border mb-4 sm:mb-6">
-                                <div class="flex items-baseline justify-between mb-1">
-                                    <span class="text-[11px] sm:text-xs text-gray-400 uppercase font-semibold">Valor Especial de Lançamento:</span>
-                                    <span class="text-xs text-gray-400 line-through">De R$ 159,90</span>
+                            <!-- Preço e Oferta Transparente -->
+                            <div class="bg-brand-card/90 p-3.5 sm:p-4 rounded-2xl border border-brand-border mb-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+                                <div>
+                                    <span class="text-[11px] text-gray-400 line-through block">De R$ 159,90</span>
+                                    <div class="flex items-baseline justify-center sm:justify-start space-x-2">
+                                        <span class="text-3xl sm:text-4xl font-outfit font-black text-white tracking-tight">R$ 89,90</span>
+                                        <span class="text-xs text-brand-green font-bold bg-brand-green/15 px-2 py-0.5 rounded-md">no PIX</span>
+                                    </div>
                                 </div>
-
-                                <div class="flex items-baseline space-x-2 flex-wrap gap-y-1">
-                                    <span class="text-xs text-brand-accent font-bold uppercase">Por apenas</span>
-                                    <span class="text-3xl sm:text-5xl font-outfit font-black text-white tracking-tight">R$ 89,90</span>
-                                    <span class="text-xs text-brand-green font-bold bg-brand-green/15 px-2 py-0.5 rounded-md">à vista no PIX</span>
-                                </div>
-
-                                <div class="flex items-center space-x-2 mt-2 pt-2 border-t border-white/5 text-xs text-gray-300">
-                                    <span class="text-brand-green">⚡</span>
-                                    <span>Pagamento rápido e seguro via <strong>PIX</strong> com aprovação imediata.</span>
+                                <div class="text-center sm:text-right">
+                                    <span class="text-xs text-brand-accent font-bold block">🚚 Frete Grátis Brasil</span>
+                                    <span class="text-[11px] text-gray-400 block">Envio em até 24h úteis</span>
                                 </div>
                             </div>
 
                             <!-- Seleção de Tamanho da Camiseta -->
-                            <div class="mb-4 sm:mb-5">
-                                <div class="flex items-center justify-between mb-2">
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-1.5">
                                     <label for="tamanho" class="text-xs sm:text-sm font-bold text-gray-200">
-                                        1. Selecione o tamanho da sua camiseta:
+                                        Escolha o tamanho da camiseta:
                                     </label>
-                                    <button type="button" onclick="openTamanhosModal()" class="text-xs text-brand-accent hover:underline flex items-center space-x-1 cursor-pointer p-1">
+                                    <button type="button" onclick="openTamanhosModal()" class="text-xs text-brand-accent hover:underline flex items-center space-x-1 cursor-pointer p-0.5">
                                         <span>📏</span>
-                                        <span>Tabela de Medidas (cm)</span>
+                                        <span>Tabela de Medidas</span>
                                     </button>
                                 </div>
 
                                 <div class="relative">
-                                    <select id="tamanho" name="tamanho" class="w-full appearance-none bg-brand-dark text-white font-semibold p-3.5 sm:p-4 rounded-xl border border-brand-borderLight focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition-all text-base sm:text-sm cursor-pointer shadow-inner">
-                                        <option value="" disabled selected class="bg-brand-dark text-gray-400">Clique aqui para escolher seu tamanho...</option>
-                                        <option value="PP" class="bg-brand-dark text-white">Tamanho PP (Extra Pequeno)</option>
-                                        <option value="P" class="bg-brand-dark text-white">Tamanho P (Pequeno)</option>
-                                        <option value="M" class="bg-brand-dark text-white">Tamanho M (Médio - Mais Escolhido)</option>
-                                        <option value="G" class="bg-brand-dark text-white">Tamanho G (Grande)</option>
-                                        <option value="GG" class="bg-brand-dark text-white">Tamanho GG (Extra Grande)</option>
+                                    <select id="tamanho" name="tamanho" class="w-full appearance-none bg-brand-dark text-white font-medium p-3.5 rounded-xl border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition-all text-base sm:text-sm cursor-pointer shadow-inner">
+                                        <option value="" disabled selected class="bg-brand-dark text-gray-400">Selecione seu tamanho...</option>
+                                        <option value="PP" class="bg-brand-dark text-white">Tamanho PP</option>
+                                        <option value="P" class="bg-brand-dark text-white">Tamanho P</option>
+                                        <option value="M" class="bg-brand-dark text-white">Tamanho M (Mais Escolhido)</option>
+                                        <option value="G" class="bg-brand-dark text-white">Tamanho G</option>
+                                        <option value="GG" class="bg-brand-dark text-white">Tamanho GG</option>
                                         <option value="XG" class="bg-brand-dark text-white">Tamanho XG</option>
                                         <option value="XXG" class="bg-brand-dark text-white">Tamanho XXG</option>
                                         <option value="XXXG" class="bg-brand-dark text-white">Tamanho XXXG</option>
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-brand-accent">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </div>
                                 </div>
                                 <p id="tamanho-erro" class="text-xs text-red-400 font-medium mt-1.5 hidden flex items-center space-x-1">
@@ -293,25 +277,25 @@
                             </div>
 
                             <!-- Botão Principal de Compra (CTA) -->
-                            <button id="comprar-btn" class="cta-pulse relative group w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base sm:text-xl py-4 sm:py-5 px-5 sm:px-6 rounded-2xl shadow-glow-accent transition-all duration-300 active:scale-[0.98] uppercase tracking-wider mb-3.5 sm:mb-4 tap-target cursor-pointer flex items-center justify-center">
+                            <button id="comprar-btn" class="cta-pulse relative group w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 px-6 rounded-2xl shadow-glow-accent transition-all duration-300 active:scale-[0.98] uppercase tracking-wider mb-3.5 tap-target cursor-pointer flex items-center justify-center">
                                 <span class="relative flex items-center justify-center space-x-2">
-                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                    <span class="text-center">QUERO GARANTIR O MEU AGORA</span>
+                                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                    <span>QUERO GARANTIR O MEU AGORA</span>
                                 </span>
                             </button>
 
-                            <!-- Mini Selos de Confiança -->
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center text-[11px] text-gray-400">
-                                <div class="bg-white/[0.02] p-2 rounded-xl border border-white/5 flex items-center justify-center space-x-1.5">
-                                    <span>🚚</span>
+                            <!-- 3 Benefícios Rápidos Abaixo do CTA (Limpos e Elegantes) -->
+                            <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-[11px] sm:text-xs text-gray-400 text-center">
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-brand-green font-bold">✓</span>
                                     <span>Frete Grátis</span>
                                 </div>
-                                <div class="bg-white/[0.02] p-2 rounded-xl border border-white/5 flex items-center justify-center space-x-1.5">
-                                    <span>⚡</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-brand-green font-bold">✓</span>
                                     <span>PIX Instantâneo</span>
                                 </div>
-                                <div class="col-span-2 sm:col-span-1 bg-white/[0.02] p-2 rounded-xl border border-white/5 flex items-center justify-center space-x-1.5">
-                                    <span>🛡️</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-brand-green font-bold">✓</span>
                                     <span>7 Dias de Garantia</span>
                                 </div>
                             </div>
@@ -651,7 +635,7 @@
                             </span>
                             <span id="faq-icon-3" class="text-brand-accent text-lg transition-transform duration-300 flex-shrink-0">＋</span>
                         </button>
-                        <div id="faq-answer-2" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
+                        <div id="faq-answer-3" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
                             Assim que seu PIX for aprovado, seu pedido entra na fila de embalagem e expedição. Em até 24 horas úteis, você receberá o código oficial de rastreamento dos Correios diretamente no seu WhatsApp e E-mail informados no checkout.
                         </div>
                     </div>
