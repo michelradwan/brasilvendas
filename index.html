@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>Kit Patriota Oficial 2026 - Brasil Vendas | 4 Itens Premium</title>
     <meta name="description" content="Garanta o Kit Patriota Oficial Completo: Camiseta 100% Algodão Premium + Boné Bordado 3D + Bandeira 1,5m + Garrafa Térmica. R$ 89,90 no PIX com Frete Grátis.">
 
@@ -91,11 +91,11 @@
     </script>
 
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { overflow-x: hidden; width: 100%; }
         
         .glass-panel {
-            background: rgba(14, 18, 26, 0.75);
+            background: rgba(14, 18, 26, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -123,35 +123,42 @@
 
         /* Thumb-friendly mobile tap targets */
         .tap-target { min-height: 48px; }
+
+        /* Prevenção estrita de auto-zoom no Safari iOS: font-size >= 16px */
+        @media screen and (max-width: 640px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
     </style>
 </head>
 
-<body class="bg-brand-dark text-gray-200 font-inter antialiased selection:bg-brand-accent selection:text-brand-dark pb-20 md:pb-0">
+<body class="bg-brand-dark text-gray-200 font-inter antialiased selection:bg-brand-accent selection:text-brand-dark pb-28 sm:pb-32 md:pb-0">
 
     <!-- 1. Barra de Notificação Superior (Confiança e Benefício Imediato) -->
     <div class="bg-gradient-to-r from-brand-emerald via-green-600 to-brand-emerald text-white text-center py-2 px-3 text-xs font-bold tracking-wide shadow-md flex items-center justify-center space-x-2">
         <span class="text-sm">🇧🇷</span>
-        <span>FRETE GRÁTIS PARA TODO O BRASIL • PAGAMENTO VIA PIX COM DESPACHO EM 24H</span>
+        <span class="leading-tight">FRETE GRÁTIS PARA TODO O BRASIL • PAGAMENTO VIA PIX COM DESPACHO EM 24H</span>
     </div>
 
     <!-- 2. Header Fixo com Blur e Acesso Rápido -->
     <header class="sticky top-0 w-full z-40 backdrop-blur-xl bg-brand-dark/90 border-b border-brand-border transition-all duration-300">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="#" class="flex items-center space-x-2.5">
-                <img src="images/IB3yGye.png" alt="Kit Patriota Oficial" class="h-10 sm:h-12 w-auto object-contain">
+        <div class="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-2 sm:space-x-2.5">
+                <img src="images/IB3yGye.png" alt="Kit Patriota Oficial" class="h-9 sm:h-11 w-auto object-contain" width="120" height="44">
                 <span class="hidden sm:inline-block text-[11px] font-bold uppercase tracking-wider text-gray-400 border-l border-brand-border pl-2.5">
                     Loja Oficial
                 </span>
             </a>
 
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-3">
                 <div class="hidden md:flex items-center space-x-1.5 text-xs text-gray-300 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
                     <span class="w-2 h-2 rounded-full bg-brand-green"></span>
                     <span>Ambiente 100% Seguro</span>
                 </div>
 
                 <!-- Botão de Carrinho / Acesso ao Pedido -->
-                <button type="button" onclick="handleCartClick()" class="flex items-center space-x-2 bg-brand-accent/15 hover:bg-brand-accent/25 border border-brand-accent/40 text-white px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95">
+                <button type="button" onclick="handleCartClick()" class="flex items-center space-x-2 bg-brand-accent/15 hover:bg-brand-accent/25 border border-brand-accent/40 text-white px-3 sm:px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 min-h-[40px]">
                     <span class="text-base">🛒</span>
                     <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">Pedido</span>
                     <span id="header-cart-badge" class="bg-brand-accent text-brand-dark font-extrabold text-xs px-1.5 py-0.5 rounded-full">1</span>
@@ -162,44 +169,44 @@
 
     <main>
         <!-- 3. PRIMEIRA DOBRA (HERO SECTION - MOBILE FIRST DE ALTA CONVERSÃO) -->
-        <section class="pt-6 pb-12 md:pt-10 md:pb-16 relative overflow-hidden">
+        <section class="pt-5 pb-10 md:pt-10 md:pb-16 relative overflow-hidden">
             <!-- Background Glow Decorativo -->
             <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-green/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute top-1/3 right-10 w-72 h-72 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div class="container mx-auto px-4 max-w-5xl relative z-10">
+            <div class="container mx-auto px-3 sm:px-4 max-w-5xl relative z-10">
                 
                 <!-- Headline e Proposta de Valor -->
-                <div class="text-center max-w-3xl mx-auto mb-6">
-                    <div class="inline-flex items-center space-x-2 bg-brand-green/15 border border-brand-green/30 rounded-full px-4 py-1.5 mb-4 shadow-sm">
+                <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
+                    <div class="inline-flex items-center space-x-2 bg-brand-green/15 border border-brand-green/30 rounded-full px-3.5 sm:px-4 py-1.5 mb-3.5 sm:mb-4 shadow-sm">
                         <span class="w-2 h-2 rounded-full bg-brand-green"></span>
-                        <span class="text-xs font-bold text-brand-green uppercase tracking-wider">Edição Oficial Completa • Pronta Entrega</span>
+                        <span class="text-[11px] sm:text-xs font-bold text-brand-green uppercase tracking-wider">Edição Oficial Completa • Pronta Entrega</span>
                     </div>
 
-                    <h1 class="font-outfit text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-4">
+                    <h1 class="font-outfit text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-3 sm:mb-4 break-words">
                         Mostre Seu Amor Pelo Brasil com o <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-yellow-200">Kit Patriota Oficial</span>
                     </h1>
 
-                    <p class="text-base sm:text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                    <p class="text-sm sm:text-base md:text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
                         <strong>4 Itens Premium em Uma Só Caixa:</strong> Camiseta 100% Algodão + Boné Bordado 3D + Bandeira Oficial 1,5m + Garrafa Térmica 500ml.
                     </p>
                 </div>
 
                 <!-- Box de Compra Principal com Imagem e Seletor -->
-                <div class="glass-panel rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl border border-brand-border">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="glass-panel rounded-3xl p-4 sm:p-8 md:p-10 shadow-2xl border border-brand-border">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
                         
                         <!-- Coluna da Foto Principal com Badges -->
                         <div class="lg:col-span-6 relative">
                             <div class="relative rounded-2xl overflow-hidden bg-brand-dark/60 border border-white/10 shadow-inner group">
-                                <img src="images/DopeXsu.png" alt="Kit Patriota Completo - Camiseta, Boné, Bandeira e Garrafa" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105" loading="eager">
+                                <img src="images/DopeXsu.png" alt="Kit Patriota Completo - Camiseta, Boné, Bandeira e Garrafa" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105" loading="eager" width="600" height="600">
                                 
-                                <div class="absolute top-3 left-3 bg-brand-dark/85 backdrop-blur-md border border-brand-accent/40 text-brand-accent text-xs font-black px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1.5">
+                                <div class="absolute top-3 left-3 bg-brand-dark/90 backdrop-blur-md border border-brand-accent/40 text-brand-accent text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1.5">
                                     <span>⭐</span>
                                     <span>KIT COMPLETO (4 ITENS)</span>
                                 </div>
 
-                                <div class="absolute bottom-3 right-3 bg-brand-green/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1">
+                                <div class="absolute bottom-3 right-3 bg-brand-green/90 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1">
                                     <span>📦</span>
                                     <span>Frete Grátis Brasil</span>
                                 </div>
@@ -210,9 +217,9 @@
                         <div class="lg:col-span-6 flex flex-col justify-center">
                             
                             <!-- Lista Rápida dos Itens -->
-                            <div class="bg-white/[0.03] border border-white/5 rounded-2xl p-4 mb-5">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2.5">O que você recebe na caixa:</p>
-                                <ul class="space-y-2 text-xs sm:text-sm text-gray-200">
+                            <div class="bg-white/[0.03] border border-white/5 rounded-2xl p-3.5 sm:p-4 mb-4 sm:mb-5">
+                                <p class="text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">O que você recebe na caixa:</p>
+                                <ul class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-200">
                                     <li class="flex items-center space-x-2">
                                         <span class="text-brand-green font-bold text-base">✓</span>
                                         <span><strong>1x Camiseta "Eu Sou Patriota"</strong> (100% Algodão Premium)</span>
@@ -233,15 +240,15 @@
                             </div>
 
                             <!-- Preço Transparente (SOMENTE PIX) -->
-                            <div class="bg-gradient-to-br from-brand-card to-brand-dark p-5 rounded-2xl border border-brand-border mb-6">
+                            <div class="bg-gradient-to-br from-brand-card to-brand-dark p-4 sm:p-5 rounded-2xl border border-brand-border mb-4 sm:mb-6">
                                 <div class="flex items-baseline justify-between mb-1">
-                                    <span class="text-xs text-gray-400 uppercase font-semibold">Valor Especial de Lançamento:</span>
+                                    <span class="text-[11px] sm:text-xs text-gray-400 uppercase font-semibold">Valor Especial de Lançamento:</span>
                                     <span class="text-xs text-gray-400 line-through">De R$ 159,90</span>
                                 </div>
 
-                                <div class="flex items-baseline space-x-2">
+                                <div class="flex items-baseline space-x-2 flex-wrap gap-y-1">
                                     <span class="text-xs text-brand-accent font-bold uppercase">Por apenas</span>
-                                    <span class="text-4xl sm:text-5xl font-outfit font-black text-white tracking-tight">R$ 89,90</span>
+                                    <span class="text-3xl sm:text-5xl font-outfit font-black text-white tracking-tight">R$ 89,90</span>
                                     <span class="text-xs text-brand-green font-bold bg-brand-green/15 px-2 py-0.5 rounded-md">à vista no PIX</span>
                                 </div>
 
@@ -252,19 +259,19 @@
                             </div>
 
                             <!-- Seleção de Tamanho da Camiseta -->
-                            <div class="mb-5">
+                            <div class="mb-4 sm:mb-5">
                                 <div class="flex items-center justify-between mb-2">
                                     <label for="tamanho" class="text-xs sm:text-sm font-bold text-gray-200">
                                         1. Selecione o tamanho da sua camiseta:
                                     </label>
-                                    <button type="button" onclick="openTamanhosModal()" class="text-xs text-brand-accent hover:underline flex items-center space-x-1 cursor-pointer">
+                                    <button type="button" onclick="openTamanhosModal()" class="text-xs text-brand-accent hover:underline flex items-center space-x-1 cursor-pointer p-1">
                                         <span>📏</span>
                                         <span>Tabela de Medidas (cm)</span>
                                     </button>
                                 </div>
 
                                 <div class="relative">
-                                    <select id="tamanho" name="tamanho" class="w-full appearance-none bg-brand-dark text-white font-semibold p-4 rounded-xl border border-brand-borderLight focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition-all text-sm cursor-pointer shadow-inner">
+                                    <select id="tamanho" name="tamanho" class="w-full appearance-none bg-brand-dark text-white font-semibold p-3.5 sm:p-4 rounded-xl border border-brand-borderLight focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition-all text-base sm:text-sm cursor-pointer shadow-inner">
                                         <option value="" disabled selected class="bg-brand-dark text-gray-400">Clique aqui para escolher seu tamanho...</option>
                                         <option value="PP" class="bg-brand-dark text-white">Tamanho PP (Extra Pequeno)</option>
                                         <option value="P" class="bg-brand-dark text-white">Tamanho P (Pequeno)</option>
@@ -286,10 +293,10 @@
                             </div>
 
                             <!-- Botão Principal de Compra (CTA) -->
-                            <button id="comprar-btn" class="cta-pulse relative group w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-lg sm:text-xl py-4 sm:py-5 px-6 rounded-2xl shadow-glow-accent transition-all duration-300 active:scale-[0.98] uppercase tracking-wider mb-4 tap-target cursor-pointer">
-                                <span class="relative flex items-center justify-center space-x-2.5">
-                                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                    <span>QUERO GARANTIR O MEU AGORA</span>
+                            <button id="comprar-btn" class="cta-pulse relative group w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base sm:text-xl py-4 sm:py-5 px-5 sm:px-6 rounded-2xl shadow-glow-accent transition-all duration-300 active:scale-[0.98] uppercase tracking-wider mb-3.5 sm:mb-4 tap-target cursor-pointer flex items-center justify-center">
+                                <span class="relative flex items-center justify-center space-x-2">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-center">QUERO GARANTIR O MEU AGORA</span>
                                 </span>
                             </button>
 
@@ -317,105 +324,105 @@
         </section>
 
         <!-- 4. CONTINUIDADE DO REELS & CONEXÃO (PROBLEMA VS SOLUÇÃO) -->
-        <section class="py-12 bg-brand-card/40 border-y border-brand-border">
-            <div class="container mx-auto px-4 max-w-4xl text-center">
+        <section class="py-10 sm:py-12 bg-brand-card/40 border-y border-brand-border">
+            <div class="container mx-auto px-3 sm:px-4 max-w-4xl text-center">
                 <span class="text-xs font-bold uppercase tracking-wider text-brand-accent mb-2 block">Feito Para Durar</span>
-                <h2 class="font-outfit text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4">
+                <h2 class="font-outfit text-xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 sm:mb-4">
                     Por que o Kit Patriota Oficial é Diferente de Tudo o que Você Já Viu?
                 </h2>
-                <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-8">
+                <p class="text-gray-300 text-xs sm:text-base leading-relaxed max-w-2xl mx-auto mb-6 sm:mb-8">
                     Chega de camisetas frágeis que desbotam na primeira lavagem ou bonés tortos e desconfortáveis. O Kit Patriota Oficial foi desenvolvido com materiais de nível superior para você vestir com orgulho e máxima durabilidade.
                 </p>
 
                 <!-- Grid de Benefícios Reais -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-left">
-                    <div class="glass-card p-5 rounded-2xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-left">
+                    <div class="glass-card p-4 sm:p-5 rounded-2xl">
                         <div class="w-10 h-10 rounded-xl bg-brand-green/15 text-brand-green flex items-center justify-center text-xl mb-3">👕</div>
                         <h3 class="font-bold text-white text-sm mb-1">100% Algodão Premium</h3>
-                        <p class="text-xs text-gray-400">Malha macia, fresca e respirável com costura dupla reforçada.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Malha macia, fresca e respirável com costura dupla reforçada.</p>
                     </div>
 
-                    <div class="glass-card p-5 rounded-2xl">
+                    <div class="glass-card p-4 sm:p-5 rounded-2xl">
                         <div class="w-10 h-10 rounded-xl bg-brand-accent/15 text-brand-accent flex items-center justify-center text-xl mb-3">🧢</div>
                         <h3 class="font-bold text-white text-sm mb-1">Bordado em Alto Relevo</h3>
-                        <p class="text-xs text-gray-400">Boné estruturado com regulagem traseira que encaixa perfeitamente.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Boné estruturado com regulagem traseira que encaixa perfeitamente.</p>
                     </div>
 
-                    <div class="glass-card p-5 rounded-2xl">
+                    <div class="glass-card p-4 sm:p-5 rounded-2xl">
                         <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-xl mb-3">🇧🇷</div>
                         <h3 class="font-bold text-white text-sm mb-1">Bandeira Oficial 1,5m</h3>
-                        <p class="text-xs text-gray-400">Cores fiéis e vivas com ilhoses metálicos para fácil fixação.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Cores fiéis e vivas com ilhoses metálicos para fácil fixação.</p>
                     </div>
 
-                    <div class="glass-card p-5 rounded-2xl">
+                    <div class="glass-card p-4 sm:p-5 rounded-2xl">
                         <div class="w-10 h-10 rounded-xl bg-brand-green/15 text-brand-green flex items-center justify-center text-xl mb-3">🧊</div>
                         <h3 class="font-bold text-white text-sm mb-1">Garrafa Térmica 500ml</h3>
-                        <p class="text-xs text-gray-400">Acabamento fosco verde militar que conserva sua bebida gelada por horas.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Acabamento fosco verde militar que conserva sua bebida gelada por horas.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 5. DETALHAMENTO VISUAL DOS 4 ITENS (O QUE VEM NA CAIXA) -->
-        <section class="py-16 relative">
-            <div class="container mx-auto px-4 max-w-5xl">
+        <section class="py-12 sm:py-16 relative">
+            <div class="container mx-auto px-3 sm:px-4 max-w-5xl">
                 
-                <div class="text-center max-w-2xl mx-auto mb-12">
+                <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
                     <span class="text-xs font-bold uppercase tracking-wider text-brand-green mb-2 block">Detalhamento dos Itens</span>
-                    <h2 class="font-outfit text-3xl sm:text-4xl font-extrabold text-white">
+                    <h2 class="font-outfit text-2xl sm:text-4xl font-extrabold text-white">
                         Conheça Cada Item do Seu Kit
                     </h2>
-                    <p class="text-gray-400 text-sm mt-2">Cada peça foi desenhada e inspecionada para entregar a melhor experiência.</p>
+                    <p class="text-gray-400 text-xs sm:text-sm mt-2">Cada peça foi desenhada e inspecionada para entregar a melhor experiência.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     
                     <!-- Item 1: Camiseta -->
-                    <div class="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-brand-green/40 transition-all duration-300">
-                        <div class="w-44 h-44 rounded-2xl bg-brand-dark/80 p-4 mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
-                            <img src="images/swe9wWa.png" alt="Camiseta Eu sou patriota" class="max-h-full max-w-full object-contain" loading="lazy">
+                    <div class="glass-panel p-5 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-brand-green/40 transition-all duration-300">
+                        <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-brand-dark/80 p-3 sm:p-4 mb-4 sm:mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
+                            <img src="images/swe9wWa.png" alt="Camiseta Eu sou patriota" class="max-h-full max-w-full object-contain" loading="lazy" width="200" height="200">
                         </div>
-                        <span class="bg-brand-green/15 text-brand-green text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 1 • Camiseta Oficial</span>
-                        <h3 class="font-outfit text-xl font-bold text-white mb-2">Camiseta "Eu Sou Patriota"</h3>
+                        <span class="bg-brand-green/15 text-brand-green text-[10px] sm:text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 1 • Camiseta Oficial</span>
+                        <h3 class="font-outfit text-lg sm:text-xl font-bold text-white mb-2">Camiseta "Eu Sou Patriota"</h3>
                         <p class="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4">
                             Produzida em malha 100% algodão penteado fio 30.1. Não encolhe, não deforma e mantém as cores vivas mesmo após diversas lavagens.
                         </p>
-                        <button type="button" onclick="openTamanhosModal()" class="text-xs text-brand-accent hover:underline font-semibold mt-auto cursor-pointer">
+                        <button type="button" onclick="openTamanhosModal()" class="text-xs text-brand-accent hover:underline font-semibold mt-auto cursor-pointer p-1">
                             📏 Conferir medidas (PP ao 3XG)
                         </button>
                     </div>
 
                     <!-- Item 2: Boné -->
-                    <div class="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-brand-accent/40 transition-all duration-300">
-                        <div class="w-44 h-44 rounded-2xl bg-brand-dark/80 p-4 mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
-                            <img src="images/HGC9WU8.png" alt="Boné Oficial Brasil" class="max-h-full max-w-full object-contain" loading="lazy">
+                    <div class="glass-panel p-5 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-brand-accent/40 transition-all duration-300">
+                        <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-brand-dark/80 p-3 sm:p-4 mb-4 sm:mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
+                            <img src="images/HGC9WU8.png" alt="Boné Oficial Brasil" class="max-h-full max-w-full object-contain" loading="lazy" width="200" height="200">
                         </div>
-                        <span class="bg-brand-accent/15 text-brand-accent text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 2 • Boné Estruturado</span>
-                        <h3 class="font-outfit text-xl font-bold text-white mb-2">Boné Brasil Bordado 3D</h3>
+                        <span class="bg-brand-accent/15 text-brand-accent text-[10px] sm:text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 2 • Boné Estruturado</span>
+                        <h3 class="font-outfit text-lg sm:text-xl font-bold text-white mb-2">Boné Brasil Bordado 3D</h3>
                         <p class="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4">
                             Confeccionado em sarja nobre, aba curva e copa reforçada. Regulagem de tamanho metálica ajustável para qualquer formato de cabeça.
                         </p>
                     </div>
 
                     <!-- Item 3: Bandeira -->
-                    <div class="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-blue-400/40 transition-all duration-300">
-                        <div class="w-44 h-44 rounded-2xl bg-brand-dark/80 p-4 mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
-                            <img src="images/vjhTpnl.png" alt="Bandeira do Brasil 1,5m" class="max-h-full max-w-full object-contain" loading="lazy">
+                    <div class="glass-panel p-5 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-blue-400/40 transition-all duration-300">
+                        <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-brand-dark/80 p-3 sm:p-4 mb-4 sm:mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
+                            <img src="images/vjhTpnl.png" alt="Bandeira do Brasil 1,5m" class="max-h-full max-w-full object-contain" loading="lazy" width="200" height="200">
                         </div>
-                        <span class="bg-blue-400/15 text-blue-400 text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 3 • Bandeira Grande</span>
-                        <h3 class="font-outfit text-xl font-bold text-white mb-2">Bandeira do Brasil (1,50m x 0,90m)</h3>
+                        <span class="bg-blue-400/15 text-blue-400 text-[10px] sm:text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 3 • Bandeira Grande</span>
+                        <h3 class="font-outfit text-lg sm:text-xl font-bold text-white mb-2">Bandeira do Brasil (1,50m x 0,90m)</h3>
                         <p class="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4">
                             Tecido especial de alto brilho e resistência aos ventos. Dupla face com ilhoses de metal reforçados para fácil fixação em mastros ou paredes.
                         </p>
                     </div>
 
                     <!-- Item 4: Garrafa Térmica -->
-                    <div class="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-brand-green/40 transition-all duration-300">
-                        <div class="w-44 h-44 rounded-2xl bg-brand-dark/80 p-4 mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
-                            <img src="images/6EaV56L.png" alt="Garrafa Térmica 500ml" class="max-h-full max-w-full object-contain" loading="lazy">
+                    <div class="glass-panel p-5 sm:p-8 rounded-3xl flex flex-col items-center text-center group hover:border-brand-green/40 transition-all duration-300">
+                        <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-brand-dark/80 p-3 sm:p-4 mb-4 sm:mb-5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
+                            <img src="images/6EaV56L.png" alt="Garrafa Térmica 500ml" class="max-h-full max-w-full object-contain" loading="lazy" width="200" height="200">
                         </div>
-                        <span class="bg-brand-green/15 text-brand-green text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 4 • Garrafa Térmica</span>
-                        <h3 class="font-outfit text-xl font-bold text-white mb-2">Garrafa Térmica Esportiva 500ml</h3>
+                        <span class="bg-brand-green/15 text-brand-green text-[10px] sm:text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Item 4 • Garrafa Térmica</span>
+                        <h3 class="font-outfit text-lg sm:text-xl font-bold text-white mb-2">Garrafa Térmica Esportiva 500ml</h3>
                         <p class="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4">
                             Isolamento térmico a vácuo em aço inoxidável. Tampa com vedação hermética antivazamento e alça ergonômica para transporte.
                         </p>
@@ -424,8 +431,8 @@
                 </div>
 
                 <!-- CTA Intermediário -->
-                <div class="text-center mt-10">
-                    <button onclick="document.getElementById('comprar-btn').scrollIntoView({behavior: 'smooth', block: 'center'})" class="bg-brand-green hover:bg-brand-greenHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 px-8 rounded-2xl shadow-glow-green transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer">
+                <div class="text-center mt-8 sm:mt-10">
+                    <button onclick="document.getElementById('comprar-btn').scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full sm:w-auto bg-brand-green hover:bg-brand-greenHover text-brand-dark font-outfit font-black text-sm sm:text-lg py-4 px-6 sm:px-8 rounded-2xl shadow-glow-green transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer tap-target">
                         GARANTIR TODOS OS 4 ITENS POR R$ 89,90 NO PIX ➔
                     </button>
                 </div>
@@ -434,11 +441,11 @@
         </section>
 
         <!-- 6. TABELA COMPARATIVA DE VALOR (POR QUE COMPRAR O KIT COMPLETO) -->
-        <section class="py-12 bg-brand-card/30 border-y border-brand-border">
-            <div class="container mx-auto px-4 max-w-4xl">
-                <div class="text-center max-w-2xl mx-auto mb-8">
+        <section class="py-10 sm:py-12 bg-brand-card/30 border-y border-brand-border">
+            <div class="container mx-auto px-3 sm:px-4 max-w-4xl">
+                <div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
                     <span class="text-xs font-bold uppercase tracking-wider text-brand-accent mb-2 block">Comparativo de Economia</span>
-                    <h2 class="font-outfit text-2xl sm:text-3xl font-extrabold text-white">
+                    <h2 class="font-outfit text-xl sm:text-3xl font-extrabold text-white">
                         Por Que o Kit Patriota Vale Tanto a Pena?
                     </h2>
                 </div>
@@ -446,10 +453,10 @@
                 <div class="glass-panel rounded-3xl overflow-hidden border border-brand-border shadow-xl">
                     <div class="grid grid-cols-1 sm:grid-cols-2 text-xs sm:text-sm">
                         <!-- Coluna 1: Valores de Referência - Itens Similares -->
-                        <div class="p-5 sm:p-6 bg-brand-dark/50 border-b sm:border-b-0 sm:border-r border-brand-border flex flex-col justify-between">
+                        <div class="p-4 sm:p-6 bg-brand-dark/50 border-b sm:border-b-0 sm:border-r border-brand-border flex flex-col justify-between">
                             <div>
-                                <h3 class="font-bold text-gray-400 uppercase text-xs mb-4 text-center">Valores de Referência — Itens Similares</h3>
-                                <ul class="space-y-3 text-gray-300">
+                                <h3 class="font-bold text-gray-400 uppercase text-xs mb-3 sm:mb-4 text-center">Valores de Referência — Itens Similares</h3>
+                                <ul class="space-y-2.5 sm:space-y-3 text-gray-300">
                                     <li class="flex justify-between items-center border-b border-white/5 pb-2">
                                         <span>Camiseta 100% Algodão</span>
                                         <span class="font-semibold text-gray-400 line-through">R$ 59,90</span>
@@ -469,22 +476,22 @@
                                 </ul>
                             </div>
 
-                            <div class="pt-4 mt-4 border-t border-white/10">
+                            <div class="pt-3.5 mt-3.5 border-t border-white/10">
                                 <div class="flex justify-between items-baseline">
                                     <span class="text-xs text-gray-400">Total estimado separadamente:</span>
-                                    <span class="text-red-400 line-through font-outfit font-extrabold text-lg sm:text-xl">R$ 169,60</span>
+                                    <span class="text-red-400 line-through font-outfit font-extrabold text-base sm:text-xl">R$ 169,60</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Coluna 2: Nosso Kit Oficial -->
-                        <div class="p-5 sm:p-6 bg-brand-green/10 flex flex-col justify-between">
+                        <div class="p-4 sm:p-6 bg-brand-green/10 flex flex-col justify-between">
                             <div>
-                                <h3 class="font-black text-brand-green uppercase text-xs mb-4 text-center flex items-center justify-center space-x-1.5">
+                                <h3 class="font-black text-brand-green uppercase text-xs mb-3 sm:mb-4 text-center flex items-center justify-center space-x-1.5">
                                     <span>⭐</span>
                                     <span>Kit Patriota Completo</span>
                                 </h3>
-                                <ul class="space-y-3 text-gray-200">
+                                <ul class="space-y-2.5 sm:space-y-3 text-gray-200">
                                     <li class="flex items-center space-x-2 border-b border-brand-green/20 pb-2">
                                         <span class="text-brand-green font-bold">✓</span>
                                         <span>Camiseta 100% Algodão</span>
@@ -508,7 +515,7 @@
                                 </ul>
                             </div>
                             
-                            <div class="pt-4 mt-4 border-t border-brand-green/30 text-center">
+                            <div class="pt-3.5 mt-3.5 border-t border-brand-green/30 text-center">
                                 <span class="text-[11px] text-gray-300 block mb-0.5">Tudo em uma única compra:</span>
                                 <div class="flex items-baseline justify-center space-x-1.5">
                                     <span class="font-outfit font-black text-3xl sm:text-4xl text-brand-green">R$ 89,90</span>
@@ -518,7 +525,7 @@
                                 </span>
 
                                 <!-- Box de Economia -->
-                                <div class="mt-3.5 bg-brand-green/20 border border-brand-green/30 rounded-2xl p-2.5 shadow-sm">
+                                <div class="mt-3 bg-brand-green/20 border border-brand-green/30 rounded-2xl p-2.5 shadow-sm">
                                     <p class="text-xs font-black text-white uppercase tracking-wide">
                                         VOCÊ ECONOMIZA R$ 79,70
                                     </p>
@@ -539,35 +546,35 @@
         </section>
 
         <!-- 7. COMO FUNCIONA SEU PEDIDO (PASSO A PASSO TRANSPARENTE) -->
-        <section class="py-16 relative">
-            <div class="container mx-auto px-4 max-w-4xl text-center">
+        <section class="py-12 sm:py-16 relative">
+            <div class="container mx-auto px-3 sm:px-4 max-w-4xl text-center">
                 <span class="text-xs font-bold uppercase tracking-wider text-brand-green mb-2 block">Simplicidade & Segurança</span>
-                <h2 class="font-outfit text-2xl sm:text-3xl font-extrabold text-white mb-10">
+                <h2 class="font-outfit text-xl sm:text-3xl font-extrabold text-white mb-8 sm:mb-10">
                     Como Funciona o Seu Pedido em 3 Passos:
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                    <div class="glass-panel p-6 rounded-3xl relative">
-                        <div class="w-10 h-10 rounded-2xl bg-brand-accent text-brand-dark font-black font-outfit text-xl flex items-center justify-center mb-4">1</div>
-                        <h3 class="font-bold text-white text-base mb-2">Escolha o Tamanho</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-left">
+                    <div class="glass-panel p-5 sm:p-6 rounded-3xl relative">
+                        <div class="w-10 h-10 rounded-2xl bg-brand-accent text-brand-dark font-black font-outfit text-xl flex items-center justify-center mb-3 sm:mb-4">1</div>
+                        <h3 class="font-bold text-white text-base mb-1.5 sm:mb-2">Escolha o Tamanho</h3>
                         <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
                             Selecione o tamanho da camiseta (PP ao 3XG) e clique no botão de compra para abrir o formulário seguro.
                         </p>
                     </div>
 
-                    <div class="glass-panel p-6 rounded-3xl relative">
-                        <div class="w-10 h-10 rounded-2xl bg-brand-green text-brand-dark font-black font-outfit text-xl flex items-center justify-center mb-4">2</div>
-                        <h3 class="font-bold text-white text-base mb-2">Pague via PIX</h3>
+                    <div class="glass-panel p-5 sm:p-6 rounded-3xl relative">
+                        <div class="w-10 h-10 rounded-2xl bg-brand-green text-brand-dark font-black font-outfit text-xl flex items-center justify-center mb-3 sm:mb-4">2</div>
+                        <h3 class="font-bold text-white text-base mb-1.5 sm:mb-2">Pague via PIX</h3>
                         <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
                             Preencha seu endereço e pague no app do seu banco via QR Code ou Copia e Cola. A aprovação é imediata.
                         </p>
                     </div>
 
-                    <div class="glass-panel p-6 rounded-3xl relative">
-                        <div class="w-10 h-10 rounded-2xl bg-blue-500 text-white font-black font-outfit text-xl flex items-center justify-center mb-4">3</div>
-                        <h3 class="font-bold text-white text-base mb-2">Receba com Rastreio</h3>
+                    <div class="glass-panel p-5 sm:p-6 rounded-3xl relative">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-500 text-white font-black font-outfit text-xl flex items-center justify-center mb-3 sm:mb-4">3</div>
+                        <h3 class="font-bold text-white text-base mb-1.5 sm:mb-2">Receba com Rastreio</h3>
                         <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                            Seu kit entra em separação prioritária e o código de rastreamento dos Correios chega no seu WhatsApp e E-mail.
+                            Seu kit entra em separação prioritária e o código de rastreamento dos Correios chega no seu WhatsApp e E-mail em até 24 horas úteis.
                         </p>
                     </div>
                 </div>
@@ -575,17 +582,17 @@
         </section>
 
         <!-- 8. GARANTIA REAL E TRANSPARÊNCIA (ART. 49 DO CDC) -->
-        <section class="py-12 bg-brand-card/40 border-y border-brand-border">
-            <div class="container mx-auto px-4 max-w-4xl">
-                <div class="glass-panel rounded-3xl p-6 sm:p-8 md:p-10 border border-brand-green/30 flex flex-col md:flex-row items-center gap-6">
-                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-brand-green/15 text-brand-green flex items-center justify-center text-4xl sm:text-5xl flex-shrink-0">
+        <section class="py-10 sm:py-12 bg-brand-card/40 border-y border-brand-border">
+            <div class="container mx-auto px-3 sm:px-4 max-w-4xl">
+                <div class="glass-panel rounded-3xl p-5 sm:p-8 md:p-10 border border-brand-green/30 flex flex-col md:flex-row items-center gap-5 sm:gap-6 text-center md:text-left">
+                    <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-3xl bg-brand-green/15 text-brand-green flex items-center justify-center text-3xl sm:text-5xl flex-shrink-0">
                         🛡️
                     </div>
                     <div>
                         <div class="inline-flex items-center space-x-2 bg-brand-green/20 text-brand-green text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
                             <span>Garantia Incondicional de 7 Dias</span>
                         </div>
-                        <h3 class="font-outfit text-xl sm:text-2xl font-bold text-white mb-2">
+                        <h3 class="font-outfit text-lg sm:text-2xl font-bold text-white mb-2">
                             Sua Satisfação Garantida ou 100% do Dinheiro de Volta
                         </h3>
                         <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
@@ -597,82 +604,82 @@
         </section>
 
         <!-- 9. FAQ - PERGUNTAS FREQUENTES (QUEBRA DE TODAS AS OBJEÇÕES) -->
-        <section class="py-16 relative">
-            <div class="container mx-auto px-4 max-w-3xl">
-                <div class="text-center mb-10">
+        <section class="py-12 sm:py-16 relative">
+            <div class="container mx-auto px-3 sm:px-4 max-w-3xl">
+                <div class="text-center mb-8 sm:mb-10">
                     <span class="text-xs font-bold uppercase tracking-wider text-brand-accent mb-2 block">Dúvidas Comuns</span>
-                    <h2 class="font-outfit text-3xl sm:text-4xl font-extrabold text-white">
+                    <h2 class="font-outfit text-2xl sm:text-4xl font-extrabold text-white">
                         Perguntas Frequentes
                     </h2>
                 </div>
 
-                <div class="space-y-3.5">
+                <div class="space-y-3">
                     <!-- Pergunta 1 -->
                     <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
-                        <button type="button" onclick="toggleFaq(1)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer">
-                            <span class="flex items-center space-x-3">
+                        <button type="button" onclick="toggleFaq(1)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer tap-target">
+                            <span class="flex items-center space-x-3 pr-2">
                                 <span class="text-lg text-brand-green">⚡</span>
                                 <span>Como funciona o pagamento via PIX?</span>
                             </span>
-                            <span id="faq-icon-1" class="text-brand-accent text-lg transition-transform duration-300">＋</span>
+                            <span id="faq-icon-1" class="text-brand-accent text-lg transition-transform duration-300 flex-shrink-0">＋</span>
                         </button>
-                        <div id="faq-answer-1" class="hidden px-5 pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
+                        <div id="faq-answer-1" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
                             O pagamento é realizado exclusivamente via PIX. Ao clicar em finalizar, geramos o QR Code e a chave Copia e Cola oficiais. Basta abrir o aplicativo do seu banco, colar o código ou escanear a imagem e confirmar. A confirmação no nosso sistema é automática e imediata.
                         </div>
                     </div>
 
                     <!-- Pergunta 2 -->
                     <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
-                        <button type="button" onclick="toggleFaq(2)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer">
-                            <span class="flex items-center space-x-3">
+                        <button type="button" onclick="toggleFaq(2)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer tap-target">
+                            <span class="flex items-center space-x-3 pr-2">
                                 <span class="text-lg text-brand-accent">🚚</span>
                                 <span>O Frete é realmente Grátis para todo o Brasil?</span>
                             </span>
-                            <span id="faq-icon-2" class="text-brand-accent text-lg transition-transform duration-300">＋</span>
+                            <span id="faq-icon-2" class="text-brand-accent text-lg transition-transform duration-300 flex-shrink-0">＋</span>
                         </button>
-                        <div id="faq-answer-2" class="hidden px-5 pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
+                        <div id="faq-answer-2" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
                             Sim! Oferecemos Frete Grátis padrão dos Correios para qualquer endereço do território nacional. Caso você tenha urgência, oferecemos também a modalidade Full Express (3 dias úteis) por uma pequena taxa adicional de R$ 9,99 na finalização.
                         </div>
                     </div>
 
                     <!-- Pergunta 3 -->
                     <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
-                        <button type="button" onclick="toggleFaq(3)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer">
-                            <span class="flex items-center space-x-3">
+                        <button type="button" onclick="toggleFaq(3)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer tap-target">
+                            <span class="flex items-center space-x-3 pr-2">
                                 <span class="text-lg text-blue-400">📦</span>
                                 <span>Como acompanho o rastreamento da minha encomenda?</span>
                             </span>
-                            <span id="faq-icon-3" class="text-brand-accent text-lg transition-transform duration-300">＋</span>
+                            <span id="faq-icon-3" class="text-brand-accent text-lg transition-transform duration-300 flex-shrink-0">＋</span>
                         </button>
-                        <div id="faq-answer-3" class="hidden px-5 pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
+                        <div id="faq-answer-2" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
                             Assim que seu PIX for aprovado, seu pedido entra na fila de embalagem e expedição. Em até 24 horas úteis, você receberá o código oficial de rastreamento dos Correios diretamente no seu WhatsApp e E-mail informados no checkout.
                         </div>
                     </div>
 
                     <!-- Pergunta 4 -->
                     <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
-                        <button type="button" onclick="toggleFaq(4)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer">
-                            <span class="flex items-center space-x-3">
+                        <button type="button" onclick="toggleFaq(4)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer tap-target">
+                            <span class="flex items-center space-x-3 pr-2">
                                 <span class="text-lg text-brand-green">👕</span>
                                 <span>E se a camiseta não servir quando chegar?</span>
                             </span>
-                            <span id="faq-icon-4" class="text-brand-accent text-lg transition-transform duration-300">＋</span>
+                            <span id="faq-icon-4" class="text-brand-accent text-lg transition-transform duration-300 flex-shrink-0">＋</span>
                         </button>
-                        <div id="faq-answer-4" class="hidden px-5 pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
+                        <div id="faq-answer-4" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
                             Fique 100% tranquilo! Você tem 7 dias de garantia após o recebimento. Se precisar de outro tamanho, basta chamar nosso suporte de atendimento que realizamos a troca com todo o suporte necessário.
                         </div>
                     </div>
 
                     <!-- Pergunta 5 -->
                     <div class="glass-panel rounded-2xl overflow-hidden border border-brand-border">
-                        <button type="button" onclick="toggleFaq(5)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer">
-                            <span class="flex items-center space-x-3">
+                        <button type="button" onclick="toggleFaq(5)" class="w-full p-4 sm:p-5 text-left flex justify-between items-center text-white font-outfit font-bold text-sm sm:text-base hover:text-brand-accent transition-colors cursor-pointer tap-target">
+                            <span class="flex items-center space-x-3 pr-2">
                                 <span class="text-lg text-brand-accent">🎁</span>
                                 <span>O que exatamente vem na caixa do Kit Patriota?</span>
                             </span>
-                            <span id="faq-icon-5" class="text-brand-accent text-lg transition-transform duration-300">＋</span>
+                            <span id="faq-icon-5" class="text-brand-accent text-lg transition-transform duration-300 flex-shrink-0">＋</span>
                         </button>
-                        <div id="faq-answer-5" class="hidden px-5 pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
+                        <div id="faq-answer-5" class="hidden px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-white/5 pt-3.5">
                             Você recebe todos os 4 itens completos: 1x Camiseta "Eu Sou Patriota" (100% Algodão Premium), 1x Boné Oficial Brasil (Bordado em Alto Relevo), 1x Bandeira do Brasil (1,50m x 0,90m) e 1x Garrafa Térmica (500ml Verde Fosco).
                         </div>
                     </div>
@@ -681,23 +688,23 @@
         </section>
 
         <!-- 10. SEÇÃO FINAL DE FECHAMENTO (CALL TO ACTION FINAL) -->
-        <section class="py-14 bg-gradient-to-t from-brand-darker via-brand-dark to-brand-card/50 border-t border-brand-border text-center">
-            <div class="container mx-auto px-4 max-w-2xl">
-                <div class="w-14 h-14 rounded-2xl bg-brand-accent/15 text-brand-accent flex items-center justify-center text-2xl mx-auto mb-4 border border-brand-accent/30">
+        <section class="py-12 sm:py-14 bg-gradient-to-t from-brand-darker via-brand-dark to-brand-card/50 border-t border-brand-border text-center">
+            <div class="container mx-auto px-3 sm:px-4 max-w-2xl">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-brand-accent/15 text-brand-accent flex items-center justify-center text-2xl mx-auto mb-3.5 sm:mb-4 border border-brand-accent/30">
                     🇧🇷
                 </div>
-                <h2 class="font-outfit text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
+                <h2 class="font-outfit text-xl sm:text-3xl md:text-4xl font-black text-white mb-2.5 sm:mb-3 leading-tight">
                     Garanta Seu Kit Patriota Oficial Agora
                 </h2>
-                <p class="text-gray-300 text-sm sm:text-base mb-6">
+                <p class="text-gray-300 text-xs sm:text-base mb-5 sm:mb-6">
                     Aproveite a oferta de lançamento: <strong>4 Itens por R$ 89,90 no PIX</strong> com Frete Grátis para todo o Brasil.
                 </p>
 
-                <button onclick="document.getElementById('comprar-btn').scrollIntoView({behavior: 'smooth', block: 'center'})" class="cta-pulse w-full sm:w-auto bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-lg sm:text-xl py-4 sm:py-5 px-10 rounded-2xl shadow-glow-accent transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer">
+                <button onclick="document.getElementById('comprar-btn').scrollIntoView({behavior: 'smooth', block: 'center'})" class="cta-pulse w-full sm:w-auto bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base sm:text-xl py-4 sm:py-5 px-8 sm:px-10 rounded-2xl shadow-glow-accent transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer tap-target">
                     QUERO GARANTIR MEU KIT AGORA ➔
                 </button>
                 
-                <p class="text-xs text-gray-400 mt-4 flex items-center justify-center space-x-1.5">
+                <p class="text-[11px] sm:text-xs text-gray-400 mt-3.5 sm:mt-4 flex items-center justify-center space-x-1.5">
                     <span class="text-brand-green">🔒</span>
                     <span>Pagamento Seguro via PIX • Envio Prioritário Correios</span>
                 </p>
@@ -706,18 +713,18 @@
     </main>
 
     <!-- 11. RODAPÉ INSTITUCIONAL & TRANSPARÊNCIA -->
-    <footer class="bg-brand-darker border-t border-brand-border pt-10 pb-8 text-gray-400 text-xs">
-        <div class="container mx-auto px-4 max-w-5xl">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 items-center text-center md:text-left">
+    <footer class="bg-brand-darker border-t border-brand-border pt-8 sm:pt-10 pb-8 text-gray-400 text-xs">
+        <div class="container mx-auto px-3 sm:px-4 max-w-5xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8 items-center text-center md:text-left">
                 
-                <div class="flex flex-col items-center md:items-start space-y-2.5">
-                    <img src="images/IB3yGye.png" alt="Kit Patriota Brasil Vendas" class="h-10 w-auto object-contain">
-                    <p class="text-gray-400 max-w-xs text-[11px]">
+                <div class="flex flex-col items-center md:items-start space-y-2">
+                    <img src="images/IB3yGye.png" alt="Kit Patriota Brasil Vendas" class="h-9 sm:h-10 w-auto object-contain" width="110" height="40" loading="lazy">
+                    <p class="text-gray-400 max-w-xs text-[11px] leading-relaxed">
                         Brasil Vendas — Vestuário e Artigos Patriotas com padrão de acabamento premium e entrega em todo o Brasil.
                     </p>
                 </div>
 
-                <div class="text-center space-y-1.5">
+                <div class="text-center space-y-1">
                     <p class="text-brand-green font-bold text-xs flex items-center justify-center space-x-1">
                         <span>🔒</span>
                         <span>Ambiente 100% Criptografado</span>
@@ -737,9 +744,9 @@
 
             </div>
 
-            <div class="border-t border-brand-border pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-400 gap-3">
+            <div class="border-t border-brand-border pt-5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-400 gap-2.5 text-center">
                 <p>© 2026 Brasil Vendas. Todos os direitos reservados.</p>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center justify-center space-x-3 sm:space-x-4 flex-wrap">
                     <span class="hover:text-gray-300 cursor-pointer">Termos de Uso</span>
                     <span>•</span>
                     <span class="hover:text-gray-300 cursor-pointer">Política de Privacidade</span>
@@ -751,40 +758,40 @@
     </footer>
 
     <!-- 12. STICKY BOTTOM BAR MOBILE (COMPRA EM 1 TOQUE NO CELULAR) -->
-    <div id="mobile-sticky-bar" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-dark/95 backdrop-blur-lg border-t border-brand-border px-3.5 py-2.5 shadow-2xl flex items-center justify-between transition-transform duration-300">
+    <div id="mobile-sticky-bar" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-dark/95 backdrop-blur-lg border-t border-brand-border px-3.5 py-2.5 shadow-2xl flex items-center justify-between transition-transform duration-300" style="padding-bottom: max(0.625rem, env(safe-area-inset-bottom));">
         <div class="flex items-center space-x-2.5">
-            <img src="images/DopeXsu.png" alt="Kit" class="w-10 h-10 rounded-lg object-cover bg-brand-card border border-white/10 flex-shrink-0">
+            <img src="images/DopeXsu.png" alt="Kit Patriota" class="w-10 h-10 rounded-lg object-cover bg-brand-card border border-white/10 flex-shrink-0" width="40" height="40" loading="lazy">
             <div>
                 <p class="text-[11px] font-bold text-white leading-tight">Kit Patriota (4 Itens)</p>
                 <p class="text-xs font-black text-brand-accent">R$ 89,90 <span class="text-[9px] text-brand-green font-bold">no PIX</span></p>
             </div>
         </div>
 
-        <button type="button" onclick="handleCartClick()" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-xs px-4 py-2.5 rounded-xl uppercase tracking-wider shadow-md active:scale-95 flex items-center space-x-1.5 cursor-pointer">
+        <button type="button" onclick="handleCartClick()" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-xs px-4 py-2.5 rounded-xl uppercase tracking-wider shadow-md active:scale-95 flex items-center space-x-1.5 cursor-pointer tap-target">
             <span>COMPRAR</span>
             <span>➔</span>
         </button>
     </div>
 
     <!-- 13. CHECKOUT MODAL TRANSPARENTE VIA PIX (DUTTYFY / VERCEL / PHP) -->
-    <div id="pix-checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="bg-[#0b0d14] border border-brand-green/30 w-full max-w-xl rounded-3xl p-5 sm:p-7 shadow-2xl relative text-white my-4 max-h-[94vh] overflow-y-auto">
-            <button type="button" onclick="closePixModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl transition-colors z-20 cursor-pointer p-1">✕</button>
+    <div id="pix-checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="bg-[#0b0d14] border border-brand-green/30 w-full max-w-xl rounded-3xl p-4 sm:p-7 shadow-2xl relative text-white my-auto max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain">
+            <button type="button" onclick="closePixModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-2xl transition-colors z-20 cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10">✕</button>
 
             <!-- Passo 1: Formulário e Endereço -->
             <div id="pix-step-form">
-                <div class="flex items-center space-x-3 mb-4">
+                <div class="flex items-center space-x-3 mb-4 pr-8">
                     <div class="w-10 h-10 rounded-xl bg-brand-green/20 flex items-center justify-center text-brand-green text-xl font-bold flex-shrink-0">⚡</div>
                     <div>
-                        <h3 id="modal-title" class="font-outfit text-xl sm:text-2xl font-bold text-white leading-tight">Finalizar Pedido via PIX</h3>
-                        <p class="text-xs text-gray-400">Preencha seus dados para geração do PIX e envio imediato</p>
+                        <h3 id="modal-title" class="font-outfit text-lg sm:text-2xl font-bold text-white leading-tight">Finalizar Pedido via PIX</h3>
+                        <p class="text-[11px] sm:text-xs text-gray-400">Preencha seus dados para geração do PIX e envio imediato</p>
                     </div>
                 </div>
 
                 <!-- Resumo do Pedido -->
-                <div class="bg-brand-dark/80 p-3.5 sm:p-4 rounded-2xl border border-brand-border mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner">
+                <div class="bg-brand-dark/80 p-3 sm:p-4 rounded-2xl border border-brand-border mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner">
                     <div class="flex items-center space-x-3">
-                        <img src="images/DopeXsu.png" alt="Kit Patriota" class="w-12 h-12 rounded-xl object-contain bg-brand-dark border border-white/10 flex-shrink-0">
+                        <img src="images/DopeXsu.png" alt="Kit Patriota" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl object-contain bg-brand-dark border border-white/10 flex-shrink-0" width="48" height="48">
                         <div>
                             <p class="font-bold text-xs sm:text-sm text-white">Kit Patriota Oficial Completo</p>
                             <p class="text-xs text-brand-accent">Tamanho: <span id="modal-tamanho-display" class="font-bold">M</span> • <span id="modal-frete-display" class="text-gray-300">Frete Grátis</span></p>
@@ -794,9 +801,9 @@
                     <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3">
                         <!-- Seletor de Quantidade -->
                         <div class="flex items-center bg-black/60 border border-brand-border rounded-xl p-1">
-                            <button type="button" onclick="changeQuantity(-1)" class="w-7 h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90" aria-label="Diminuir quantidade">－</button>
+                            <button type="button" onclick="changeQuantity(-1)" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90" aria-label="Diminuir quantidade">－</button>
                             <span id="modal-qtd-display" class="w-7 text-center font-outfit font-black text-sm text-white">1</span>
-                            <button type="button" onclick="changeQuantity(1)" class="w-7 h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90" aria-label="Aumentar quantidade">＋</button>
+                            <button type="button" onclick="changeQuantity(1)" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90" aria-label="Aumentar quantidade">＋</button>
                         </div>
 
                         <!-- Preço Total -->
@@ -807,42 +814,42 @@
                     </div>
                 </div>
 
-                <form id="pix-customer-form" onsubmit="handlePixSubmit(event)" class="space-y-4">
+                <form id="pix-customer-form" onsubmit="handlePixSubmit(event)" class="space-y-3.5 sm:space-y-4">
                     
                     <!-- 1. DADOS PESSOAIS -->
                     <div>
-                        <div class="flex items-center space-x-2 mb-2.5">
+                        <div class="flex items-center space-x-2 mb-2">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">1. Dados Pessoais</span>
                             <div class="h-[1px] flex-1 bg-brand-border"></div>
                         </div>
                         <div class="space-y-2.5">
                             <div>
                                 <label for="pix-name" class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo *</label>
-                                <input type="text" id="pix-name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                <input type="text" id="pix-name" required autocomplete="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label for="pix-cpf" class="block text-xs font-semibold text-gray-300 mb-1">CPF (apenas números) *</label>
-                                    <input type="text" id="pix-cpf" required placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <input type="text" id="pix-cpf" required inputmode="numeric" placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                     <p id="cpf-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite um CPF válido.</p>
                                 </div>
                                 <div>
                                     <label for="pix-phone" class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Celular *</label>
-                                    <input type="tel" id="pix-phone" required placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <input type="tel" id="pix-phone" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                 </div>
                             </div>
 
                             <div>
                                 <label for="pix-email" class="block text-xs font-semibold text-gray-300 mb-1">E-mail para envio do rastreamento *</label>
-                                <input type="email" id="pix-email" required placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                <input type="email" id="pix-email" required inputmode="email" autocomplete="email" placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                             </div>
                         </div>
                     </div>
 
                     <!-- 2. ENDEREÇO DE ENTREGA -->
                     <div>
-                        <div class="flex items-center space-x-2 mb-2.5">
+                        <div class="flex items-center space-x-2 mb-2">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">2. Endereço de Entrega</span>
                             <div class="h-[1px] flex-1 bg-brand-border"></div>
                         </div>
@@ -850,7 +857,7 @@
                             <div>
                                 <label for="pix-cep" class="block text-xs font-semibold text-gray-300 mb-1">CEP * <span class="text-[10px] text-brand-accent font-normal">(Busca automática)</span></label>
                                 <div class="relative">
-                                    <input type="text" id="pix-cep" required placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <input type="text" id="pix-cep" required inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                     <div id="cep-loading" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
                                         <div class="w-4 h-4 border-2 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
                                     </div>
@@ -860,33 +867,33 @@
 
                             <div>
                                 <label for="pix-street" class="block text-xs font-semibold text-gray-300 mb-1">Rua / Logradouro *</label>
-                                <input type="text" id="pix-street" required placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                <input type="text" id="pix-street" required autocomplete="address-line1" placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label for="pix-number" class="block text-xs font-semibold text-gray-300 mb-1">Número *</label>
-                                    <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                 </div>
                                 <div>
                                     <label for="pix-complement" class="block text-xs font-semibold text-gray-300 mb-1">Complemento <span class="text-gray-500 font-normal">(Opcional)</span></label>
-                                    <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label for="pix-neighborhood" class="block text-xs font-semibold text-gray-300 mb-1">Bairro *</label>
-                                    <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                    <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                 </div>
                                 <div class="grid grid-cols-3 gap-2">
                                     <div class="col-span-2">
                                         <label for="pix-city" class="block text-xs font-semibold text-gray-300 mb-1">Cidade *</label>
-                                        <input type="text" id="pix-city" required placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                        <input type="text" id="pix-city" required autocomplete="address-level2" placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="pix-state" class="block text-xs font-semibold text-gray-300 mb-1">UF *</label>
-                                        <input type="text" id="pix-state" required placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-sm">
+                                        <input type="text" id="pix-state" required autocomplete="address-level1" placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -895,7 +902,7 @@
 
                     <!-- 3. OPÇÕES DE ENVIO -->
                     <div>
-                        <div class="flex items-center space-x-2 mb-2.5">
+                        <div class="flex items-center space-x-2 mb-2">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">3. Opções de Envio</span>
                             <div class="h-[1px] flex-1 bg-brand-border"></div>
                         </div>
@@ -939,28 +946,28 @@
             <!-- Passo 2: Exibição do QR Code e Copia e Cola -->
             <div id="pix-step-qrcode" class="hidden text-center py-2">
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand-green/20 text-brand-green text-2xl mb-2">⚡</div>
-                <h3 class="font-outfit text-2xl font-bold text-white mb-1">PIX Gerado com Sucesso!</h3>
-                <p class="text-xs text-gray-400 mb-5">Abra o app do seu banco e pague com o QR Code ou código abaixo:</p>
+                <h3 class="font-outfit text-xl sm:text-2xl font-bold text-white mb-1">PIX Gerado com Sucesso!</h3>
+                <p class="text-xs text-gray-400 mb-4 sm:mb-5">Abra o app do seu banco e pague com o QR Code ou código abaixo:</p>
 
                 <!-- QR Code Box -->
-                <div class="bg-white p-3 rounded-2xl w-56 h-56 mx-auto mb-5 flex items-center justify-center shadow-inner">
-                    <img id="pix-qrcode-img" src="" alt="QR Code PIX Oficial" class="w-full h-full object-contain">
+                <div class="bg-white p-3 rounded-2xl w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-4 sm:mb-5 flex items-center justify-center shadow-inner">
+                    <img id="pix-qrcode-img" src="" alt="QR Code PIX Oficial" class="w-full h-full object-contain" width="224" height="224">
                 </div>
 
                 <!-- Copia e Cola -->
-                <div class="mb-5 text-left">
+                <div class="mb-4 sm:mb-5 text-left">
                     <label for="pix-copia-cola" class="block text-xs font-semibold text-gray-400 mb-1.5">Código PIX Copia e Cola:</label>
                     <div class="flex items-center space-x-2">
-                        <input type="text" id="pix-copia-cola" readonly class="flex-1 bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-gray-300 font-mono select-all focus:outline-none">
-                        <button type="button" onclick="copiarPixCode()" id="btn-copiar-pix" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold text-xs px-4 py-3 rounded-xl transition-colors whitespace-nowrap cursor-pointer">
+                        <input type="text" id="pix-copia-cola" readonly class="flex-1 bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-gray-300 font-mono select-all focus:outline-none min-h-[44px]">
+                        <button type="button" onclick="copiarPixCode()" id="btn-copiar-pix" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold text-xs px-3.5 sm:px-4 py-3 rounded-xl transition-colors whitespace-nowrap cursor-pointer min-h-[44px] flex items-center justify-center">
                             Copiar Código
                         </button>
                     </div>
                     <p id="copiado-msg" class="text-xs text-brand-green font-medium mt-1.5 hidden">✓ Código PIX copiado com sucesso!</p>
                 </div>
 
-                <div class="bg-brand-green/10 border border-brand-green/20 rounded-xl p-3.5 text-xs text-gray-300 flex items-center space-x-3">
-                    <div class="w-2.5 h-2.5 rounded-full bg-brand-green animate-ping"></div>
+                <div class="bg-brand-green/10 border border-brand-green/20 rounded-xl p-3 sm:p-3.5 text-xs text-gray-300 flex items-center space-x-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-brand-green animate-ping flex-shrink-0"></div>
                     <div class="text-left">
                         <p class="font-bold text-brand-green text-sm">Aguardando Pagamento...</p>
                         <p class="text-gray-400 text-[11px]">Assim que você pagar no seu banco, esta tela atualizará automaticamente!</p>
@@ -969,12 +976,12 @@
             </div>
 
             <!-- Passo 3: Pagamento Confirmado -->
-            <div id="pix-step-success" class="hidden text-center py-6">
+            <div id="pix-step-success" class="hidden text-center py-4 sm:py-6">
                 <div class="w-16 h-16 bg-brand-green/20 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-green text-3xl shadow-glow-green">✓</div>
-                <h3 class="font-outfit text-2xl sm:text-3xl font-bold text-white mb-1">PAGAMENTO APROVADO! 🎉</h3>
+                <h3 class="font-outfit text-xl sm:text-3xl font-bold text-white mb-1">PAGAMENTO APROVADO! 🎉</h3>
                 <p class="text-brand-green font-semibold text-sm mb-4">Seu Kit Patriota já está garantido e em preparação!</p>
                 
-                <div class="bg-brand-dark/90 border border-brand-border rounded-2xl p-5 mb-5 text-left text-xs sm:text-sm space-y-2.5">
+                <div class="bg-brand-dark/90 border border-brand-border rounded-2xl p-4 sm:p-5 mb-5 text-left text-xs sm:text-sm space-y-2.5">
                     <div class="flex justify-between border-b border-brand-border pb-2">
                         <span class="text-gray-400">Valor Pago:</span>
                         <span class="font-bold text-white" id="success-valor-pago">R$ 89,90</span>
@@ -989,7 +996,7 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="closePixModal()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold py-3.5 rounded-xl transition-colors cursor-pointer">
+                <button type="button" onclick="closePixModal()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold py-3.5 rounded-xl transition-colors cursor-pointer tap-target">
                     Concluir
                 </button>
             </div>
@@ -997,11 +1004,11 @@
     </div>
 
     <!-- 14. MODAL DA TABELA DE MEDIDAS (CM) -->
-    <div id="tamanhos-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div class="bg-[#0e1017] border border-white/10 w-full max-w-md rounded-3xl p-5 sm:p-6 shadow-2xl relative text-white">
-            <button type="button" onclick="closeTamanhosModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl transition-colors p-1 cursor-pointer">✕</button>
+    <div id="tamanhos-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="bg-[#0e1017] border border-white/10 w-full max-w-md rounded-3xl p-4 sm:p-6 shadow-2xl relative text-white max-h-[90vh] overflow-y-auto">
+            <button type="button" onclick="closeTamanhosModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-xl transition-colors w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer">✕</button>
             
-            <div class="flex items-center space-x-3 mb-4">
+            <div class="flex items-center space-x-3 mb-4 pr-8">
                 <span class="text-2xl">📏</span>
                 <div>
                     <h4 class="font-outfit text-lg sm:text-xl font-bold text-white">Tabela de Medidas (cm)</h4>
@@ -1033,7 +1040,7 @@
 
             <p class="text-[11px] text-gray-400 text-center mb-4">💡 <em>Modelagem padrão brasileira. Em caso de dúvida, sugerimos escolher um tamanho maior para caimento confortável.</em></p>
             
-            <button type="button" onclick="closeTamanhosModal()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-bold py-3 rounded-xl transition-colors cursor-pointer">
+            <button type="button" onclick="closeTamanhosModal()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-bold py-3.5 rounded-xl transition-colors cursor-pointer tap-target">
                 Entendido, Escolher Tamanho
             </button>
         </div>
@@ -1098,24 +1105,30 @@
         function toggleFaq(id) {
             const answer = document.getElementById(`faq-answer-${id}`);
             const icon = document.getElementById(`faq-icon-${id}`);
-            if (answer.classList.contains('hidden')) {
+            if (answer && answer.classList.contains('hidden')) {
                 answer.classList.remove('hidden');
-                icon.textContent = '✕';
-                icon.classList.add('rotate-90');
-            } else {
+                if (icon) {
+                    icon.textContent = '✕';
+                    icon.classList.add('rotate-90');
+                }
+            } else if (answer) {
                 answer.classList.add('hidden');
-                icon.textContent = '＋';
-                icon.classList.remove('rotate-90');
+                if (icon) {
+                    icon.textContent = '＋';
+                    icon.classList.remove('rotate-90');
+                }
             }
         }
 
         // Funções da Tabela de Medidas
         function openTamanhosModal() {
-            document.getElementById('tamanhos-modal').classList.remove('hidden');
+            const modal = document.getElementById('tamanhos-modal');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closeTamanhosModal() {
-            document.getElementById('tamanhos-modal').classList.add('hidden');
+            const modal = document.getElementById('tamanhos-modal');
+            if (modal) modal.classList.add('hidden');
         }
 
         // Função de Abertura do Pedido / Carrinho
@@ -1132,7 +1145,8 @@
                     if (erro) erro.classList.remove('hidden');
                 }
             } else {
-                document.getElementById('comprar-btn').click();
+                const btn = document.getElementById('comprar-btn');
+                if (btn) btn.click();
             }
         }
 
@@ -1231,14 +1245,14 @@
                 const cpfErro = document.getElementById('cpf-erro');
                 if (v.replace(/\D/g, '').length === 11) {
                     if (!validarCPF(v)) {
-                        cpfErro.classList.remove('hidden');
+                        if (cpfErro) cpfErro.classList.remove('hidden');
                         cpfInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
                     } else {
-                        cpfErro.classList.add('hidden');
+                        if (cpfErro) cpfErro.classList.add('hidden');
                         cpfInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
                     }
                 } else {
-                    cpfErro.classList.add('hidden');
+                    if (cpfErro) cpfErro.classList.add('hidden');
                     cpfInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
                 }
             });
@@ -1274,10 +1288,12 @@
             const loading = document.getElementById('cep-loading');
             const feedback = document.getElementById('cep-feedback');
             
-            loading.classList.remove('hidden');
-            feedback.textContent = "Buscando localização...";
-            feedback.className = "text-[11px] text-brand-accent mt-1";
-            feedback.classList.remove('hidden');
+            if (loading) loading.classList.remove('hidden');
+            if (feedback) {
+                feedback.textContent = "Buscando localização...";
+                feedback.className = "text-[11px] text-brand-accent mt-1";
+                feedback.classList.remove('hidden');
+            }
 
             try {
                 let res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
@@ -1288,80 +1304,103 @@
                     data = await res.json();
                 }
 
-                loading.classList.add('hidden');
+                if (loading) loading.classList.add('hidden');
 
                 if (data && !data.erro && (data.logradouro || data.street || data.localidade || data.city)) {
-                    document.getElementById('pix-street').value = data.logradouro || data.street || '';
-                    document.getElementById('pix-neighborhood').value = data.bairro || data.neighborhood || '';
-                    document.getElementById('pix-city').value = data.localidade || data.city || '';
-                    document.getElementById('pix-state').value = data.uf || data.state || '';
+                    const streetEl = document.getElementById('pix-street');
+                    const neighEl = document.getElementById('pix-neighborhood');
+                    const cityEl = document.getElementById('pix-city');
+                    const stateEl = document.getElementById('pix-state');
+                    const numberEl = document.getElementById('pix-number');
+
+                    if (streetEl) streetEl.value = data.logradouro || data.street || '';
+                    if (neighEl) neighEl.value = data.bairro || data.neighborhood || '';
+                    if (cityEl) cityEl.value = data.localidade || data.city || '';
+                    if (stateEl) stateEl.value = data.uf || data.state || '';
                     
-                    feedback.textContent = `✓ Endereço localizado: ${data.localidade || data.city} / ${data.uf || data.state}`;
-                    feedback.className = "text-[11px] text-brand-green font-medium mt-1";
+                    if (feedback) {
+                        feedback.textContent = `✓ Endereço localizado: ${data.localidade || data.city} / ${data.uf || data.state}`;
+                        feedback.className = "text-[11px] text-brand-green font-medium mt-1";
+                    }
                     
-                    document.getElementById('pix-number').focus();
+                    if (numberEl) numberEl.focus();
                 } else {
-                    feedback.textContent = "⚠️ CEP não localizado automaticamente. Por favor, preencha seu endereço abaixo.";
-                    feedback.className = "text-[11px] text-yellow-400 mt-1";
+                    if (feedback) {
+                        feedback.textContent = "⚠️ CEP não localizado automaticamente. Por favor, preencha seu endereço abaixo.";
+                        feedback.className = "text-[11px] text-yellow-400 mt-1";
+                    }
                 }
             } catch (err) {
-                loading.classList.add('hidden');
-                feedback.textContent = "Por favor, complete seu endereço nos campos abaixo.";
-                feedback.className = "text-[11px] text-gray-400 mt-1";
+                if (loading) loading.classList.add('hidden');
+                if (feedback) {
+                    feedback.textContent = "Por favor, complete seu endereço nos campos abaixo.";
+                    feedback.className = "text-[11px] text-gray-400 mt-1";
+                }
             }
         }
 
         // Abertura do Modal de Checkout
-        document.getElementById('comprar-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const tamanhoSelect = document.getElementById('tamanho');
-            const tamanhoErro = document.getElementById('tamanho-erro');
-            const tamanhoSelecionado = tamanhoSelect ? tamanhoSelect.value : '';
-            
-            if (!tamanhoSelecionado) {
-                if (tamanhoSelect) {
-                    tamanhoSelect.classList.add('ring-4', 'ring-brand-accent', 'border-brand-accent');
-                    tamanhoSelect.focus();
-                    tamanhoSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const mainBuyBtn = document.getElementById('comprar-btn');
+        if (mainBuyBtn) {
+            mainBuyBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tamanhoSelect = document.getElementById('tamanho');
+                const tamanhoErro = document.getElementById('tamanho-erro');
+                const tamanhoSelecionado = tamanhoSelect ? tamanhoSelect.value : '';
+                
+                if (!tamanhoSelecionado) {
+                    if (tamanhoSelect) {
+                        tamanhoSelect.classList.add('ring-4', 'ring-brand-accent', 'border-brand-accent');
+                        tamanhoSelect.focus();
+                        tamanhoSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    if (tamanhoErro) tamanhoErro.classList.remove('hidden');
+                    return;
                 }
-                if (tamanhoErro) tamanhoErro.classList.remove('hidden');
-                return;
-            }
 
-            if (tamanhoErro) tamanhoErro.classList.add('hidden');
-            document.getElementById('modal-tamanho-display').textContent = tamanhoSelecionado;
-            
-            recalculateTotals();
+                if (tamanhoErro) tamanhoErro.classList.add('hidden');
+                const modalSizeDisplay = document.getElementById('modal-tamanho-display');
+                if (modalSizeDisplay) modalSizeDisplay.textContent = tamanhoSelecionado;
+                
+                recalculateTotals();
 
-            // Dispara InitiateCheckout no Meta Pixel
-            if (typeof fbq === 'function') {
-                try {
-                    const isExp = (selectedShipping === 'express');
-                    const totalVal = (currentQuantity * 89.90) + (isExp ? 9.99 : 0);
-                    fbq('track', 'InitiateCheckout', {
-                        content_name: 'Kit Patriota Oficial 2026',
-                        content_category: 'Kit Completo',
-                        value: totalVal,
-                        currency: 'BRL'
-                    });
-                } catch(e){}
-            }
-            
-            const modal = document.getElementById('pix-checkout-modal');
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
-        });
+                // Dispara InitiateCheckout no Meta Pixel
+                if (typeof fbq === 'function') {
+                    try {
+                        const isExp = (selectedShipping === 'express');
+                        const totalVal = (currentQuantity * 89.90) + (isExp ? 9.99 : 0);
+                        fbq('track', 'InitiateCheckout', {
+                            content_name: 'Kit Patriota Oficial 2026',
+                            content_category: 'Kit Completo',
+                            value: totalVal,
+                            currency: 'BRL'
+                        });
+                    } catch(e){}
+                }
+                
+                const modal = document.getElementById('pix-checkout-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                }
+            });
+        }
 
-        document.getElementById('tamanho').addEventListener('change', function() {
-            this.classList.remove('ring-4', 'ring-brand-accent', 'border-brand-accent');
-            const tamanhoErro = document.getElementById('tamanho-erro');
-            if (tamanhoErro) tamanhoErro.classList.add('hidden');
-        });
+        const sizeSelect = document.getElementById('tamanho');
+        if (sizeSelect) {
+            sizeSelect.addEventListener('change', function() {
+                this.classList.remove('ring-4', 'ring-brand-accent', 'border-brand-accent');
+                const tamanhoErro = document.getElementById('tamanho-erro');
+                if (tamanhoErro) tamanhoErro.classList.add('hidden');
+            });
+        }
 
         function closePixModal() {
             const modal = document.getElementById('pix-checkout-modal');
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
             if (pixCheckInterval) clearInterval(pixCheckInterval);
         }
 
@@ -1370,33 +1409,39 @@
             e.preventDefault();
             const btn = document.getElementById('btn-gerar-pix');
             
-            const cpfRaw = document.getElementById('pix-cpf').value;
+            const cpfRaw = document.getElementById('pix-cpf') ? document.getElementById('pix-cpf').value : '';
             const cpf = cpfRaw.replace(/\D/g, '');
             
             // Validação estrita de CPF
             if (!validarCPF(cpf)) {
-                document.getElementById('cpf-erro').classList.remove('hidden');
-                document.getElementById('pix-cpf').focus();
-                document.getElementById('pix-cpf').classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                const cpfErr = document.getElementById('cpf-erro');
+                if (cpfErr) cpfErr.classList.remove('hidden');
+                const cpfIn = document.getElementById('pix-cpf');
+                if (cpfIn) {
+                    cpfIn.focus();
+                    cpfIn.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                }
                 return;
             }
 
-            btn.disabled = true;
-            btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando o PIX...</span></span>`;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando o PIX...</span></span>`;
+            }
 
-            const name = document.getElementById('pix-name').value || 'Cliente Patriota';
-            const phone = document.getElementById('pix-phone').value.replace(/\D/g, '') || '11999999999';
-            const email = document.getElementById('pix-email').value || 'cliente@patriotas.com.br';
+            const name = (document.getElementById('pix-name') && document.getElementById('pix-name').value) || 'Cliente Patriota';
+            const phone = (document.getElementById('pix-phone') && document.getElementById('pix-phone').value.replace(/\D/g, '')) || '11999999999';
+            const email = (document.getElementById('pix-email') && document.getElementById('pix-email').value) || 'cliente@patriotas.com.br';
             const size = document.getElementById('tamanho') ? document.getElementById('tamanho').value : 'M';
 
             const address = {
-                cep: document.getElementById('pix-cep').value.replace(/\D/g, ''),
-                street: document.getElementById('pix-street').value,
-                number: document.getElementById('pix-number').value,
-                complement: document.getElementById('pix-complement').value,
-                neighborhood: document.getElementById('pix-neighborhood').value,
-                city: document.getElementById('pix-city').value,
-                state: document.getElementById('pix-state').value
+                cep: (document.getElementById('pix-cep') && document.getElementById('pix-cep').value.replace(/\D/g, '')) || '',
+                street: (document.getElementById('pix-street') && document.getElementById('pix-street').value) || '',
+                number: (document.getElementById('pix-number') && document.getElementById('pix-number').value) || '',
+                complement: (document.getElementById('pix-complement') && document.getElementById('pix-complement').value) || '',
+                neighborhood: (document.getElementById('pix-neighborhood') && document.getElementById('pix-neighborhood').value) || '',
+                city: (document.getElementById('pix-city') && document.getElementById('pix-city').value) || '',
+                state: (document.getElementById('pix-state') && document.getElementById('pix-state').value) || ''
             };
 
             const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
@@ -1434,14 +1479,21 @@
 
             function exibirPix(pixCode, qrcodeUrl, txId) {
                 currentTransactionId = txId || 'tx_' + Date.now();
-                document.getElementById('pix-step-form').classList.add('hidden');
-                document.getElementById('pix-step-qrcode').classList.remove('hidden');
+                const stepForm = document.getElementById('pix-step-form');
+                const stepQrcode = document.getElementById('pix-step-qrcode');
+                const qrImg = document.getElementById('pix-qrcode-img');
+                const copiaCola = document.getElementById('pix-copia-cola');
+                const successVal = document.getElementById('success-valor-pago');
+                const successEnv = document.getElementById('success-envio-tipo');
 
-                document.getElementById('pix-qrcode-img').src = qrcodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixCode)}`;
-                document.getElementById('pix-copia-cola').value = pixCode;
+                if (stepForm) stepForm.classList.add('hidden');
+                if (stepQrcode) stepQrcode.classList.remove('hidden');
 
-                document.getElementById('success-valor-pago').textContent = `R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}`;
-                document.getElementById('success-envio-tipo').textContent = shippingLabel;
+                if (qrImg) qrImg.src = qrcodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixCode)}`;
+                if (copiaCola) copiaCola.value = pixCode;
+
+                if (successVal) successVal.textContent = `R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}`;
+                if (successEnv) successEnv.textContent = shippingLabel;
 
                 const pedidoObj = {
                     transaction_id: currentTransactionId,
@@ -1528,8 +1580,10 @@
             } catch (err) {}
 
             alert("Atenção: Não foi possível processar a chave PIX no momento. Por favor, verifique sua conexão e tente novamente.");
-            btn.disabled = false;
-            btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
+            }
         }
 
         // Monitoramento de Pagamento em Tempo Real
@@ -1553,8 +1607,11 @@
                     if (result && (result.status === 'paid' || result.status === 'approved')) {
                         clearInterval(pixCheckInterval);
 
-                        document.getElementById('pix-step-qrcode').classList.add('hidden');
-                        document.getElementById('pix-step-success').classList.remove('hidden');
+                        const stepQrcode = document.getElementById('pix-step-qrcode');
+                        const stepSuccess = document.getElementById('pix-step-success');
+
+                        if (stepQrcode) stepQrcode.classList.add('hidden');
+                        if (stepSuccess) stepSuccess.classList.remove('hidden');
 
                         try {
                             let list = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
@@ -1576,16 +1633,21 @@
 
         function copiarPixCode() {
             const input = document.getElementById('pix-copia-cola');
-            input.select();
-            input.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(input.value);
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(input.value);
 
-            const msg = document.getElementById('copiado-msg');
-            msg.classList.remove('hidden');
-            document.getElementById('btn-copiar-pix').textContent = "✓ Copiado!";
-            setTimeout(() => {
-                document.getElementById('btn-copiar-pix').textContent = "Copiar Código";
-            }, 3000);
+                const msg = document.getElementById('copiado-msg');
+                if (msg) msg.classList.remove('hidden');
+                const btn = document.getElementById('btn-copiar-pix');
+                if (btn) {
+                    btn.textContent = "✓ Copiado!";
+                    setTimeout(() => {
+                        btn.textContent = "Copiar Código";
+                    }, 3000);
+                }
+            }
         }
     </script>
 </body>
