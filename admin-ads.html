@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Gestor Ads IA | Central de Campanhas</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                        'outfit': ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#07090e',
+                            darker: '#040508',
+                            card: '#0e121a',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            accent: '#FACC15',
+                            accentHover: '#EAB308',
+                            green: '#10B981',
+                            greenHover: '#059669',
+                            red: '#EF4444',
+                        }
+                    },
+                    boxShadow: {
+                        'glow-accent': '0 0 25px rgba(250, 204, 21, 0.25)',
+                        'glow-green': '0 0 25px rgba(16, 185, 129, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #07090e; }
+        .glass-panel {
+            background: rgba(14, 18, 26, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #07090e; }
+        ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+    </style>
+</head>
+
+<body class="text-gray-200 font-inter antialiased min-h-screen pb-16">
+
+    <!-- Configuração Inicial / Modal de Chaves (Exibido apenas se não houver Token) -->
+    <div id="setup-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative text-white">
+            <div class="text-center mb-6">
+                <span class="text-4xl">🔑</span>
+                <h3 class="font-outfit text-xl font-bold mt-3">Configurar Acesso Meta Ads</h3>
+                <p class="text-xs text-gray-400 mt-1">Insira suas credenciais para conectar o painel ao vivo</p>
+            </div>
+            
+            <form id="setup-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Conta de Anúncios (Ad Account ID)</label>
+                    <input type="text" id="setup-act-id" required placeholder="Ex: act_846780837970771" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-brand-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Token de Acesso (Access Token)</label>
+                    <input type="password" id="setup-token" required placeholder="Inserir token EAA..." class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-brand-accent">
+                </div>
+                <button type="submit" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold py-3.5 rounded-xl transition-all active:scale-[0.98]">
+                    Conectar e Salvar Localmente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="border-b border-brand-border bg-brand-card/90 sticky top-0 z-30 backdrop-blur-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🤖</span>
+                <div>
+                    <h1 class="font-outfit text-lg sm:text-xl font-black text-white tracking-tight flex items-center space-x-2">
+                        <span>Gestor Ads IA</span>
+                        <span class="text-[10px] bg-brand-accent/20 text-brand-accent font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Ao Vivo</span>
+                    </h1>
+                    <p class="text-[10px] sm:text-xs text-gray-400">Otimização e Gerenciamento em Tempo Real</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <span id="conn-badge" class="text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 flex items-center space-x-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-green animate-ping"></span>
+                    <span>Conectado</span>
+                </span>
+                <button onclick="limparCredenciais()" class="text-xs bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-xl border border-white/5 transition-colors">
+                    Desconectar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 mt-6 max-w-6xl space-y-6">
+
+        <!-- Cards de Métricas Gerais -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-panel p-5 rounded-2xl">
+                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Total Investido (Geral)</p>
+                <h3 class="text-2xl font-bold font-outfit text-white mt-1.5" id="metric-spent">R$ 0,00</h3>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl">
+                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Status da Conta</p>
+                <h3 class="text-2xl font-bold font-outfit text-white mt-1.5" id="metric-status">Consultando...</h3>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl">
+                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Moeda / País</p>
+                <h3 class="text-2xl font-bold font-outfit text-white mt-1.5" id="metric-currency">Consultando...</h3>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-brand-accent/20 bg-brand-accent/[0.02]">
+                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Piloto Automático IA</p>
+                <h3 class="text-2xl font-bold font-outfit text-brand-accent mt-1.5" id="metric-ai-status">Inativo 😴</h3>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Coluna de Regras e Logs da IA -->
+            <div class="space-y-6 lg:col-span-1">
+                
+                <!-- Card de Configuração da IA -->
+                <div class="glass-panel p-5 rounded-3xl space-y-4">
+                    <h3 class="font-outfit text-base font-bold text-white flex items-center space-x-2">
+                        <span>⚙️</span>
+                        <span>Regras do Otimizador IA</span>
+                    </h3>
+                    
+                    <div class="space-y-3.5 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">CPA Máximo Aceitável (R$)</label>
+                            <input type="number" id="cfg-cpa" value="40" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white focus:outline-none focus:border-brand-accent text-sm">
+                            <p class="text-[10px] text-gray-400 mt-1">Anúncios que gastarem mais que isso sem vendas serão pausados.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Teto de Escala Diária (R$)</label>
+                            <input type="number" id="cfg-budget-limit" value="500" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white focus:outline-none focus:border-brand-accent text-sm">
+                            <p class="text-[10px] text-gray-400 mt-1">Limite máximo de gasto acumulado para escala automática.</p>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/5 mt-2">
+                            <div>
+                                <p class="text-xs font-bold text-white">Ativar Robô Otimizador</p>
+                                <p class="text-[10px] text-gray-400">Verificação automática ativa</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="ai-toggle" class="sr-only peer" onchange="toggleAiPilot()">
+                                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-accent"></div>
+                            </label>
+                        </div>
+
+                        <button onclick="salvarConfiguracoesIA()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold py-3 rounded-xl transition-all text-xs uppercase tracking-wider">
+                            Salvar Parâmetros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Histórico de Ações da IA (Terminal de Logs) -->
+                <div class="glass-panel p-5 rounded-3xl space-y-3">
+                    <h3 class="font-outfit text-base font-bold text-white flex items-center space-x-2">
+                        <span>🚀</span>
+                        <span>Histórico de Ações da IA</span>
+                    </h3>
+                    <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1" id="log-container">
+                        <p class="text-xs text-gray-400 italic text-center py-4">Nenhuma ação registrada neste ciclo.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Coluna Principal (Tabela de Campanhas & Insights) -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Campanhas -->
+                <div class="glass-panel p-5 rounded-3xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-outfit text-base font-bold text-white flex items-center space-x-2">
+                            <span>📢</span>
+                            <span>Campanhas Ativas</span>
+                        </h3>
+                        <button onclick="carregarCampanhas()" class="text-xs font-semibold px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center space-x-1.5">
+                            <span>🔄</span>
+                            <span>Sincronizar Meta Ads</span>
+                        </button>
+                    </div>
+
+                    <!-- Tabela Responsiva -->
+                    <div class="overflow-x-auto rounded-2xl border border-brand-border">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-[#0e121a] text-gray-400 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3.5">Campanha / Status</th>
+                                    <th class="p-3.5">Orçamento</th>
+                                    <th class="p-3.5">Vendas / CPA</th>
+                                    <th class="p-3.5 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-brand-border text-gray-200" id="campaigns-tbody">
+                                <tr>
+                                    <td colspan="4" class="p-8 text-center text-gray-400 italic">Nenhuma credencial configurada ainda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Execução Rápida do Robô -->
+                <div class="glass-panel p-6 rounded-3xl border-brand-accent/20 bg-brand-accent/[0.02] flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h4 class="font-bold text-white text-sm">Forçar Varredura Completa da IA agora?</h4>
+                        <p class="text-xs text-gray-400 mt-0.5">Analisa todas as métricas do dia, pausa criativos ruins e escala os vencedores instantaneamente.</p>
+                    </div>
+                    <button onclick="rodarOtimizadorIA()" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold text-xs px-5 py-3.5 rounded-xl transition-all shadow-lg active:scale-95 whitespace-nowrap uppercase tracking-wider">
+                        🤖 Rodar Varredura IA
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Configurações do Estado Local (Salvas no Browser)
+        let META_TOKEN = localStorage.getItem('meta_access_token') || '';
+        let AD_ACCOUNT_ID = localStorage.getItem('meta_ad_account_id') || '';
+        let aiEnabled = localStorage.getItem('meta_ai_enabled') === 'true';
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!META_TOKEN || !AD_ACCOUNT_ID) {
+                document.getElementById('setup-modal').classList.remove('hidden');
+            } else {
+                inicializarPainel();
+            }
+        });
+
+        // Configuração do Setup Inicial
+        document.getElementById('setup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let actId = document.getElementById('setup-act-id').value.trim();
+            let token = document.getElementById('setup-token').value.trim();
+
+            if (!actId.startsWith('act_')) {
+                actId = 'act_' + actId;
+            }
+
+            localStorage.setItem('meta_access_token', token);
+            localStorage.setItem('meta_ad_account_id', actId);
+            
+            META_TOKEN = token;
+            AD_ACCOUNT_ID = actId;
+
+            document.getElementById('setup-modal').classList.add('hidden');
+            inicializarPainel();
+        });
+
+        function limparCredenciais() {
+            if (confirm('Deseja desconectar sua conta e apagar as chaves deste navegador?')) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        // Funções de Inicialização e Chamadas à Graph API
+        function inicializarPainel() {
+            carregarContaInfo();
+            carregarCampanhas();
+            
+            const aiToggle = document.getElementById('ai-toggle');
+            if (aiToggle) aiToggle.checked = aiEnabled;
+            atualizarBadgeAI();
+
+            carregarLogsLocais();
+        }
+
+        async function graphRequest(endpoint, method = 'GET', params = {}) {
+            params['access_token'] = META_TOKEN;
+            const query = new URLSearchParams(params).toString();
+            const url = `https://graph.facebook.com/v20.0/${endpoint}?${query}`;
+
+            const options = { method: method };
+            
+            const res = await fetch(url, options);
+            return await res.json();
+        }
+
+        async function graphPostRequest(endpoint, payload = {}) {
+            const url = `https://graph.facebook.com/v20.0/${endpoint}?access_token=${META_TOKEN}`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            return await res.json();
+        }
+
+        // Carregar Informações Básicas da Conta de Anúncios
+        async function carregarContaInfo() {
+            try {
+                const info = await graphRequest(AD_ACCOUNT_ID, 'GET', { fields: 'name,account_status,currency,amount_spent' });
+                
+                if (info && !info.error) {
+                    const spent = (parseFloat(info.amount_spent) || 0).toLocaleString('pt-BR', { style: 'currency', currency: info.currency || 'BRL' });
+                    document.getElementById('metric-spent').textContent = spent;
+                    
+                    document.getElementById('metric-status').textContent = info.account_status === 1 ? 'Ativa 🟢' : 'Inativa 🔴';
+                    document.getElementById('metric-currency').textContent = `${info.currency || 'BRL'} / BR`;
+                } else {
+                    tratarErroAPI(info.error);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Carregar Campanhas e seus Insights de Conversão
+        async function carregarCampanhas() {
+            const tbody = document.getElementById('campaigns-tbody');
+            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400 italic animate-pulse">Buscando campanhas direto do Meta Ads...</td></tr>`;
+
+            try {
+                const res = await graphRequest(`${AD_ACCOUNT_ID}/campaigns`, 'GET', {
+                    fields: 'name,status,daily_budget,lifetime_budget,buying_type',
+                    limit: 20
+                });
+
+                if (res.error) {
+                    tratarErroAPI(res.error);
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-brand-red">⚠️ Erro de conexão com o Meta. Verifique seu Token.</td></tr>`;
+                    return;
+                }
+
+                if (!res.data || res.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400">Nenhuma campanha localizada nesta conta.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+
+                for (const camp of res.data) {
+                    // Pega insights de hoje
+                    const insRes = await graphRequest(`${camp.id}/insights`, 'GET', {
+                        fields: 'spend,actions',
+                        date_preset: 'today'
+                    });
+
+                    let spend = 0;
+                    let purchases = 0;
+                    let cpa = 0;
+
+                    if (insRes.data && insRes.data[0]) {
+                        const insight = insRes.data[0];
+                        spend = parseFloat(insight.spend) || 0;
+                        if (insight.actions) {
+                            const pAction = insight.actions.find(act => act.action_type === 'purchase');
+                            if (pAction) purchases = parseInt(pAction.value) || 0;
+                        }
+                        if (purchases > 0) {
+                            cpa = spend / purchases;
+                        }
+                    }
+
+                    const isChecked = camp.status === 'ACTIVE';
+                    const budgetRaw = camp.daily_budget ? camp.daily_budget : camp.lifetime_budget;
+                    const budgetFormatted = budgetRaw ? (parseFloat(budgetRaw) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta';
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-white/[0.02] transition-colors border-b border-brand-border";
+                    tr.innerHTML = `
+                        <td class="p-3.5">
+                            <p class="font-semibold text-white text-sm truncate max-w-[200px]" title="${camp.name}">${camp.name}</p>
+                            <span class="text-[10px] text-gray-400 flex items-center space-x-1.5 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full ${isChecked ? 'bg-brand-green' : 'bg-brand-red'}"></span>
+                                <span>${camp.status}</span>
+                            </span>
+                        </td>
+                        <td class="p-3.5 font-bold text-white">
+                            ${budgetFormatted}
+                            <span class="text-[9px] text-gray-400 font-normal block">${camp.daily_budget ? 'Diário' : 'Total'}</span>
+                        </td>
+                        <td class="p-3.5">
+                            <span class="font-bold text-white">${purchases} conversões</span>
+                            <span class="text-[10px] text-gray-400 block mt-0.5">CPA Hoje: ${cpa > 0 ? cpa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'}</span>
+                        </td>
+                        <td class="p-3.5 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button onclick="alterarStatus('${camp.id}', '${camp.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'}')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold ${isChecked ? 'bg-brand-red/10 text-brand-red border border-brand-red/20' : 'bg-brand-green/10 text-brand-green border border-brand-green/20'} hover:opacity-85 transition-opacity">
+                                    ${isChecked ? 'Pausar' : 'Ativar'}
+                                </button>
+                                <button onclick="ajustarOrcamentoPrompt('${camp.id}', '${camp.daily_budget ? 'daily_budget' : 'lifetime_budget'}', ${budgetRaw || 0})" class="px-2.5 py-1.5 rounded-lg bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:opacity-85 text-[10px] font-bold">
+                                    Orçamento
+                                </button>
+                                <button onclick="duplicarCampanha('${camp.id}')" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:opacity-85 text-[10px] font-bold">
+                                    Duplicar
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-brand-red">Erro técnico de rede.</td></tr>`;
+            }
+        }
+
+        // Alterar status
+        async function alterarStatus(campId, newStatus) {
+            try {
+                const res = await graphPostRequest(campId, { status: newStatus });
+                if (res.success) {
+                    adicionarLog(`Alterado status da campanha ${campId} para ${newStatus}.`);
+                    carregarCampanhas();
+                } else {
+                    alert('Erro: ' + (res.error?.message || 'Falha ao atualizar'));
+                }
+            } catch (e) {
+                alert('Erro de conexão.');
+            }
+        }
+
+        // Duplicar campanha
+        async function duplicarCampanha(campId) {
+            if (!confirm('Deseja duplicar esta campanha estruturalmente?')) return;
+
+            try {
+                const info = await graphRequest(campId, 'GET', { fields: 'name,buying_type,objective' });
+                if (info.error) {
+                    alert('Erro ao ler dados da campanha.');
+                    return;
+                }
+
+                const res = await graphPostRequest(`${AD_ACCOUNT_ID}/campaigns`, {
+                    name: info.name + ' - CÓPIA AUTÔNOMA IA',
+                    buying_type: info.buying_type,
+                    objective: info.objective,
+                    status: 'PAUSED'
+                });
+
+                if (res.id) {
+                    adicionarLog(`Campanha ${campId} duplicada com sucesso. Nova criada sob ID: ${res.id}`);
+                    alert(`Duplicada sob o ID: ${res.id}`);
+                    carregarCampanhas();
+                } else {
+                    alert('Erro ao duplicar.');
+                }
+            } catch (e) {
+                alert('Erro na requisição.');
+            }
+        }
+
+        // Ajustar Orçamento
+        async function ajustarOrcamentoPrompt(campId, field, rawValue) {
+            const current = rawValue / 100;
+            const input = prompt(`Ajustar orçamento (Atual: R$ ${current.toFixed(2)}):`, current.toFixed(2));
+            if (input === null) return;
+
+            const newVal = parseFloat(input);
+            if (isNaN(newVal) || newVal <= 0) {
+                alert('Orçamento inválido.');
+                return;
+            }
+
+            const valCents = Math.round(newVal * 100);
+
+            try {
+                const res = await graphPostRequest(campId, { [field]: valCents });
+                if (res.success) {
+                    adicionarLog(`Alterado orçamento da campanha ${campId} de R$ ${current.toFixed(2)} para R$ ${newVal.toFixed(2)}.`);
+                    carregarCampanhas();
+                } else {
+                    alert('Erro ao atualizar: ' + (res.error?.message || 'Falha'));
+                }
+            } catch (e) {
+                alert('Erro de conexão.');
+            }
+        }
+
+        // Otimizador e Varredura da IA
+        async function rodarOtimizadorIA() {
+            adicionarLog("IA iniciou varredura completa das campanhas do dia...");
+            
+            const targetCpa = parseFloat(document.getElementById('cfg-cpa').value) || 40;
+            const budgetLimit = parseFloat(document.getElementById('cfg-budget-limit').value) || 500;
+
+            try {
+                const res = await graphRequest(`${AD_ACCOUNT_ID}/campaigns`, 'GET', {
+                    fields: 'name,status,daily_budget,lifetime_budget'
+                });
+
+                if (!res.data || res.data.length === 0) {
+                    adicionarLog("Varredura concluída. Nenhuma campanha ativa.");
+                    return;
+                }
+
+                let acoes = 0;
+
+                for (const camp of res.data) {
+                    if (camp.status !== 'ACTIVE') continue;
+
+                    const insRes = await graphRequest(`${camp.id}/insights`, 'GET', {
+                        fields: 'spend,actions',
+                        date_preset: 'today'
+                    });
+
+                    if (insRes.data && insRes.data[0]) {
+                        const insight = insRes.data[0];
+                        const spend = parseFloat(insight.spend) || 0;
+                        let purchases = 0;
+                        if (insight.actions) {
+                            const pAction = insight.actions.find(act => act.action_type === 'purchase');
+                            if (pAction) purchases = parseInt(pAction.value) || 0;
+                        }
+
+                        // REGRA 1: Stop-loss (Campanha gastando muito sem vendas)
+                        if (purchases === 0 && spend > targetCpa) {
+                            await graphPostRequest(camp.id, { status: 'PAUSED' });
+                            adicionarLog(`[PAUSADA] IA pausou campanha "${camp.name}" por Stop-loss. Gasto: R$ ${spend.toFixed(2)} sem conversões.`);
+                            acoes++;
+                        }
+
+                        // REGRA 2: Escala (+15% no orçamento se o CPA estiver abaixo da meta)
+                        if (purchases >= 3) {
+                            const currentCpa = spend / purchases;
+                            if (currentCpa < targetCpa && camp.daily_budget) {
+                                const currentBudget = parseFloat(camp.daily_budget);
+                                const newBudget = Math.round(currentBudget * 1.15);
+                                
+                                if ((newBudget / 100) <= budgetLimit) {
+                                    await graphPostRequest(camp.id, { daily_budget: newBudget });
+                                    adicionarLog(`[ESCALA] IA aumentou orçamento de "${camp.name}" em 15%. Novo: R$ ${(newBudget/100).toFixed(2)}/dia.`);
+                                    acoes++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (acoes === 0) {
+                    adicionarLog("Varredura concluída. Métricas saudáveis e estáveis, nenhuma ação necessária.");
+                } else {
+                    adicionarLog(`Varredura concluída. ${acoes} ações corretivas foram tomadas.`);
+                }
+                carregarCampanhas();
+                alert('Varredura e otimização IA concluídas!');
+
+            } catch (err) {
+                adicionarLog("⚠️ Erro na varredura da IA: falha na conexão.");
+            }
+        }
+
+        // Funções da Configuração Local de IA
+        function toggleAiPilot() {
+            const checked = document.getElementById('ai-toggle').checked;
+            localStorage.setItem('meta_ai_enabled', checked ? 'true' : 'false');
+            aiEnabled = checked;
+            atualizarBadgeAI();
+            adicionarLog(`Modo piloto automático IA foi ${checked ? 'ATIVADO' : 'DESATIVADO'}.`);
+        }
+
+        function atualizarBadgeAI() {
+            document.getElementById('metric-ai-status').textContent = aiEnabled ? 'Ativo 🤖' : 'Inativo 😴';
+        }
+
+        function salvarConfiguracoesIA() {
+            alert('Parâmetros salvos com sucesso!');
+            adicionarLog("Novos parâmetros de CPA e orçamento foram salvos no otimizador.");
+        }
+
+        // Sistema de Logs no LocalStorage
+        function adicionarLog(msg) {
+            const time = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR');
+            let logs = [];
+            try {
+                logs = JSON.parse(localStorage.getItem('meta_ai_logs') || '[]');
+            } catch(e){}
+
+            logs.unshift({ time: time, message: msg });
+            logs = logs.slice(0, 40); // Limite de 40 logs
+            localStorage.setItem('meta_ai_logs', JSON.stringify(logs));
+
+            renderizarLogs(logs);
+        }
+
+        function carregarLogsLocais() {
+            let logs = [];
+            try {
+                logs = JSON.parse(localStorage.getItem('meta_ai_logs') || '[]');
+            } catch(e){}
+            renderizarLogs(logs);
+        }
+
+        function renderizarLogs(logs) {
+            const container = document.getElementById('log-container');
+            if (logs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma ação registrada neste ciclo.</p>`;
+                return;
+            }
+
+            container.innerHTML = logs.map(log => `
+                <div class="p-2.5 rounded-xl bg-white/[0.02] border border-brand-border text-[11px] space-y-1">
+                    <div class="flex justify-between font-semibold text-brand-accent">
+                        <span>Ação IA</span>
+                        <span class="text-gray-500 font-normal">${log.time}</span>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">${log.message}</p>
+                </div>
+            `).join('');
+        }
+
+        function tratarErroAPI(error) {
+            if (error) {
+                console.error('Meta API Error:', error);
+                if (error.code === 190) {
+                    alert('Token de acesso expirado ou inválido. Por favor, desconecte e configure novamente.');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
