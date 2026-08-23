@@ -3,9 +3,9 @@
 // ==============================================================================
 
 module.exports = {
-    META_GRAPH_VERSION: 'v20.0',
-    META_GRAPH_BASE_URL: 'https://graph.facebook.com/v20.0',
-    ALLOWED_AD_ACCOUNT_ID: 'act_846780837970771',
+    META_GRAPH_VERSION: process.env.META_GRAPH_VERSION || 'v21.0',
+    META_GRAPH_BASE_URL: `https://graph.facebook.com/${process.env.META_GRAPH_VERSION || 'v21.0'}`,
+    ALLOWED_AD_ACCOUNT_ID: process.env.META_AD_ACCOUNT_ID || 'act_846780837970771',
     ALLOWED_BM_ID: '396465144606279',
 
     // Limites Financeiros & Guardrails

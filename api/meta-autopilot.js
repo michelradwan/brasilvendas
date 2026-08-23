@@ -109,7 +109,7 @@ async function fetchAllCampaigns(adAccountId) {
         } else {
             break;
         }
-    } while (allCampaigns.length < 250); // Limite de segurança de 250 campanhas por ciclo
+    } while (allCampaigns.length < 5000); // Limite de segurança de 5.000 campanhas por ciclo
 
     return allCampaigns;
 }

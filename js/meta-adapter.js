@@ -113,7 +113,7 @@ class MetaDataProvider {
             } else {
                 break;
             }
-        } while (all.length < 200);
+        } while (all.length < 5000);
 
         return { data: all };
     }

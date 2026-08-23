@@ -97,8 +97,8 @@ class MetaApiClient {
         }
     }
 
-    // Leitura Paginada Completa
-    async fetchAllPages(endpoint, params = {}, maxLimit = 250) {
+    // Leitura Paginada Completa (Sem limite artificial de 250 objetos)
+    async fetchAllPages(endpoint, params = {}, maxLimit = 5000) {
         let results = [];
         let currentParams = { ...params, limit: params.limit || 50 };
 
