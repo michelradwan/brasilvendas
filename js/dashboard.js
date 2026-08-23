@@ -1,5 +1,5 @@
 // ==============================================================================
-// DASHBOARD ORCHESTRATOR & USER INTERACTION ENGINE (XSS-FREE)
+// DASHBOARD ORCHESTRATOR & USER INTERACTION ENGINE (v2.0 XSS-FREE)
 // ==============================================================================
 
 function escapeHTML(str) {
@@ -147,11 +147,14 @@ class DashboardApp {
             });
 
             this.renderOverviewMetrics();
+            this.renderWhatShouldIDoNow();
             this.renderCampaignsTable();
             this.renderFunnelView();
             this.renderCreativesView();
             this.renderAuditLogs();
             this.renderTopOpportunities();
+            this.renderMissions();
+            this.renderAICoach();
 
             document.getElementById('topbar-last-sync').textContent = new Date().toLocaleTimeString('pt-BR');
             this.showToast('Dados sincronizados e verificados com sucesso.', 'success');
@@ -204,6 +207,28 @@ class DashboardApp {
         }
     }
 
+    renderWhatShouldIDoNow() {
+        const container = document.getElementById('what-should-i-do-container');
+        if (!container) return;
+
+        const actions = [
+            { priority: 1, action: 'Manter campanhas vencedoras com ROAS > 3.0x ativas', reason: 'Entrega estável', impact: 'ALTO' },
+            { priority: 2, action: 'Verificar integridade do Pixel no Tracking Health', reason: 'Zero perda de sinal', impact: 'ALTO' },
+            { priority: 3, action: 'Preparar novas variações de criativos no Lab', reason: 'Prevenção de saturação', impact: 'MÉDIO' }
+        ];
+
+        container.innerHTML = actions.map(item => `
+            <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between">
+                    <span class="w-5 h-5 rounded-full bg-yellow-400/10 text-yellow-400 font-bold flex items-center justify-center text-[10px]">${item.priority}</span>
+                    <span class="badge badge-winner text-[9px]">${escapeHTML(item.impact)}</span>
+                </div>
+                <p class="font-bold text-white text-xs">${escapeHTML(item.action)}</p>
+                <p class="text-[11px] text-gray-400">${escapeHTML(item.reason)}</p>
+            </div>
+        `).join('');
+    }
+
     renderCampaignsTable() {
         const tbody = document.getElementById('campaigns-table-body');
         const mobileContainer = document.getElementById('campaigns-mobile-cards');
@@ -223,7 +248,6 @@ class DashboardApp {
         tbody.innerHTML = filtered.map(camp => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
             const isChecked = camp.status === 'ACTIVE';
-            const isProtected = window.guardrailEngine?.isProtectedWinner(camp.id);
             const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : 0;
             const evalResult = window.decisionEngine.evaluateCreative(ins, window.guardrailEngine.config.targetCPA);
 
@@ -231,13 +255,15 @@ class DashboardApp {
             const safeObj = escapeHTML(camp.objective || 'Vendas');
             const safeId = escapeHTML(camp.id);
 
+            const isGreen = evalResult.classification === 'WINNER' || isChecked;
+            const trafficClass = isGreen ? 'traffic-green' : 'traffic-red';
+
             return `
                 <tr class="hover:bg-white/[0.02] border-b border-brand-border transition-colors text-xs">
                     <td class="p-3.5">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full ${isChecked ? 'bg-emerald-400' : 'bg-red-400'}"></span>
+                        <div class="flex items-center space-x-2.5">
+                            <span class="traffic-dot ${trafficClass}"></span>
                             <span class="font-semibold text-white truncate max-w-[220px]" title="${safeName}">${safeName}</span>
-                            ${isProtected ? '<span class="badge badge-winner text-[9px]">WINNER</span>' : ''}
                         </div>
                         <span class="text-[10px] text-gray-400 block mt-0.5">${safeObj}</span>
                     </td>
@@ -258,7 +284,7 @@ class DashboardApp {
                     </td>
                     <td class="p-3.5">
                         <span class="badge ${evalResult.classification === 'WINNER' ? 'badge-winner' : (evalResult.classification === 'FATIGUE' ? 'badge-fatigue' : 'badge-active')}">
-                            ${escapeHTML(evalResult.classification)}
+                            ${escapeHTML(evalResult.classification)} (${evalResult.score})
                         </span>
                     </td>
                     <td class="p-3.5 text-right space-x-1.5">
@@ -413,6 +439,61 @@ class DashboardApp {
                 <span class="badge badge-winner text-[10px] flex-shrink-0">Score ${opp.score}</span>
             </div>
         `).join('');
+    }
+
+    renderMissions() {
+        const container = document.getElementById('missions-container');
+        if (!container) return;
+
+        const missions = [
+            { id: 'M1', title: 'Validar Unit Economics Real', desc: 'Confirmar custos em Configurações para liberar escala autônoma', xp: 100, completed: false },
+            { id: 'M2', title: 'Auditar Eventos no Tracking Health', desc: 'Verificar integridade do Pixel CAPI', xp: 60, completed: true },
+            { id: 'M3', title: 'Revisar Análise do AI Coach', desc: 'Inspecionar as recomendações diárias de performance', xp: 40, completed: false }
+        ];
+
+        container.innerHTML = missions.map(m => `
+            <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="text-base">${m.completed ? '✅' : '⏳'}</span>
+                    <div>
+                        <p class="font-bold text-white text-xs ${m.completed ? 'line-through text-gray-400' : ''}">${escapeHTML(m.title)}</p>
+                        <p class="text-[11px] text-gray-400">${escapeHTML(m.desc)}</p>
+                    </div>
+                </div>
+                <span class="badge badge-winner font-mono">+${m.xp} XP</span>
+            </div>
+        `).join('');
+    }
+
+    renderAICoach() {
+        const headlineEl = document.getElementById('aicoach-headline');
+        const bulletsEl = document.getElementById('aicoach-bullets');
+        if (!headlineEl || !bulletsEl) return;
+
+        let totalSpend = 0, totalPurchases = 0;
+        this.cachedInsights.forEach(ins => {
+            totalSpend += ins.spend;
+            totalPurchases += ins.purchases;
+        });
+
+        const targetCPA = window.guardrailEngine?.config?.targetCPA || 35.00;
+        const avgCpa = totalPurchases > 0 ? (totalSpend / totalPurchases) : 0;
+
+        if (totalPurchases > 0 && avgCpa <= targetCPA * 0.85) {
+            headlineEl.textContent = 'Eficiência de Aquisição em Alta Performance 🚀';
+            bulletsEl.innerHTML = `
+                <li>O CPA médio global está R$ ${avgCpa.toFixed(2)} (abaixo da meta de R$ ${targetCPA.toFixed(2)}).</li>
+                <li>As campanhas vencedoras estão qualificadas para escala controlada de +15%.</li>
+                <li>Mantenha o monitoramento ativo para prevenir fadiga de criativos.</li>
+            `;
+        } else {
+            headlineEl.textContent = 'Operação em Fase de Aprendizado & Calibração';
+            bulletsEl.innerHTML = `
+                <li>Monitore a taxa de cliques (CTR) e passagem para Início de Checkout.</li>
+                <li>Verifique se o checkout está convertendo sem fricção de pagamento.</li>
+                <li>Evite alterações bruscas de orçamento para preservar a entrega do leilão.</li>
+            `;
+        }
     }
 
     openBudgetModal(campaignId, currentBudgetValue) {
@@ -576,14 +657,29 @@ class DashboardApp {
                 alert('Senha administrativa incorreta.');
             }
         } catch(e) {
-            // Em fallback local, salva a senha fornecida
             window.metaAdapter.setAdminPassword(pass);
             document.getElementById('login-screen-modal').classList.add('hidden');
             await this.syncAllData();
         }
     }
+
+    saveSettings() {
+        const cpa = parseFloat(document.getElementById('setting-target-cpa').value);
+        const maxSpend = parseFloat(document.getElementById('setting-max-spend').value);
+        const isVerified = document.getElementById('setting-unit-verified').checked;
+
+        if (window.guardrailEngine) {
+            window.guardrailEngine.config.targetCPA = cpa;
+            window.guardrailEngine.config.maxDailySpend = maxSpend;
+        }
+
+        if (window.analyticsEngine) {
+            window.analyticsEngine.saveUnitEconomics({ verifiedByOperator: isVerified });
+        }
+
+        this.showToast('Configurações e Unit Economics salvos com sucesso.', 'success');
+    }
 }
 
-// Inicialização Global
 window.dashboard = new DashboardApp();
 document.addEventListener('DOMContentLoaded', () => window.dashboard.init());

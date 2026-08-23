@@ -1,14 +1,34 @@
 // ==============================================================================
-// CENTRALIZED META MARKETING CONSTANTS & ALLOWLIST CONFIGURATION
+// CENTRALIZED META MARKETING CONSTANTS & GOVERNANCE RULES
 // ==============================================================================
 
 module.exports = {
-    GRAPH_VERSION: 'v20.0',
-    GRAPH_BASE_URL: 'https://graph.facebook.com/v20.0',
+    META_GRAPH_VERSION: 'v20.0',
+    META_GRAPH_BASE_URL: 'https://graph.facebook.com/v20.0',
     ALLOWED_AD_ACCOUNT_ID: 'act_846780837970771',
     ALLOWED_BM_ID: '396465144606279',
-    
-    // Lista estrita de operações autorizadas no backend
+
+    // Limites Financeiros & Guardrails
+    DEFAULT_MAX_BUDGET_CHANGE_PCT: 15,    // 15% por ciclo
+    HARD_CEILING_BUDGET_CHANGE_PCT: 20,   // 20% teto absoluto sem override
+    DEFAULT_COOLDOWN_HOURS: 12,           // 12 horas entre mutações do mesmo objeto
+    DEFAULT_MAX_DAILY_ACCOUNT_SPEND: 500, // R$ 500,00 diários
+    MINIMUM_PURCHASES_FOR_SCALE: 3,       // Amostra mínima de conversões
+    MINIMUM_SPEND_FOR_STOPLOSS: 1.15,     // 1.15x CPA Alvo para pausa sem vendas
+    MAX_AUTOPILOT_ACTIONS_PER_CYCLE: 5,   // Máximo de ações por ciclo autônomo
+
+    // Categorias Especiais Reguladas (Políticas, Eleitorais, Questões Sociais)
+    // EXIGEM APROVAÇÃO HUMANA OBRIGATÓRIA (FAIL CLOSED)
+    SPECIAL_AD_CATEGORIES: [
+        'POLITICAL_AND_ISSUE_ADS',
+        'ELECTIONS_POLITICS',
+        'HOUSING',
+        'EMPLOYMENT',
+        'CREDIT',
+        'SOCIAL_ISSUES'
+    ],
+
+    // Mapeamento Estrito de Recursos e Operações Permitidas
     ALLOWED_OPERATIONS: {
         'ACCOUNT_INFO': { method: 'GET', pathRegex: /^act_846780837970771$/ },
         'CAMPAIGNS_LIST': { method: 'GET', pathRegex: /^act_846780837970771\/campaigns$/ },
@@ -18,6 +38,7 @@ module.exports = {
         'INSIGHTS_READ': { method: 'GET', pathRegex: /^([0-9]+|act_846780837970771)\/insights$/ },
         'STATUS_UPDATE': { method: 'POST', pathRegex: /^[0-9]+$/ },
         'BUDGET_UPDATE': { method: 'POST', pathRegex: /^[0-9]+$/ },
+        'RENAME_UPDATE': { method: 'POST', pathRegex: /^[0-9]+$/ },
         'OBJECT_READ': { method: 'GET', pathRegex: /^[0-9]+$/ }
     },
 

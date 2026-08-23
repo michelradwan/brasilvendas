@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (Core Framework) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Design System CSS -->
@@ -36,7 +36,7 @@
             <form onsubmit="window.dashboard.handleLoginSubmit(event)" class="space-y-4 text-left">
                 <div>
                     <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Senha do Servidor</label>
-                    <input type="password" id="login-password-input" required placeholder="••••••••" class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-400 text-center tracking-widest">
+                    <input type="password" id="login-password-input" required placeholder="••••••••" class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-400 text-center tracking-widest text-sm">
                 </div>
                 <button type="submit" class="btn-primary w-full py-3.5 text-xs uppercase tracking-wider">
                     Desbloquear Painel
@@ -51,7 +51,7 @@
             
             <!-- Contexto da Conta / BM -->
             <div class="flex items-center space-x-3 min-w-0">
-                <div class="w-8 h-8 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 flex items-center justify-center font-bold text-sm flex-shrink-0 font-outfit">
                     M
                 </div>
                 <div class="min-w-0">
@@ -67,6 +67,13 @@
                 </div>
             </div>
 
+            <!-- Gamificação Rápida / Level & XP -->
+            <div class="hidden xl:flex items-center space-x-3 px-3 py-1 rounded-xl bg-white/[0.03] border border-white/5 text-xs">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span id="topbar-level-name" class="font-bold text-white">Level 1: Junior Operator</span>
+                <span id="topbar-xp" class="text-yellow-400 font-mono">150 XP</span>
+            </div>
+
             <!-- Quick Actions & Status -->
             <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
                 <button onclick="window.dashboard.runWarRoomAudit()" class="btn-danger text-[11px] py-1 px-2.5 hidden sm:inline-flex">
@@ -74,7 +81,7 @@
                 </button>
                 <button onclick="window.dashboard.toggleCommandPalette()" class="btn-secondary text-[11px] py-1 px-2.5 hidden md:inline-flex">
                     <span>⌘K</span>
-                    <span class="text-gray-400 font-normal">Buscar</span>
+                    <span class="text-gray-400 font-normal">Comandos</span>
                 </button>
                 <button onclick="window.dashboard.syncAllData()" class="btn-secondary text-[11px] py-1 px-2.5">
                     <span>🔄 Sincronizar</span>
@@ -89,7 +96,7 @@
     <!-- Layout Principal: Sidebar + Conteúdo -->
     <div class="flex-1 flex max-w-[1600px] w-full mx-auto">
 
-        <!-- Sidebar de Navegação -->
+        <!-- Sidebar de Navegação (11 Seções) -->
         <aside class="w-56 border-r border-white/[0.08] bg-[#07090e] p-3 hidden md:flex flex-col justify-between flex-shrink-0">
             <nav class="space-y-1">
                 <div class="nav-item active" data-nav-target="overview">
@@ -108,21 +115,25 @@
                     <span>🌪</span>
                     <span>Funil</span>
                 </div>
-                <div class="nav-item" data-nav-target="experiments">
+                <div class="nav-item" data-nav-target="lab">
                     <span>🧪</span>
-                    <span>Experimentos</span>
+                    <span>Lab & Testes</span>
                 </div>
                 <div class="nav-item" data-nav-target="tracking">
                     <span>🎯</span>
-                    <span>Tracking & Pixel</span>
+                    <span>Tracking Health</span>
                 </div>
-                <div class="nav-item" data-nav-target="business">
-                    <span>🏢</span>
-                    <span>Business Manager</span>
+                <div class="nav-item" data-nav-target="aicoach">
+                    <span>🤖</span>
+                    <span>AI Coach</span>
+                </div>
+                <div class="nav-item" data-nav-target="gamification">
+                    <span>🎮</span>
+                    <span>Missões & XP</span>
                 </div>
                 <div class="nav-item" data-nav-target="autopilot">
-                    <span>🤖</span>
-                    <span>IA / Autopilot</span>
+                    <span>⚡</span>
+                    <span>Autopilot</span>
                 </div>
                 <div class="nav-item" data-nav-target="audit">
                     <span>📜</span>
@@ -140,8 +151,8 @@
                     <span id="sidebar-ai-mode" class="text-yellow-400 font-bold">Assistido</span>
                 </div>
                 <div class="flex items-center justify-between text-gray-400">
-                    <span>Autonomia</span>
-                    <span class="text-emerald-400 font-bold">Ativa</span>
+                    <span>Emergency Stop</span>
+                    <span id="sidebar-emergency-status" class="text-emerald-400 font-bold">Normal</span>
                 </div>
             </div>
         </aside>
@@ -163,14 +174,14 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO 1: VISÃO GERAL (OVERVIEW) -->
+            <!-- SEÇÃO 1: VISÃO GERAL (OVERVIEW & SCORECARD) -->
             <section id="view-overview" class="view-section space-y-6">
-                <!-- Top 4 KPIs -->
+                <!-- Top 4 KPIs Executivos -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
-                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Investimento Total</p>
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Investimento</p>
                         <h3 class="text-xl sm:text-2xl font-bold font-mono text-white" id="kpi-spend">R$ 0,00</h3>
-                        <span class="text-[10px] text-gray-500 block">Orçamento consumido</span>
+                        <span class="text-[10px] text-gray-500 block">Consumido hoje</span>
                     </div>
                     <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
                         <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Receita Estimada</p>
@@ -185,11 +196,23 @@
                     <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
                         <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">ROAS Geral</p>
                         <h3 class="text-xl sm:text-2xl font-bold font-mono text-yellow-400" id="kpi-roas">0.00x</h3>
-                        <span class="text-[10px] text-gray-500 block">Retorno sobre gasto</span>
+                        <span class="text-[10px] text-gray-500 block">Retorno do leilão</span>
                     </div>
                 </div>
 
-                <!-- Secondary Row: Health Score & Top Opportunities -->
+                <!-- O QUE DEVO FAZER AGORA? (WHAT SHOULD I DO NOW) -->
+                <div class="glass-panel p-5 rounded-2xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg">🎯</span>
+                            <h4 class="font-bold text-white text-xs uppercase tracking-wider">O que devo fazer agora? (Ações Prioritárias)</h4>
+                        </div>
+                        <span class="badge badge-winner text-[10px]">IA Priorizada</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="what-should-i-do-container"></div>
+                </div>
+
+                <!-- Secondary Row: Health Score & Live Activity -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Account Health Score -->
                     <div class="glass-panel p-5 rounded-2xl space-y-4 lg:col-span-1">
@@ -198,8 +221,8 @@
                             <span id="account-health-badge" class="badge badge-active">SAUDÁVEL</span>
                         </div>
                         <div class="text-center py-3">
-                            <span id="account-health-number" class="text-4xl font-extrabold font-mono text-white">92/100</span>
-                            <p class="text-[11px] text-gray-400 mt-1">Algoritmo ponderado de eficiência e entrega</p>
+                            <span id="account-health-number" class="text-4xl font-extrabold font-mono text-white">94/100</span>
+                            <p class="text-[11px] text-gray-400 mt-1">Algoritmo ponderado de dados e entrega</p>
                         </div>
                         <div class="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-white/5">
                             <div>
@@ -217,26 +240,24 @@
                         </div>
                     </div>
 
-                    <!-- Top 10 Opportunities Ranking -->
+                    <!-- Top 10 Oportunidades -->
                     <div class="glass-panel p-5 rounded-2xl space-y-3 lg:col-span-2">
                         <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-white text-xs uppercase tracking-wider">Oportunidades de Otimização (IA)</h4>
-                            <span class="text-[11px] text-gray-400">Classificação por Impacto</span>
+                            <h4 class="font-bold text-white text-xs uppercase tracking-wider">Oportunidades de Otimização</h4>
+                            <span class="text-[11px] text-gray-400">Impacto × Confiança ÷ Risco</span>
                         </div>
-                        <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1" id="top-opportunities-container">
-                            <p class="text-xs text-gray-500 italic text-center py-4">Calculando oportunidades...</p>
-                        </div>
+                        <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1" id="top-opportunities-container"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 2: CAMPANHAS (CAMPAIGNS TABLE 2.0) -->
+            <!-- SEÇÃO 2: CAMPANHAS (CAMPAIGNS TABLE 2.0 COM TRAFFIC LIGHT) -->
             <section id="view-campaigns" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-bold text-white text-sm">Gerenciamento de Campanhas</h3>
-                            <p class="text-xs text-gray-400">Inspeção detalhada de performance e ajustes de orçamento</p>
+                            <p class="text-xs text-gray-400">Inspeção detalhada de performance, Power Score e ajustes de orçamento</p>
                         </div>
                     </div>
 
@@ -251,7 +272,7 @@
                                     <th class="p-3.5">CPA</th>
                                     <th class="p-3.5">ROAS</th>
                                     <th class="p-3.5">CTR</th>
-                                    <th class="p-3.5">Classificação</th>
+                                    <th class="p-3.5">Power Score</th>
                                     <th class="p-3.5 text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -266,16 +287,14 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 3: CRIATIVOS -->
+            <!-- SEÇÃO 3: CRIATIVOS & FAMÍLIAS -->
             <section id="view-creatives" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div>
-                        <h3 class="font-bold text-white text-sm">Inteligência de Criativos & Detecção de Fadiga</h3>
-                        <p class="text-xs text-gray-400">Classificação de criativos por score de atratividade e saturação de frequência</p>
+                        <h3 class="font-bold text-white text-sm">Inteligência de Criativos & Famílias de Conceito</h3>
+                        <p class="text-xs text-gray-400">Classificação de criativos por score e detecção multivariada de fadiga</p>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="creatives-grid-container">
-                        <p class="text-xs text-gray-500 italic text-center py-8 col-span-full">Processando criativos...</p>
-                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="creatives-grid-container"></div>
                 </div>
             </section>
 
@@ -284,29 +303,35 @@
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div>
                         <h3 class="font-bold text-white text-sm">Funil Completo de Conversão</h3>
-                        <p class="text-xs text-gray-400">Taxas de passagem entre cliques, visualizações, checkout e PIX confirmados</p>
+                        <p class="text-xs text-gray-400">Taxas de passagem entre impressões, cliques, LPV, IC, PIX gerados e compras</p>
                     </div>
-                    <div class="space-y-3" id="funnel-steps-container">
-                        <p class="text-xs text-gray-500 italic text-center py-8">Carregando funil...</p>
-                    </div>
+                    <div class="space-y-3" id="funnel-steps-container"></div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 5: EXPERIMENTOS -->
-            <section id="view-experiments" class="view-section hidden space-y-4">
+            <!-- SEÇÃO 5: LAB & EXPERIMENTOS -->
+            <section id="view-lab" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div>
-                        <h3 class="font-bold text-white text-sm">Central de Experimentos e Testes A/B</h3>
-                        <p class="text-xs text-gray-400">Validação científica de hipóteses de criativos, hooks e públicos</p>
+                        <h3 class="font-bold text-white text-sm">Central de Experimentos e Knowledge Base</h3>
+                        <p class="text-xs text-gray-400">Registro de hipóteses, testes A/B e aprendizados históricos</p>
                     </div>
-                    <div class="p-6 rounded-xl bg-white/[0.02] border border-white/5 text-center text-xs text-gray-400 space-y-2">
-                        <p class="font-bold text-white">Nenhum experimento ativo no momento.</p>
-                        <p>Para iniciar um teste controlado, selecione um criativo ou público na tabela de campanhas.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                            <span class="badge badge-winner">Winning Hooks</span>
+                            <p class="text-white font-medium">"O Kit Oficial que Todo Patriota Usa"</p>
+                            <span class="text-gray-400 text-[10px]">CTR: 2.8% • CPA Médio: R$ 22,40</span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                            <span class="badge badge-fatigue">Losing Pattern Identificado</span>
+                            <p class="text-white font-medium">Texto longo sem menção direta ao valor do frete</p>
+                            <span class="text-gray-400 text-[10px]">Queda de 35% no LPV→IC</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 6: TRACKING & PIXEL -->
+            <!-- SEÇÃO 6: TRACKING HEALTH -->
             <section id="view-tracking" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div>
@@ -321,7 +346,7 @@
                         </div>
                         <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span class="text-gray-400 font-bold uppercase text-[10px]">CAPI Server-Side</span>
-                            <p class="font-bold text-white font-mono">Node.js Vercel</p>
+                            <p class="font-bold text-white font-mono">Vercel Proxy</p>
                             <span class="badge badge-active">Conectado</span>
                         </div>
                         <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
@@ -333,49 +358,66 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 7: BUSINESS MANAGER -->
-            <section id="view-business" class="view-section hidden space-y-4">
+            <!-- SEÇÃO 7: AI COACH -->
+            <section id="view-aicoach" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
-                    <div>
-                        <h3 class="font-bold text-white text-sm">Inventário do Business Manager</h3>
-                        <p class="text-xs text-gray-400">Ativos vinculados, páginas, contas e faturamento</p>
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm">AI Coach — Análise de Mídia em Linguagem Humana</h3>
+                        <span class="badge badge-active text-[10px]">Acurácia de Decisão: 84%</span>
                     </div>
-                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-xs space-y-2">
-                        <p><b class="text-white">Conta Selecionada:</b> C.A 01 (act_846780837970771)</p>
-                        <p><b class="text-white">Status de Pagamento:</b> Regular 🟢</p>
-                        <p><b class="text-white">Limite Diário da Conta:</b> Ilimitado / Gerenciado</p>
+                    <div class="p-4 rounded-xl bg-yellow-400/5 border border-yellow-400/20 space-y-2 text-xs">
+                        <h4 class="font-bold text-yellow-400 text-sm" id="aicoach-headline">Diagnóstico do Gestor IA</h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-300" id="aicoach-bullets"></ul>
                     </div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 8: IA / AUTOPILOT -->
+            <!-- SEÇÃO 8: GAMIFICAÇÃO & MISSÕES -->
+            <section id="view-gamification" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Centro de Operações & Gamificação</h3>
+                            <p class="text-xs text-gray-400">Progresso baseado em disciplina analítica, integridade de dados e lucro</p>
+                        </div>
+                        <span class="badge badge-winner" id="gamif-level-badge">Level 1: Junior Operator</span>
+                    </div>
+
+                    <!-- Missões de Hoje -->
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-white text-xs uppercase tracking-wider">Missões de Hoje</h4>
+                        <div class="space-y-2 text-xs" id="missions-container"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 9: AUTOPILOT -->
             <section id="view-autopilot" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-bold text-white text-sm">Central do Autopilot IA</h3>
-                            <p class="text-xs text-gray-400">Modos de autonomia, regras de escala e histórico de decisões</p>
+                            <p class="text-xs text-gray-400">Modos de autonomia, regras de escala e simulador sandbox</p>
                         </div>
-                        <button onclick="window.autopilotEngine.runCycle(true)" class="btn-primary text-xs">
-                            Executar Ciclo Agora
+                        <button onclick="window.dashboard.openSimulatorModal()" class="btn-secondary text-xs">
+                            🧪 Simular sem Gravar
                         </button>
                     </div>
 
-                    <!-- Seletor de Modo de Autonomia -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                        <div onclick="window.autopilotEngine.setMode('SAFE')" class="p-3.5 rounded-xl border border-white/10 hover:border-yellow-400 cursor-pointer bg-white/[0.02]">
+                        <div class="p-3.5 rounded-xl border border-white/10 bg-white/[0.02]">
                             <p class="font-bold text-white">🔵 Safe Mode</p>
                             <p class="text-[10px] text-gray-400 mt-1">Somente leitura e alertas.</p>
                         </div>
-                        <div onclick="window.autopilotEngine.setMode('ASSISTED')" class="p-3.5 rounded-xl border border-yellow-400/30 bg-yellow-400/5 cursor-pointer">
+                        <div class="p-3.5 rounded-xl border border-yellow-400/30 bg-yellow-400/5">
                             <p class="font-bold text-yellow-400">🟢 Assistido</p>
                             <p class="text-[10px] text-gray-400 mt-1">IA sugere, você aprova.</p>
                         </div>
-                        <div onclick="window.autopilotEngine.setMode('SEMI_AUTO')" class="p-3.5 rounded-xl border border-white/10 hover:border-yellow-400 cursor-pointer bg-white/[0.02]">
+                        <div class="p-3.5 rounded-xl border border-white/10 bg-white/[0.02]">
                             <p class="font-bold text-white">🟡 Semi-Autônomo</p>
                             <p class="text-[10px] text-gray-400 mt-1">Executa baixo risco.</p>
                         </div>
-                        <div onclick="window.autopilotEngine.setMode('AUTOPILOT')" class="p-3.5 rounded-xl border border-white/10 hover:border-yellow-400 cursor-pointer bg-white/[0.02]">
+                        <div class="p-3.5 rounded-xl border border-white/10 bg-white/[0.02]">
                             <p class="font-bold text-white">🔴 Autopilot Total</p>
                             <p class="text-[10px] text-gray-400 mt-1">Otimização contínua.</p>
                         </div>
@@ -383,7 +425,7 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 9: AUDITORIA -->
+            <!-- SEÇÃO 10: AUDITORIA & TIME MACHINE -->
             <section id="view-audit" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div class="flex items-center justify-between">
@@ -391,22 +433,15 @@
                             <h3 class="font-bold text-white text-sm">Changelog e Auditoria Estruturada</h3>
                             <p class="text-xs text-gray-400">Registro imutável de todas as ações tomadas pelo operador e pela IA</p>
                         </div>
-                        <div class="space-x-2">
-                            <button onclick="window.auditEngine.exportCSV()" class="btn-secondary text-xs">Exportar CSV</button>
-                            <button onclick="window.auditEngine.exportJSON()" class="btn-secondary text-xs">Exportar JSON</button>
-                        </div>
                     </div>
-
-                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto" id="audit-timeline-container">
-                        <p class="text-xs text-gray-500 italic text-center py-6">Nenhum log registrado.</p>
-                    </div>
+                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto" id="audit-timeline-container"></div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 10: CONFIGURAÇÕES -->
+            <!-- SEÇÃO 11: CONFIGURAÇÕES & UNIT ECONOMICS -->
             <section id="view-settings" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4 max-w-xl">
-                    <h3 class="font-bold text-white text-sm">Parâmetros & Guardrails</h3>
+                    <h3 class="font-bold text-white text-sm">Parâmetros, Unit Economics & Guardrails</h3>
                     <div class="space-y-3 text-xs">
                         <div>
                             <label class="block text-[11px] text-gray-400 uppercase font-bold mb-1">CPA Alvo de Segurança (R$)</label>
@@ -419,11 +454,11 @@
                         <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
                             <div>
                                 <p class="font-bold text-white">Validar Unit Economics Real</p>
-                                <p class="text-[10px] text-gray-400">Permite escala autônoma baseada em margem</p>
+                                <p class="text-[10px] text-gray-400">Permite escala autônoma baseada em margem de contribuição</p>
                             </div>
                             <input type="checkbox" id="setting-unit-verified" class="w-4 h-4 text-yellow-400 rounded">
                         </div>
-                        <button onclick="alert('Configurações salvas!')" class="btn-primary w-full py-2.5">
+                        <button onclick="window.dashboard.saveSettings()" class="btn-primary w-full py-2.5">
                             Salvar Configurações
                         </button>
                     </div>
@@ -434,7 +469,7 @@
 
     </div>
 
-    <!-- MODAL 1: COMMAND PALETTE (CTRL+K) -->
+    <!-- MODAIS E DRAWERS -->
     <div id="command-palette-modal" class="modal-overlay fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center pt-24 p-4 hidden">
         <div class="glass-panel w-full max-w-lg rounded-2xl p-4 shadow-2xl space-y-3">
             <div class="flex items-center space-x-2 pb-2 border-b border-white/10">
@@ -444,7 +479,7 @@
             </div>
             <div class="space-y-1 text-xs text-gray-300 max-h-60 overflow-y-auto">
                 <div onclick="window.dashboard.switchView('campaigns'); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between">
-                    <span>📢 Ir para Campanhas</span>
+                    <span>📢 Campanhas</span>
                     <span class="text-[10px] text-gray-500">Navegar</span>
                 </div>
                 <div onclick="window.dashboard.runWarRoomAudit(); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between">
@@ -459,7 +494,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: WAR ROOM AUDIT -->
     <div id="war-room-modal" class="modal-overlay fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-white/10 pb-3">
@@ -473,7 +507,6 @@
         </div>
     </div>
 
-    <!-- MODAL 3: ALTERAÇÃO DE ORÇAMENTO (SEM PROMPT()) -->
     <div id="budget-modal" class="modal-overlay fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4">
             <h3 class="font-bold text-white text-sm">Alterar Orçamento Diário</h3>
@@ -492,7 +525,6 @@
         </div>
     </div>
 
-    <!-- DRAWER LATERAL: DETALHES DA CAMPANHA -->
     <div id="campaign-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#0b0f17] border-l border-white/10 z-50 transform translate-x-full transition-transform duration-300 shadow-2xl p-6 flex flex-col justify-between">
         <div class="space-y-4">
             <div class="flex items-center justify-between border-b border-white/10 pb-3">

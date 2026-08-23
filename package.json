@@ -1,0 +1,21 @@
+{
+  "name": "meta-ads-command-center",
+  "version": "2.0.0",
+  "description": "Meta Ads Autonomous Command Center — Institutional Performance Operations & AI Decision Engine",
+  "main": "api/meta-proxy.js",
+  "scripts": {
+    "test": "node tests/verify-all-fixes.js",
+    "test:full": "node tests/test-suite-complete.js",
+    "mcp": "node C:\\Users\\Michel\\.gemini\\config\\meta-ads-mcp-server.js"
+  },
+  "keywords": [
+    "meta-ads",
+    "mcp",
+    "autonomous-agent",
+    "marketing-api",
+    "performance-marketing"
+  ],
+  "author": "Brasil Vendas Engineering",
+  "license": "UNLICENSED",
+  "private": true
+}
