@@ -7,6 +7,12 @@ const https = require('https');
 const API_URL = 'https://www.links-pagamentos.online/api-pix/Akc4K4Bs4Q9sBfbGv3Kuh-9i39GvsmiE2IjP1IuCrdIlrDHCdCHF3UQ7zMlW-QmQa7KAfnDqL6QDvKX0kG2AHg';
 const API_KEY = process.env.DUTTYFY_KEY || 'b8ae99391cf645b2af25b66eef4b99d3';
 
+// ALLOWLIST OFICIAL DE PREÇOS NO SERVIDOR (EM CENTAVOS)
+const ORDER_BUMP_PRICES = {
+    stickers100: { priceCents: 1990, label: 'Kit 100 Adesivos' },
+    flavioKeychain: { priceCents: 2490, label: 'Chaveiro Colecionável' }
+};
+
 module.exports = async (req, res) => {
     // CORS Seguro
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,7 +33,7 @@ module.exports = async (req, res) => {
         const address = body.address || {};
         const shipping = body.shipping || {};
         const size = body.size || 'M';
-        // Limite de 1 a 10 unidades (mantendo o valor abaixo de 1k)
+        // Limite de 1 a 10 unidades
         const quantity = Math.min(10, Math.max(1, parseInt(body.quantity || (body.item && body.item.quantity) || 1)));
 
         const name = (customer.name || 'Cliente Patriota').trim();
@@ -35,10 +41,34 @@ module.exports = async (req, res) => {
         const phone = (customer.phone || '11999999999').replace(/\D/g, '');
         const email = (customer.email || 'cliente@patriotas.com.br').trim();
 
+        // Processamento seguro e com deduplicação dos Order Bumps
+        const rawBumps = Array.isArray(body.orderBumps) ? body.orderBumps : [];
+        const uniqueBumps = Array.from(new Set(rawBumps));
+
+        let bumpTotalCents = 0;
+        const validBumpsLabels = [];
+        const validBumpsIds = [];
+
+        uniqueBumps.forEach(bumpId => {
+            if (ORDER_BUMP_PRICES[bumpId]) {
+                bumpTotalCents += ORDER_BUMP_PRICES[bumpId].priceCents;
+                validBumpsLabels.push(ORDER_BUMP_PRICES[bumpId].label);
+                validBumpsIds.push(bumpId);
+            }
+        });
+
         const isExpress = (shipping.type === 'express');
-        const amountInCents = Math.round((quantity * 8990) + (isExpress ? 999 : 0));
-        const amountFormatted = (quantity * 89.90) + (isExpress ? 9.99 : 0);
+        const kitTotalCents = quantity * 8990;
+        const shippingCents = isExpress ? 999 : 0;
+        const amountInCents = kitTotalCents + shippingCents + bumpTotalCents;
+        const amountFormatted = amountInCents / 100;
         const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
+
+        let itemTitle = `${quantity}x Kit Patriota 2026 (Tam ${size})`;
+        if (validBumpsLabels.length > 0) {
+            itemTitle += ` + ${validBumpsLabels.join(' + ')}`;
+        }
+        itemTitle += ` - ${shippingLabel}`;
 
         // Payload estrito exigido pela API da Duttyfy
         const payload = JSON.stringify({
@@ -50,7 +80,7 @@ module.exports = async (req, res) => {
                 phone: phone
             },
             item: {
-                title: `${quantity}x Kit Patriota 2026 (Tam ${size}) - ${shippingLabel}`,
+                title: itemTitle,
                 price: amountInCents,
                 quantity: quantity
             },
@@ -101,6 +131,7 @@ module.exports = async (req, res) => {
                 pix_code: pixCode,
                 qrcode_url: qrcodeUrl,
                 amount: amountFormatted,
+                order_bumps: validBumpsIds,
                 shipping: {
                     type: isExpress ? 'express' : 'free',
                     label: shippingLabel,

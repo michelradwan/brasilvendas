@@ -745,60 +745,64 @@
         </button>
     </div>
 
-    <!-- 13. CHECKOUT MODAL TRANSPARENTE E PROFISSIONAL (PADRÃO GATEWAY MODERNO) -->
+    <!-- 13. CHECKOUT MODAL EM 3 ETAPAS (1. DADOS -> 2. ENTREGA -> 3. PIX) -->
     <div id="pix-checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="bg-[#0b0d14] border border-white/10 w-full max-w-xl rounded-3xl p-4 sm:p-7 shadow-2xl relative text-white my-auto max-h-[94dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain">
+        <div id="checkout-modal-content" class="bg-[#0b0d14] border border-white/10 w-full max-w-xl rounded-3xl p-4 sm:p-7 shadow-2xl relative text-white my-auto max-h-[94dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain transition-all duration-200">
+            
+            <!-- Botão Fechar -->
             <button type="button" onclick="closePixModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-2xl transition-colors z-20 cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10" aria-label="Fechar checkout">✕</button>
 
-            <!-- Passo 1: Formulário e Endereço -->
-            <div id="pix-step-form">
+            <!-- Cabeçalho do Checkout -->
+            <div class="flex items-center space-x-3 mb-3.5 pr-8">
+                <img src="images/IB3yGye.png" alt="Brasil Vendas" class="h-7 sm:h-8 w-auto object-contain" width="80" height="32">
+                <div class="border-l border-white/10 pl-3">
+                    <h3 id="modal-title" class="font-outfit text-base sm:text-lg font-bold text-white leading-tight">Finalizar Compra</h3>
+                    <p class="text-[10px] sm:text-xs text-gray-400">Ambiente Criptografado • Pagamento PIX</p>
+                </div>
+            </div>
+
+            <!-- Barra de Progresso Real em 3 Etapas -->
+            <div class="flex items-center justify-between text-[11px] font-semibold text-gray-400 bg-white/[0.03] border border-white/5 rounded-xl px-3 py-2 mb-4">
+                <div id="step-indicator-1" class="flex items-center space-x-1.5 font-bold text-brand-green">
+                    <span class="w-4 h-4 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center text-[10px]">1</span>
+                    <span>Dados</span>
+                </div>
+                <span class="text-gray-600">───</span>
+                <div id="step-indicator-2" class="flex items-center space-x-1.5 text-gray-500">
+                    <span class="w-4 h-4 rounded-full bg-white/10 text-gray-400 flex items-center justify-center text-[10px]">2</span>
+                    <span>Entrega</span>
+                </div>
+                <span class="text-gray-600">───</span>
+                <div id="step-indicator-3" class="flex items-center space-x-1.5 text-gray-500">
+                    <span class="w-4 h-4 rounded-full bg-white/10 text-gray-400 flex items-center justify-center text-[10px]">3</span>
+                    <span>PIX</span>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- ETAPA 1: SEUS DADOS PESSOAIS -->
+            <!-- ========================================================================= -->
+            <div id="checkout-step-1" class="space-y-4">
                 
-                <!-- Cabeçalho Institucional Discreto do Checkout -->
-                <div class="flex items-center space-x-3 mb-3.5 pr-8">
-                    <img src="images/IB3yGye.png" alt="Brasil Vendas" class="h-7 sm:h-8 w-auto object-contain" width="80" height="32">
-                    <div class="border-l border-white/10 pl-3">
-                        <h3 id="modal-title" class="font-outfit text-base sm:text-lg font-bold text-white leading-tight">Finalizar Compra</h3>
-                        <p class="text-[10px] sm:text-xs text-gray-400">Ambiente Criptografado • Pagamento PIX</p>
-                    </div>
-                </div>
-
-                <!-- Barra de Progresso Discreta -->
-                <div class="flex items-center justify-between text-[11px] font-semibold text-gray-400 bg-white/[0.03] border border-white/5 rounded-xl px-3 py-2 mb-4">
-                    <span class="text-brand-green flex items-center space-x-1 font-bold">
-                        <span class="w-2 h-2 rounded-full bg-brand-green"></span>
-                        <span>1. Dados</span>
-                    </span>
-                    <span class="text-gray-600">➔</span>
-                    <span class="text-brand-accent flex items-center space-x-1 font-bold">
-                        <span class="w-2 h-2 rounded-full bg-brand-accent"></span>
-                        <span>2. Entrega</span>
-                    </span>
-                    <span class="text-gray-600">➔</span>
-                    <span class="flex items-center space-x-1">
-                        <span class="w-2 h-2 rounded-full bg-gray-600"></span>
-                        <span>3. PIX</span>
-                    </span>
-                </div>
-
-                <!-- Resumo Imediato do Pedido -->
-                <div class="bg-brand-dark/80 p-3 sm:p-4 rounded-2xl border border-brand-border mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner">
+                <!-- Resumo Compacto do Kit -->
+                <div class="bg-brand-dark/80 p-3 sm:p-4 rounded-2xl border border-brand-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner">
                     <div class="flex items-center space-x-3">
                         <img src="images/DopeXsu.png" alt="Kit Patriota" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl object-contain bg-brand-dark border border-white/10 flex-shrink-0" width="48" height="48">
                         <div>
                             <p class="font-bold text-xs sm:text-sm text-white">Kit Patriota Completo</p>
-                            <p class="text-xs text-brand-accent">Tamanho: <span id="modal-tamanho-display" class="font-bold">M</span> • <span id="modal-frete-display" class="text-gray-300">Frete Grátis</span></p>
+                            <p class="text-xs text-brand-accent">Tamanho da Camiseta: <span id="modal-tamanho-display" class="font-bold">M</span></p>
                         </div>
                     </div>
                     
                     <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3">
-                        <!-- Seletor de Quantidade -->
+                        <!-- Seletor de Quantidade do Kit -->
                         <div class="flex items-center bg-black/60 border border-brand-border rounded-xl p-1">
                             <button type="button" onclick="changeQuantity(-1)" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90" aria-label="Diminuir quantidade">－</button>
                             <span id="modal-qtd-display" class="w-7 text-center font-outfit font-black text-sm text-white">1</span>
                             <button type="button" onclick="changeQuantity(1)" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-brand-dark hover:bg-brand-accent hover:text-brand-dark text-white font-bold flex items-center justify-center transition-colors text-sm cursor-pointer select-none active:scale-90" aria-label="Aumentar quantidade">＋</button>
                         </div>
 
-                        <!-- Preço Total -->
+                        <!-- Preço do Kit -->
                         <div class="text-right">
                             <span id="modal-original-price" class="text-[10px] text-gray-400 line-through block">R$ 159,90</span>
                             <p class="text-lg sm:text-xl font-outfit font-black text-brand-green" id="modal-total-display">R$ 89,90</p>
@@ -806,156 +810,299 @@
                     </div>
                 </div>
 
-                <form id="pix-customer-form" onsubmit="handlePixSubmit(event)" class="space-y-3.5 sm:space-y-4">
+                <!-- Formulário de Dados Pessoais -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-2.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">Seus Dados</span>
+                        <div class="h-[1px] flex-1 bg-brand-border"></div>
+                    </div>
                     
-                    <!-- 1. DADOS PESSOAIS -->
-                    <div>
-                        <div class="flex items-center space-x-2 mb-2">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">1. Dados Pessoais</span>
-                            <div class="h-[1px] flex-1 bg-brand-border"></div>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label for="pix-name" class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo *</label>
+                            <input type="text" id="pix-name" required autocomplete="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                            <p id="name-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite seu nome completo.</p>
                         </div>
-                        <div class="space-y-2.5">
-                            <div>
-                                <label for="pix-name" class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo *</label>
-                                <input type="text" id="pix-name" required autocomplete="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                            </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                <div>
-                                    <label for="pix-cpf" class="block text-xs font-semibold text-gray-300 mb-1">CPF (apenas números) *</label>
-                                    <input type="text" id="pix-cpf" required inputmode="numeric" placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                    <p id="cpf-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite um CPF válido.</p>
-                                </div>
-                                <div>
-                                    <label for="pix-phone" class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Celular *</label>
-                                    <input type="tel" id="pix-phone" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="pix-email" class="block text-xs font-semibold text-gray-300 mb-1">E-mail para envio do rastreamento *</label>
-                                <input type="email" id="pix-email" required inputmode="email" autocomplete="email" placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. ENDEREÇO DE ENTREGA -->
-                    <div>
-                        <div class="flex items-center space-x-2 mb-2">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">2. Endereço de Entrega</span>
-                            <div class="h-[1px] flex-1 bg-brand-border"></div>
-                        </div>
-                        <div class="space-y-2.5">
-                            <div>
-                                <label for="pix-cep" class="block text-xs font-semibold text-gray-300 mb-1">CEP * <span class="text-[10px] text-brand-accent font-normal">(Busca automática)</span></label>
-                                <div class="relative">
-                                    <input type="text" id="pix-cep" required inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                    <div id="cep-loading" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
-                                        <div class="w-4 h-4 border-2 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
-                                    </div>
-                                </div>
-                                <p id="cep-feedback" class="text-[11px] mt-1 hidden"></p>
-                            </div>
-
-                            <div>
-                                <label for="pix-street" class="block text-xs font-semibold text-gray-300 mb-1">Rua / Logradouro *</label>
-                                <input type="text" id="pix-street" required autocomplete="address-line1" placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                <div>
-                                    <label for="pix-number" class="block text-xs font-semibold text-gray-300 mb-1">Número *</label>
-                                    <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                </div>
-                                <div>
-                                    <label for="pix-complement" class="block text-xs font-semibold text-gray-300 mb-1">Complemento <span class="text-gray-500 font-normal">(Opcional)</span></label>
-                                    <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                <div>
-                                    <label for="pix-neighborhood" class="block text-xs font-semibold text-gray-300 mb-1">Bairro *</label>
-                                    <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                </div>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div class="col-span-2">
-                                        <label for="pix-city" class="block text-xs font-semibold text-gray-300 mb-1">Cidade *</label>
-                                        <input type="text" id="pix-city" required autocomplete="address-level2" placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                    </div>
-                                    <div>
-                                        <label for="pix-state" class="block text-xs font-semibold text-gray-300 mb-1">UF *</label>
-                                        <input type="text" id="pix-state" required autocomplete="address-level1" placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. OPÇÕES DE ENVIO -->
-                    <div>
-                        <div class="flex items-center space-x-2 mb-2">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">3. Opções de Envio</span>
-                            <div class="h-[1px] flex-1 bg-brand-border"></div>
-                        </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            
-                            <!-- Opção 1: Frete Grátis -->
-                            <div class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all select-none shadow-md" id="label-shipping-free" onclick="handleShippingChange('free')">
-                                <div class="flex items-center space-x-2.5 pointer-events-none">
-                                    <input type="radio" id="radio-shipping-free" name="shipping_type" value="free" checked class="w-4 h-4 text-brand-green focus:ring-0 cursor-pointer">
-                                    <div>
-                                        <p class="font-bold text-xs sm:text-sm text-white">Frete Grátis</p>
-                                        <p class="text-[11px] text-gray-400">Correios Padrão</p>
-                                    </div>
-                                </div>
-                                <span class="font-bold text-[11px] text-brand-green bg-brand-green/20 px-2 py-0.5 rounded-lg pointer-events-none">GRÁTIS</span>
+                            <div>
+                                <label for="pix-cpf" class="block text-xs font-semibold text-gray-300 mb-1">CPF (apenas números) *</label>
+                                <input type="text" id="pix-cpf" required inputmode="numeric" placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                <p id="cpf-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite um CPF válido.</p>
                             </div>
-
-                            <!-- Opção 2: Full Express (+R$ 9,99) -->
-                            <div class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all select-none" id="label-shipping-express" onclick="handleShippingChange('express')">
-                                <div class="flex items-center space-x-2.5 pointer-events-none">
-                                    <input type="radio" id="radio-shipping-express" name="shipping_type" value="express" class="w-4 h-4 text-brand-accent focus:ring-0 cursor-pointer">
-                                    <div>
-                                        <p class="font-bold text-xs sm:text-sm text-white">Full Express ⚡</p>
-                                        <p class="text-[11px] text-brand-accent font-medium">Entrega em 3 dias úteis</p>
-                                    </div>
-                                </div>
-                                <span class="font-bold text-[11px] text-brand-accent bg-brand-accent/20 px-2 py-0.5 rounded-lg pointer-events-none">+ R$ 9,99</span>
+                            <div>
+                                <label for="pix-phone" class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Celular *</label>
+                                <input type="tel" id="pix-phone" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                <p id="phone-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite um WhatsApp/telefone válido.</p>
                             </div>
+                        </div>
 
+                        <div>
+                            <label for="pix-email" class="block text-xs font-semibold text-gray-300 mb-1">E-mail para envio do rastreamento *</label>
+                            <input type="email" id="pix-email" required inputmode="email" autocomplete="email" placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                            <p id="email-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite um e-mail válido.</p>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Resumo Financeiro Final Antes do PIX -->
-                    <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 text-xs space-y-2">
-                        <div class="flex justify-between text-gray-400">
-                            <span>Subtotal Produtos:</span>
-                            <span class="text-gray-200 font-semibold" id="checkout-subtotal">R$ 89,90</span>
-                        </div>
-                        <div class="flex justify-between text-gray-400">
-                            <span>Frete:</span>
-                            <span class="text-brand-green font-semibold" id="checkout-frete-label">Grátis</span>
-                        </div>
-                        <div class="flex justify-between items-baseline border-t border-white/5 pt-2 text-sm">
-                            <span class="font-bold text-white uppercase">Total a pagar:</span>
-                            <span class="font-outfit font-black text-xl sm:text-2xl text-brand-green" id="checkout-total-final">R$ 89,90</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400 text-center pt-1 flex items-center justify-center space-x-1.5">
-                            <span class="text-brand-green">🔒</span>
-                            <span>Pagamento seguro e instantâneo via PIX</span>
-                        </p>
-                    </div>
-
-                    <!-- Botão de Ação com Proteção contra Duplo Envio -->
-                    <button type="submit" id="btn-gerar-pix" class="w-full bg-brand-green hover:bg-brand-greenHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 rounded-2xl shadow-glow-green transition-all flex items-center justify-center space-x-2 mt-4 active:scale-[0.98] tap-target cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
-                        <span id="btn-text">GERAR PIX DE R$ 89,90</span>
-                        <span>➔</span>
-                    </button>
-                </form>
+                <!-- Botão Avançar para Etapa 2 -->
+                <button type="button" onclick="goToStep(2)" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base py-4 rounded-2xl shadow-glow-accent transition-all flex items-center justify-center space-x-2 mt-4 active:scale-[0.98] tap-target cursor-pointer">
+                    <span>CONTINUAR PARA ENTREGA</span>
+                    <span>➔</span>
+                </button>
             </div>
 
-            <!-- Passo 2: Exibição do QR Code e Copia e Cola -->
+            <!-- ========================================================================= -->
+            <!-- ETAPA 2: ENDEREÇO, FRETE & ORDER BUMPS -->
+            <!-- ========================================================================= -->
+            <div id="checkout-step-2" class="space-y-4 hidden">
+                
+                <!-- Endereço de Entrega -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-2.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">Endereço de Entrega</span>
+                        <div class="h-[1px] flex-1 bg-brand-border"></div>
+                    </div>
+                    
+                    <div class="space-y-2.5">
+                        <div>
+                            <label for="pix-cep" class="block text-xs font-semibold text-gray-300 mb-1">CEP * <span class="text-[10px] text-brand-accent font-normal">(Busca automática)</span></label>
+                            <div class="relative">
+                                <input type="text" id="pix-cep" required inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                <div id="cep-loading" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
+                                    <div class="w-4 h-4 border-2 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            </div>
+                            <p id="cep-feedback" class="text-[11px] mt-1 hidden"></p>
+                            <p id="cep-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Informe um CEP válido com 8 dígitos.</p>
+                        </div>
+
+                        <div>
+                            <label for="pix-street" class="block text-xs font-semibold text-gray-300 mb-1">Rua / Logradouro *</label>
+                            <input type="text" id="pix-street" required autocomplete="address-line1" placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                            <p id="street-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Preencha a rua / logradouro.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                                <label for="pix-number" class="block text-xs font-semibold text-gray-300 mb-1">Número *</label>
+                                <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                <p id="number-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Informe o número.</p>
+                            </div>
+                            <div>
+                                <label for="pix-complement" class="block text-xs font-semibold text-gray-300 mb-1">Complemento <span class="text-gray-500 font-normal">(Opcional)</span></label>
+                                <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                                <label for="pix-neighborhood" class="block text-xs font-semibold text-gray-300 mb-1">Bairro *</label>
+                                <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                <p id="neighborhood-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Informe o bairro.</p>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <label for="pix-city" class="block text-xs font-semibold text-gray-300 mb-1">Cidade *</label>
+                                    <input type="text" id="pix-city" required autocomplete="address-level2" placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                    <p id="city-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Informe a cidade.</p>
+                                </div>
+                                <div>
+                                    <label for="pix-state" class="block text-xs font-semibold text-gray-300 mb-1">UF *</label>
+                                    <input type="text" id="pix-state" required autocomplete="address-level1" placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
+                                    <p id="state-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ UF.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opções de Envio -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-2.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">Opções de Envio</span>
+                        <div class="h-[1px] flex-1 bg-brand-border"></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        
+                        <!-- Frete Grátis -->
+                        <div class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-brand-green bg-brand-green/10 cursor-pointer transition-all select-none shadow-md" id="label-shipping-free" onclick="handleShippingChange('free')">
+                            <div class="flex items-center space-x-2.5 pointer-events-none">
+                                <input type="radio" id="radio-shipping-free" name="shipping_type" value="free" checked class="w-4 h-4 text-brand-green focus:ring-0 cursor-pointer">
+                                <div>
+                                    <p class="font-bold text-xs sm:text-sm text-white">Frete Grátis</p>
+                                    <p class="text-[11px] text-gray-400">Correios Padrão</p>
+                                </div>
+                            </div>
+                            <span class="font-bold text-[11px] text-brand-green bg-brand-green/20 px-2 py-0.5 rounded-lg pointer-events-none">GRÁTIS</span>
+                        </div>
+
+                        <!-- Full Express -->
+                        <div class="shipping-option relative flex items-center justify-between p-3.5 rounded-2xl border border-brand-border bg-brand-dark/80 hover:border-brand-accent/50 cursor-pointer transition-all select-none" id="label-shipping-express" onclick="handleShippingChange('express')">
+                            <div class="flex items-center space-x-2.5 pointer-events-none">
+                                <input type="radio" id="radio-shipping-express" name="shipping_type" value="express" class="w-4 h-4 text-brand-accent focus:ring-0 cursor-pointer">
+                                <div>
+                                    <p class="font-bold text-xs sm:text-sm text-white">Full Express ⚡</p>
+                                    <p class="text-[11px] text-brand-accent font-medium">Entrega em 3 dias úteis</p>
+                                </div>
+                            </div>
+                            <span class="font-bold text-[11px] text-brand-accent bg-brand-accent/20 px-2 py-0.5 rounded-lg pointer-events-none">+ R$ 9,99</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: COMPLETE SEU PEDIDO (ORDER BUMPS REAIS) -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-2.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-accent">Complete seu Pedido</span>
+                        <div class="h-[1px] flex-1 bg-brand-border"></div>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        
+                        <!-- Order Bump 1: 100 Adesivos Temáticos -->
+                        <div id="card-bump-stickers100" class="border border-white/10 bg-brand-dark/60 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-3 transition-all">
+                            <div class="flex items-center space-x-3">
+                                <img src="images/order_bump_adesivos.png" alt="100 Adesivos Temáticos" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-contain bg-black/40 border border-white/10 flex-shrink-0" width="64" height="64" loading="lazy">
+                                <div>
+                                    <p class="font-bold text-xs sm:text-sm text-white leading-tight">100 Adesivos Temáticos 🇧🇷</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">Pacote com 100 adesivos para adicionar ao pedido.</p>
+                                    <p class="text-xs font-black text-brand-green mt-1">+ R$ 19,90</p>
+                                </div>
+                            </div>
+                            <button type="button" id="btn-bump-stickers100" onclick="toggleOrderBump('stickers100')" class="bg-brand-accent/20 hover:bg-brand-accent/30 text-brand-accent border border-brand-accent/40 font-bold text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer select-none active:scale-95">
+                                + ADICIONAR
+                            </button>
+                        </div>
+
+                        <!-- Order Bump 2: Chaveiro Colecionável -->
+                        <div id="card-bump-flavioKeychain" class="border border-white/10 bg-brand-dark/60 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-3 transition-all">
+                            <div class="flex items-center space-x-3">
+                                <img src="images/order_bump_chaveiro.png" alt="Chaveiro Colecionável" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-contain bg-black/40 border border-white/10 flex-shrink-0" width="64" height="64" loading="lazy">
+                                <div>
+                                    <p class="font-bold text-xs sm:text-sm text-white leading-tight">Chaveiro Colecionável 🇧🇷</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">Adicione o chaveiro colecionável junto ao seu Kit.</p>
+                                    <p class="text-xs font-black text-brand-green mt-1">+ R$ 24,90</p>
+                                </div>
+                            </div>
+                            <button type="button" id="btn-bump-flavioKeychain" onclick="toggleOrderBump('flavioKeychain')" class="bg-brand-accent/20 hover:bg-brand-accent/30 text-brand-accent border border-brand-accent/40 font-bold text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer select-none active:scale-95">
+                                + ADICIONAR
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Resumo Dinâmico da Etapa 2 -->
+                <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 text-xs space-y-1.5">
+                    <div class="flex justify-between text-gray-400">
+                        <span>Kit Patriota (<span id="summary-qtd-display">1</span>x):</span>
+                        <span class="text-gray-200 font-semibold" id="summary-kit-price">R$ 89,90</span>
+                    </div>
+                    <div id="summary-row-stickers" class="flex justify-between text-gray-400 hidden">
+                        <span>100 Adesivos Temáticos:</span>
+                        <span class="text-brand-accent font-semibold">+ R$ 19,90</span>
+                    </div>
+                    <div id="summary-row-keychain" class="flex justify-between text-gray-400 hidden">
+                        <span>Chaveiro Colecionável:</span>
+                        <span class="text-brand-accent font-semibold">+ R$ 24,90</span>
+                    </div>
+                    <div class="flex justify-between text-gray-400">
+                        <span>Frete:</span>
+                        <span class="text-brand-green font-semibold" id="summary-shipping-label">Grátis</span>
+                    </div>
+                    <div class="flex justify-between items-baseline border-t border-white/5 pt-2 text-sm">
+                        <span class="font-bold text-white uppercase">Total:</span>
+                        <span class="font-outfit font-black text-lg sm:text-xl text-brand-green" id="summary-step2-total">R$ 89,90</span>
+                    </div>
+                </div>
+
+                <!-- Botões de Navegação Etapa 2 -->
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <button type="button" onclick="goToStep(1)" class="w-full bg-white/10 hover:bg-white/15 text-gray-300 font-bold text-sm py-3.5 rounded-2xl transition-all active:scale-[0.98] tap-target cursor-pointer">
+                        ← VOLTAR
+                    </button>
+                    <button type="button" onclick="goToStep(3)" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-sm sm:text-base py-3.5 rounded-2xl shadow-glow-accent transition-all active:scale-[0.98] tap-target cursor-pointer">
+                        CONTINUAR PARA O PIX ➔
+                    </button>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- ETAPA 3: REVISÃO & PAGAMENTO PIX -->
+            <!-- ========================================================================= -->
+            <div id="checkout-step-3" class="space-y-4 hidden">
+                
+                <div class="text-center">
+                    <h4 class="font-outfit text-lg font-bold text-white">Revise seu Pedido</h4>
+                    <p class="text-xs text-gray-400">Confira todos os itens antes de gerar o código de pagamento</p>
+                </div>
+
+                <!-- Lista de Itens do Pedido -->
+                <div class="bg-brand-dark/90 border border-brand-border rounded-2xl p-4 text-xs space-y-2.5 shadow-inner">
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                        <div>
+                            <p class="font-bold text-white text-xs sm:text-sm">Kit Patriota Completo</p>
+                            <p class="text-[11px] text-gray-400">Tamanho: <span id="review-tamanho" class="text-brand-accent font-semibold">M</span> • Qtd: <span id="review-qtd" class="text-brand-accent font-semibold">1</span></p>
+                        </div>
+                        <span class="font-outfit font-bold text-white text-sm" id="review-kit-price">R$ 89,90</span>
+                    </div>
+
+                    <div id="review-row-stickers" class="flex justify-between items-center border-b border-white/5 pb-2 hidden">
+                        <div>
+                            <p class="font-bold text-white">100 Adesivos Temáticos 🇧🇷</p>
+                            <p class="text-[11px] text-gray-400">Item Adicional</p>
+                        </div>
+                        <span class="font-outfit font-bold text-brand-accent text-sm">+ R$ 19,90</span>
+                    </div>
+
+                    <div id="review-row-keychain" class="flex justify-between items-center border-b border-white/5 pb-2 hidden">
+                        <div>
+                            <p class="font-bold text-white">Chaveiro Colecionável 🇧🇷</p>
+                            <p class="text-[11px] text-gray-400">Item Adicional</p>
+                        </div>
+                        <span class="font-outfit font-bold text-brand-accent text-sm">+ R$ 24,90</span>
+                    </div>
+
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2 text-gray-300">
+                        <div>
+                            <p class="font-medium text-white">Modalidade de Envio:</p>
+                            <p class="text-[11px] text-gray-400" id="review-shipping-desc">Correios Padrão</p>
+                        </div>
+                        <span class="font-semibold text-brand-green" id="review-shipping-price">Grátis</span>
+                    </div>
+
+                    <div class="text-gray-400 pt-1 text-[11px]">
+                        <p class="font-medium text-gray-300">Endereço de Entrega:</p>
+                        <p id="review-address-text" class="text-gray-400 italic mt-0.5 leading-relaxed"></p>
+                    </div>
+
+                    <div class="flex justify-between items-baseline border-t border-brand-green/30 pt-3 text-base">
+                        <span class="font-bold text-white uppercase">TOTAL A PAGAR:</span>
+                        <span class="font-outfit font-black text-2xl text-brand-green" id="review-total-final">R$ 89,90</span>
+                    </div>
+                </div>
+
+                <p class="text-[11px] text-gray-400 text-center flex items-center justify-center space-x-1.5">
+                    <span class="text-brand-green">🔒</span>
+                    <span>Pagamento via PIX com aprovação imediata e sem taxas</span>
+                </p>
+
+                <!-- Botões de Ação Etapa 3 -->
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <button type="button" onclick="goToStep(2)" class="w-full bg-white/10 hover:bg-white/15 text-gray-300 font-bold text-sm py-4 rounded-2xl transition-all active:scale-[0.98] tap-target cursor-pointer">
+                        ← VOLTAR
+                    </button>
+                    <button type="button" id="btn-gerar-pix" onclick="executarGerarPix()" class="w-full bg-brand-green hover:bg-brand-greenHover text-brand-dark font-outfit font-black text-sm sm:text-base py-4 rounded-2xl shadow-glow-green transition-all active:scale-[0.98] tap-target cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                        <span id="btn-text">GERAR PIX</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- TELA DO QR CODE / PIX COPIA E COLA -->
+            <!-- ========================================================================= -->
             <div id="pix-step-qrcode" class="hidden text-center py-2">
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand-green/20 text-brand-green text-2xl mb-2">⚡</div>
                 <h3 class="font-outfit text-xl sm:text-2xl font-bold text-white mb-1">PIX Gerado com Sucesso!</h3>
@@ -987,7 +1134,9 @@
                 </div>
             </div>
 
-            <!-- Passo 3: Pagamento Confirmado -->
+            <!-- ========================================================================= -->
+            <!-- TELA DE SUCESSO / PAGAMENTO APROVADO -->
+            <!-- ========================================================================= -->
             <div id="pix-step-success" class="hidden text-center py-4 sm:py-6">
                 <div class="w-16 h-16 bg-brand-green/20 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-green text-3xl shadow-glow-green">✓</div>
                 <h3 class="font-outfit text-xl sm:text-3xl font-bold text-white mb-1">PAGAMENTO APROVADO! 🎉</h3>
@@ -1012,6 +1161,7 @@
                     Concluir
                 </button>
             </div>
+
         </div>
     </div>
 
@@ -1067,7 +1217,11 @@
         const PRICING_CONFIG = {
             kitUnitPriceCents: 8990,
             originalKitPriceCents: 15990,
-            expressShippingCents: 999
+            expressShippingCents: 999,
+            orderBumps: {
+                stickers100: { id: 'stickers100', priceCents: 1990, label: '100 Adesivos Temáticos 🇧🇷' },
+                flavioKeychain: { id: 'flavioKeychain', priceCents: 2490, label: 'Chaveiro Colecionável 🇧🇷' }
+            }
         };
 
         // ==============================================================================
@@ -1105,10 +1259,12 @@
 
         const initialUTMs = capturarUTMs();
 
+        let currentStep = 1;
         let currentTransactionId = null;
         let pixCheckInterval = null;
-        let selectedShipping = 'free'; // 'free' (R$ 89,90) ou 'express' (+R$ 9,99)
+        let selectedShipping = 'free'; // 'free' ou 'express'
         let currentQuantity = 1;
+        let selectedBumps = new Set(); // 'stickers100', 'flavioKeychain'
         let isCreatingOrder = false;
 
         // Disparo do ViewContent no carregamento inicial
@@ -1172,26 +1328,58 @@
             }
         }
 
-        // Seletor de Quantidade
+        // Seletor de Quantidade do Kit
         function changeQuantity(delta) {
             currentQuantity = Math.max(1, Math.min(10, currentQuantity + delta));
             recalculateTotals();
         }
 
+        // Toggle dos Order Bumps
+        function toggleOrderBump(bumpId) {
+            if (selectedBumps.has(bumpId)) {
+                selectedBumps.delete(bumpId);
+            } else {
+                selectedBumps.add(bumpId);
+            }
+
+            // Atualiza o estado visual do card
+            const isSelected = selectedBumps.has(bumpId);
+            const cardEl = document.getElementById(`card-bump-${bumpId}`);
+            const btnEl = document.getElementById(`btn-bump-${bumpId}`);
+
+            if (cardEl && btnEl) {
+                if (isSelected) {
+                    cardEl.className = "border-2 border-brand-green bg-brand-green/10 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-3 transition-all shadow-md";
+                    btnEl.className = "bg-brand-green hover:bg-brand-greenHover text-brand-dark font-black text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer select-none active:scale-95";
+                    btnEl.textContent = "✓ ADICIONADO";
+                } else {
+                    cardEl.className = "border border-white/10 bg-brand-dark/60 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-3 transition-all";
+                    btnEl.className = "bg-brand-accent/20 hover:bg-brand-accent/30 text-brand-accent border border-brand-accent/40 font-bold text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer select-none active:scale-95";
+                    btnEl.textContent = "+ ADICIONAR";
+                }
+            }
+
+            recalculateTotals();
+        }
+
         // Recálculo Dinâmico de Valores com Centavos Exatos
         function recalculateTotals() {
-            const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
-            const isExpress = radioChecked ? (radioChecked.value === 'express') : (selectedShipping === 'express');
-            
+            const isExpress = (selectedShipping === 'express');
             const kitSubtotalCents = currentQuantity * PRICING_CONFIG.kitUnitPriceCents;
             const originalSubtotalCents = currentQuantity * PRICING_CONFIG.originalKitPriceCents;
             const shippingCents = isExpress ? PRICING_CONFIG.expressShippingCents : 0;
-            const totalCents = kitSubtotalCents + shippingCents;
+
+            let bumpsTotalCents = 0;
+            if (selectedBumps.has('stickers100')) bumpsTotalCents += PRICING_CONFIG.orderBumps.stickers100.priceCents;
+            if (selectedBumps.has('flavioKeychain')) bumpsTotalCents += PRICING_CONFIG.orderBumps.flavioKeychain.priceCents;
+
+            const totalCents = kitSubtotalCents + shippingCents + bumpsTotalCents;
 
             const totalFormatted = (totalCents / 100).toFixed(2).replace('.', ',');
-            const subtotalFormatted = (kitSubtotalCents / 100).toFixed(2).replace('.', ',');
+            const kitSubtotalFormatted = (kitSubtotalCents / 100).toFixed(2).replace('.', ',');
             const originalFormatted = (originalSubtotalCents / 100).toFixed(2).replace('.', ',');
 
+            // Atualiza Etapa 1
             const qtdDisplay = document.getElementById('modal-qtd-display');
             if (qtdDisplay) qtdDisplay.textContent = currentQuantity;
 
@@ -1199,29 +1387,65 @@
             if (cartBadge) cartBadge.textContent = currentQuantity;
 
             const totalDisplay = document.getElementById('modal-total-display');
-            if (totalDisplay) totalDisplay.textContent = `R$ ${totalFormatted}`;
+            if (totalDisplay) totalDisplay.textContent = `R$ ${kitSubtotalFormatted}`;
 
             const originalDisplay = document.getElementById('modal-original-price');
             if (originalDisplay) originalDisplay.textContent = `R$ ${originalFormatted}`;
 
-            const subtotalEl = document.getElementById('checkout-subtotal');
-            if (subtotalEl) subtotalEl.textContent = `R$ ${subtotalFormatted}`;
+            // Atualiza Etapa 2
+            const sumQtd = document.getElementById('summary-qtd-display');
+            if (sumQtd) sumQtd.textContent = currentQuantity;
 
-            const freteLabelEl = document.getElementById('checkout-frete-label');
-            if (freteLabelEl) freteLabelEl.textContent = isExpress ? '+ R$ 9,99' : 'Grátis';
+            const sumKitPrice = document.getElementById('summary-kit-price');
+            if (sumKitPrice) sumKitPrice.textContent = `R$ ${kitSubtotalFormatted}`;
 
-            const totalFinalEl = document.getElementById('checkout-total-final');
-            if (totalFinalEl) totalFinalEl.textContent = `R$ ${totalFormatted}`;
-
-            const freteDisplay = document.getElementById('modal-frete-display');
-            if (freteDisplay) {
-                freteDisplay.textContent = isExpress ? 'Full Express (3 dias)' : 'Frete Grátis (Correios)';
+            const rowStickers = document.getElementById('summary-row-stickers');
+            if (rowStickers) {
+                if (selectedBumps.has('stickers100')) rowStickers.classList.remove('hidden');
+                else rowStickers.classList.add('hidden');
             }
+
+            const rowKeychain = document.getElementById('summary-row-keychain');
+            if (rowKeychain) {
+                if (selectedBumps.has('flavioKeychain')) rowKeychain.classList.remove('hidden');
+                else rowKeychain.classList.add('hidden');
+            }
+
+            const sumShippingLabel = document.getElementById('summary-shipping-label');
+            if (sumShippingLabel) sumShippingLabel.textContent = isExpress ? '+ R$ 9,99' : 'Grátis';
+
+            const sumStep2Total = document.getElementById('summary-step2-total');
+            if (sumStep2Total) sumStep2Total.textContent = `R$ ${totalFormatted}`;
+
+            // Atualiza Etapa 3 (Revisão)
+            const revQtd = document.getElementById('review-qtd');
+            if (revQtd) revQtd.textContent = currentQuantity;
+
+            const revKitPrice = document.getElementById('review-kit-price');
+            if (revKitPrice) revKitPrice.textContent = `R$ ${kitSubtotalFormatted}`;
+
+            const revRowStickers = document.getElementById('review-row-stickers');
+            if (revRowStickers) {
+                if (selectedBumps.has('stickers100')) revRowStickers.classList.remove('hidden');
+                else revRowStickers.classList.add('hidden');
+            }
+
+            const revRowKeychain = document.getElementById('review-row-keychain');
+            if (revRowKeychain) {
+                if (selectedBumps.has('flavioKeychain')) revRowKeychain.classList.remove('hidden');
+                else revRowKeychain.classList.add('hidden');
+            }
+
+            const revShippingDesc = document.getElementById('review-shipping-desc');
+            const revShippingPrice = document.getElementById('review-shipping-price');
+            if (revShippingDesc) revShippingDesc.textContent = isExpress ? 'Full Express (3 dias úteis)' : 'Correios Padrão (Frete Grátis)';
+            if (revShippingPrice) revShippingPrice.textContent = isExpress ? '+ R$ 9,99' : 'Grátis';
+
+            const revTotalFinal = document.getElementById('review-total-final');
+            if (revTotalFinal) revTotalFinal.textContent = `R$ ${totalFormatted}`;
 
             const btnText = document.getElementById('btn-text');
-            if (btnText) {
-                btnText.textContent = `GERAR PIX DE R$ ${totalFormatted}`;
-            }
+            if (btnText) btnText.textContent = `GERAR PIX DE R$ ${totalFormatted}`;
         }
 
         // Alternância Dinâmica de Frete
@@ -1300,6 +1524,25 @@
                 else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
                 else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})$/, '($1) $2');
                 e.target.value = v;
+
+                const phoneErro = document.getElementById('phone-erro');
+                if (phoneErro) phoneErro.classList.add('hidden');
+            });
+        }
+
+        const nameInput = document.getElementById('pix-name');
+        if (nameInput) {
+            nameInput.addEventListener('input', function() {
+                const nameErro = document.getElementById('name-erro');
+                if (nameErro) nameErro.classList.add('hidden');
+            });
+        }
+
+        const emailInput = document.getElementById('pix-email');
+        if (emailInput) {
+            emailInput.addEventListener('input', function() {
+                const emailErro = document.getElementById('email-erro');
+                if (emailErro) emailErro.classList.add('hidden');
             });
         }
 
@@ -1309,6 +1552,9 @@
                 let v = e.target.value.replace(/\D/g, '').substring(0, 8);
                 if (v.length > 5) v = v.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
                 e.target.value = v;
+
+                const cepErro = document.getElementById('cep-erro');
+                if (cepErro) cepErro.classList.add('hidden');
 
                 const cleanCep = v.replace(/\D/g, '');
                 if (cleanCep.length === 8) {
@@ -1373,6 +1619,145 @@
             }
         }
 
+        // ==============================================================================
+        // NAVEGAÇÃO E TRANSIÇÃO ENTRE AS 3 ETAPAS DO CHECKOUT
+        // ==============================================================================
+        function goToStep(targetStep) {
+            // Validações da Etapa 1 ao tentar ir para a Etapa 2
+            if (targetStep === 2 && currentStep === 1) {
+                const nameVal = (document.getElementById('pix-name')?.value || '').trim();
+                const cpfVal = (document.getElementById('pix-cpf')?.value || '').replace(/\D/g, '');
+                const phoneVal = (document.getElementById('pix-phone')?.value || '').replace(/\D/g, '');
+                const emailVal = (document.getElementById('pix-email')?.value || '').trim();
+
+                let hasError = false;
+
+                if (nameVal.length < 3) {
+                    document.getElementById('name-erro')?.classList.remove('hidden');
+                    document.getElementById('pix-name')?.focus();
+                    hasError = true;
+                }
+                if (!validarCPF(cpfVal)) {
+                    document.getElementById('cpf-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-cpf')?.focus();
+                    hasError = true;
+                }
+                if (phoneVal.length < 10) {
+                    document.getElementById('phone-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-phone')?.focus();
+                    hasError = true;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                    document.getElementById('email-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-email')?.focus();
+                    hasError = true;
+                }
+
+                if (hasError) return;
+            }
+
+            // Validações da Etapa 2 ao tentar ir para a Etapa 3
+            if (targetStep === 3) {
+                const cepVal = (document.getElementById('pix-cep')?.value || '').replace(/\D/g, '');
+                const streetVal = (document.getElementById('pix-street')?.value || '').trim();
+                const numberVal = (document.getElementById('pix-number')?.value || '').trim();
+                const neighVal = (document.getElementById('pix-neighborhood')?.value || '').trim();
+                const cityVal = (document.getElementById('pix-city')?.value || '').trim();
+                const stateVal = (document.getElementById('pix-state')?.value || '').trim();
+
+                let hasError = false;
+
+                if (cepVal.length !== 8) {
+                    document.getElementById('cep-erro')?.classList.remove('hidden');
+                    document.getElementById('pix-cep')?.focus();
+                    hasError = true;
+                }
+                if (streetVal.length < 2) {
+                    document.getElementById('street-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-street')?.focus();
+                    hasError = true;
+                }
+                if (numberVal.length < 1) {
+                    document.getElementById('number-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-number')?.focus();
+                    hasError = true;
+                }
+                if (neighVal.length < 2) {
+                    document.getElementById('neighborhood-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-neighborhood')?.focus();
+                    hasError = true;
+                }
+                if (cityVal.length < 2) {
+                    document.getElementById('city-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-city')?.focus();
+                    hasError = true;
+                }
+                if (stateVal.length !== 2) {
+                    document.getElementById('state-erro')?.classList.remove('hidden');
+                    if (!hasError) document.getElementById('pix-state')?.focus();
+                    hasError = true;
+                }
+
+                if (hasError) return;
+
+                // Monta texto de endereço de revisão
+                const compVal = (document.getElementById('pix-complement')?.value || '').trim();
+                const addressReviewEl = document.getElementById('review-address-text');
+                if (addressReviewEl) {
+                    addressReviewEl.textContent = `${streetVal}, ${numberVal}${compVal ? ' (' + compVal + ')' : ''} - ${neighVal}, ${cityVal}/${stateVal.toUpperCase()} - CEP: ${cepVal}`;
+                }
+            }
+
+            // Transição suave de telas
+            const step1 = document.getElementById('checkout-step-1');
+            const step2 = document.getElementById('checkout-step-2');
+            const step3 = document.getElementById('checkout-step-3');
+
+            if (step1) step1.classList.add('hidden');
+            if (step2) step2.classList.add('hidden');
+            if (step3) step3.classList.add('hidden');
+
+            if (targetStep === 1 && step1) step1.classList.remove('hidden');
+            if (targetStep === 2 && step2) step2.classList.remove('hidden');
+            if (targetStep === 3 && step3) step3.classList.remove('hidden');
+
+            // Atualiza Indicador de Progresso
+            const ind1 = document.getElementById('step-indicator-1');
+            const ind2 = document.getElementById('step-indicator-2');
+            const ind3 = document.getElementById('step-indicator-3');
+
+            if (targetStep === 1) {
+                if (ind1) ind1.className = "flex items-center space-x-1.5 font-bold text-brand-green";
+                if (ind1) ind1.innerHTML = `<span class="w-4 h-4 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center text-[10px]">1</span><span>Dados</span>`;
+                if (ind2) ind2.className = "flex items-center space-x-1.5 text-gray-500";
+                if (ind2) ind2.innerHTML = `<span class="w-4 h-4 rounded-full bg-white/10 text-gray-400 flex items-center justify-center text-[10px]">2</span><span>Entrega</span>`;
+                if (ind3) ind3.className = "flex items-center space-x-1.5 text-gray-500";
+                if (ind3) ind3.innerHTML = `<span class="w-4 h-4 rounded-full bg-white/10 text-gray-400 flex items-center justify-center text-[10px]">3</span><span>PIX</span>`;
+            } else if (targetStep === 2) {
+                if (ind1) ind1.className = "flex items-center space-x-1.5 font-bold text-brand-green";
+                if (ind1) ind1.innerHTML = `<span class="w-4 h-4 rounded-full bg-brand-green text-brand-dark flex items-center justify-center text-[10px]">✓</span><span class="text-gray-300">Dados</span>`;
+                if (ind2) ind2.className = "flex items-center space-x-1.5 font-bold text-brand-accent";
+                if (ind2) ind2.innerHTML = `<span class="w-4 h-4 rounded-full bg-brand-accent/20 text-brand-accent flex items-center justify-center text-[10px]">2</span><span>Entrega</span>`;
+                if (ind3) ind3.className = "flex items-center space-x-1.5 text-gray-500";
+                if (ind3) ind3.innerHTML = `<span class="w-4 h-4 rounded-full bg-white/10 text-gray-400 flex items-center justify-center text-[10px]">3</span><span>PIX</span>`;
+            } else if (targetStep === 3) {
+                if (ind1) ind1.className = "flex items-center space-x-1.5 font-bold text-brand-green";
+                if (ind1) ind1.innerHTML = `<span class="w-4 h-4 rounded-full bg-brand-green text-brand-dark flex items-center justify-center text-[10px]">✓</span><span class="text-gray-300">Dados</span>`;
+                if (ind2) ind2.className = "flex items-center space-x-1.5 font-bold text-brand-green";
+                if (ind2) ind2.innerHTML = `<span class="w-4 h-4 rounded-full bg-brand-green text-brand-dark flex items-center justify-center text-[10px]">✓</span><span class="text-gray-300">Entrega</span>`;
+                if (ind3) ind3.className = "flex items-center space-x-1.5 font-bold text-brand-accent";
+                if (ind3) ind3.innerHTML = `<span class="w-4 h-4 rounded-full bg-brand-accent/20 text-brand-accent flex items-center justify-center text-[10px]">3</span><span>PIX</span>`;
+            }
+
+            currentStep = targetStep;
+
+            // Rola o container interno do modal para o topo suavemente
+            const modalContent = document.getElementById('checkout-modal-content');
+            if (modalContent) modalContent.scrollTop = 0;
+
+            recalculateTotals();
+        }
+
         // Abertura do Modal de Checkout
         const mainBuyBtn = document.getElementById('comprar-btn');
         if (mainBuyBtn) {
@@ -1394,8 +1779,11 @@
 
                 if (tamanhoErro) tamanhoErro.classList.add('hidden');
                 const modalSizeDisplay = document.getElementById('modal-tamanho-display');
+                const reviewTamanho = document.getElementById('review-tamanho');
                 if (modalSizeDisplay) modalSizeDisplay.textContent = tamanhoSelecionado;
+                if (reviewTamanho) reviewTamanho.textContent = tamanhoSelecionado;
                 
+                goToStep(1);
                 recalculateTotals();
 
                 // Dispara InitiateCheckout no Meta Pixel
@@ -1438,59 +1826,41 @@
             if (pixCheckInterval) clearInterval(pixCheckInterval);
         }
 
-        // Submissão do PIX com Trava de Duplo Envio & Validação Estrita
-        async function handlePixSubmit(e) {
-            e.preventDefault();
-            
-            // Prevenção de duplo envio (lock)
+        // ==============================================================================
+        // EXECUÇÃO E GERAÇÃO DO PIX (COM ORDER BUMPS & PROTEÇÃO DE DUPLO ENVIO)
+        // ==============================================================================
+        async function executarGerarPix() {
             if (isCreatingOrder) return;
             
             const btn = document.getElementById('btn-gerar-pix');
-            const cpfRaw = document.getElementById('pix-cpf') ? document.getElementById('pix-cpf').value : '';
-            const cpf = cpfRaw.replace(/\D/g, '');
-            
-            // Validação estrita de CPF
-            if (!validarCPF(cpf)) {
-                const cpfErr = document.getElementById('cpf-erro');
-                if (cpfErr) cpfErr.classList.remove('hidden');
-                const cpfIn = document.getElementById('pix-cpf');
-                if (cpfIn) {
-                    cpfIn.focus();
-                    cpfIn.classList.add('border-red-500', 'ring-2', 'ring-red-500');
-                }
-                return;
-            }
+            const name = (document.getElementById('pix-name')?.value || 'Cliente Patriota').trim();
+            const cpf = (document.getElementById('pix-cpf')?.value || '').replace(/\D/g, '');
+            const phone = (document.getElementById('pix-phone')?.value || '').replace(/\D/g, '');
+            const email = (document.getElementById('pix-email')?.value || 'cliente@patriotas.com.br').trim();
+            const size = document.getElementById('tamanho')?.value || 'M';
+
+            const address = {
+                cep: (document.getElementById('pix-cep')?.value || '').replace(/\D/g, ''),
+                street: (document.getElementById('pix-street')?.value || '').trim(),
+                number: (document.getElementById('pix-number')?.value || '').trim(),
+                complement: (document.getElementById('pix-complement')?.value || '').trim(),
+                neighborhood: (document.getElementById('pix-neighborhood')?.value || '').trim(),
+                city: (document.getElementById('pix-city')?.value || '').trim(),
+                state: (document.getElementById('pix-state')?.value || '').trim()
+            };
+
+            const isExpress = (selectedShipping === 'express');
+            currentQuantity = Math.min(10, Math.max(1, currentQuantity));
+            const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (Correios)';
+            const utms = capturarUTMs();
+
+            const orderBumpsArray = Array.from(selectedBumps);
 
             isCreatingOrder = true;
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando seu PIX...</span></span>`;
             }
-
-            const name = (document.getElementById('pix-name') && document.getElementById('pix-name').value) || 'Cliente Patriota';
-            const phone = (document.getElementById('pix-phone') && document.getElementById('pix-phone').value.replace(/\D/g, '')) || '11999999999';
-            const email = (document.getElementById('pix-email') && document.getElementById('pix-email').value) || 'cliente@patriotas.com.br';
-            const size = document.getElementById('tamanho') ? document.getElementById('tamanho').value : 'M';
-
-            const address = {
-                cep: (document.getElementById('pix-cep') && document.getElementById('pix-cep').value.replace(/\D/g, '')) || '',
-                street: (document.getElementById('pix-street') && document.getElementById('pix-street').value) || '',
-                number: (document.getElementById('pix-number') && document.getElementById('pix-number').value) || '',
-                complement: (document.getElementById('pix-complement') && document.getElementById('pix-complement').value) || '',
-                neighborhood: (document.getElementById('pix-neighborhood') && document.getElementById('pix-neighborhood').value) || '',
-                city: (document.getElementById('pix-city') && document.getElementById('pix-city').value) || '',
-                state: (document.getElementById('pix-state') && document.getElementById('pix-state').value) || ''
-            };
-
-            const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
-            const currentShipping = radioChecked ? radioChecked.value : selectedShipping;
-            const isExpress = (currentShipping === 'express');
-            currentQuantity = Math.min(10, Math.max(1, currentQuantity));
-            
-            const totalAmountCents = Math.round((currentQuantity * PRICING_CONFIG.kitUnitPriceCents) + (isExpress ? PRICING_CONFIG.expressShippingCents : 0));
-            const totalAmountFormatted = (totalAmountCents / 100);
-            const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (Correios)';
-            const utms = capturarUTMs();
 
             const payload = {
                 paymentMethod: 'PIX',
@@ -1500,39 +1870,40 @@
                     email: email,
                     phone: phone
                 },
-                item: {
-                    title: `${currentQuantity}x Kit Patriota Oficial (Tam ${size}) - ${shippingLabel}`,
-                    price: totalAmountCents,
-                    quantity: currentQuantity
-                },
-                amount: totalAmountCents,
-                quantity: currentQuantity,
                 size: size,
+                quantity: currentQuantity,
+                orderBumps: orderBumpsArray,
                 address: address,
                 shipping: {
-                    type: currentShipping,
+                    type: selectedShipping,
                     label: shippingLabel,
                     amount: isExpress ? 9.99 : 0.00
                 }
             };
 
-            function exibirPix(pixCode, qrcodeUrl, txId) {
+            function exibirPix(pixCode, qrcodeUrl, txId, returnedAmount) {
                 isCreatingOrder = false;
                 currentTransactionId = txId || 'tx_' + Date.now();
-                const stepForm = document.getElementById('pix-step-form');
+                
+                const step1 = document.getElementById('checkout-step-1');
+                const step2 = document.getElementById('checkout-step-2');
+                const step3 = document.getElementById('checkout-step-3');
                 const stepQrcode = document.getElementById('pix-step-qrcode');
                 const qrImg = document.getElementById('pix-qrcode-img');
                 const copiaCola = document.getElementById('pix-copia-cola');
                 const successVal = document.getElementById('success-valor-pago');
                 const successEnv = document.getElementById('success-envio-tipo');
 
-                if (stepForm) stepForm.classList.add('hidden');
+                if (step1) step1.classList.add('hidden');
+                if (step2) step2.classList.add('hidden');
+                if (step3) step3.classList.add('hidden');
                 if (stepQrcode) stepQrcode.classList.remove('hidden');
 
                 if (qrImg) qrImg.src = qrcodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixCode)}`;
                 if (copiaCola) copiaCola.value = pixCode;
 
-                if (successVal) successVal.textContent = `R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}`;
+                const finalAmountNum = parseFloat(returnedAmount) || ((currentQuantity * 89.90) + (isExpress ? 9.99 : 0));
+                if (successVal) successVal.textContent = `R$ ${finalAmountNum.toFixed(2).replace('.', ',')}`;
                 if (successEnv) successEnv.textContent = shippingLabel;
 
                 const pedidoObj = {
@@ -1544,9 +1915,10 @@
                     email: email,
                     size: size,
                     quantity: currentQuantity,
-                    shipping_type: currentShipping,
+                    order_bumps: orderBumpsArray,
+                    shipping_type: selectedShipping,
                     shipping_label: shippingLabel,
-                    amount: totalAmountFormatted,
+                    amount: finalAmountNum,
                     status: 'PENDENTE',
                     cep: address.cep,
                     street: address.street,
@@ -1576,13 +1948,13 @@
                 if (typeof fbq === 'function') {
                     try {
                         fbq('track', 'AddPaymentInfo', {
-                            value: totalAmountFormatted,
+                            value: finalAmountNum,
                             currency: 'BRL'
                         });
                     } catch(e){}
                 }
 
-                startPixPolling(currentTransactionId, totalAmountFormatted);
+                startPixPolling(currentTransactionId, finalAmountNum);
             }
 
             try {
@@ -1596,7 +1968,7 @@
                 if (resApi.ok) {
                     const dataApi = await resApi.json();
                     if (dataApi && (dataApi.pix_code || dataApi.pixCode || dataApi.qrcode_url)) {
-                        exibirPix(dataApi.pix_code || dataApi.pixCode, dataApi.qrcode_url, dataApi.transaction_id || dataApi.transactionId);
+                        exibirPix(dataApi.pix_code || dataApi.pixCode, dataApi.qrcode_url, dataApi.transaction_id || dataApi.transactionId, dataApi.amount);
                         return;
                     }
                 }
@@ -1613,17 +1985,17 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data && (data.pix_code || data.pixCode || data.qrcode_url)) {
-                        exibirPix(data.pix_code || data.pixCode, data.qrcode_url, data.transaction_id || data.transactionId);
+                        exibirPix(data.pix_code || data.pixCode, data.qrcode_url, data.transaction_id || data.transactionId, data.amount);
                         return;
                     }
                 }
             } catch (err) {}
 
             isCreatingOrder = false;
-            alert("Atenção: Não foi possível processar a chave PIX no momento. Por favor, verifique sua conexão e tente novamente.");
+            alert("Atenção: Não foi possível gerar o PIX agora. Por favor, verifique sua conexão e tente novamente.");
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = `<span id="btn-text">GERAR PIX DE R$ ${totalAmountFormatted.toFixed(2).replace('.', ',')}</span> <span>➔</span>`;
+                recalculateTotals();
             }
         }
 

@@ -18,6 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $apiUrl = 'https://www.links-pagamentos.online/api-pix/Akc4K4Bs4Q9sBfbGv3Kuh-9i39GvsmiE2IjP1IuCrdIlrDHCdCHF3UQ7zMlW-QmQa7KAfnDqL6QDvKX0kG2AHg';
 $apiKey = 'b8ae99391cf645b2af25b66eef4b99d3';
 
+// ALLOWLIST OFICIAL DE PREÇOS NO SERVIDOR (EM CENTAVOS)
+$ORDER_BUMP_PRICES = [
+    'stickers100' => ['priceCents' => 1990, 'label' => 'Kit 100 Adesivos'],
+    'flavioKeychain' => ['priceCents' => 2490, 'label' => 'Chaveiro Colecionável']
+];
+
 // Ler dados recebidos do frontend
 $rawInput = file_get_contents('php://input');
 $inputData = json_decode($rawInput, true);
@@ -36,7 +42,7 @@ $phone = isset($inputData['customer']['phone']) ? preg_replace('/\D/', '', $inpu
 $email = isset($inputData['customer']['email']) ? trim($inputData['customer']['email']) : 'cliente@patriotas.com.br';
 $size = isset($inputData['size']) ? trim($inputData['size']) : (isset($inputData['item']['size']) ? trim($inputData['item']['size']) : 'M');
 
-// Dados de Entrega / Dropshipping
+// Dados de Entrega
 $address = isset($inputData['address']) ? $inputData['address'] : [];
 $cep = isset($address['cep']) ? preg_replace('/\D/', '', $address['cep']) : '';
 $street = isset($address['street']) ? trim($address['street']) : '';
@@ -46,19 +52,41 @@ $neighborhood = isset($address['neighborhood']) ? trim($address['neighborhood'])
 $city = isset($address['city']) ? trim($address['city']) : '';
 $state = isset($address['state']) ? strtoupper(trim($address['state'])) : '';
 
-// Quantidade
-// Limite de 1 a 10 unidades (mantendo valor abaixo de 1k)
+// Quantidade (1 a 10)
 $rawQtd = isset($inputData['quantity']) ? intval($inputData['quantity']) : (isset($inputData['item']['quantity']) ? intval($inputData['item']['quantity']) : 1);
 $quantity = min(10, max(1, $rawQtd));
+
+// Processamento seguro e com deduplicação dos Order Bumps
+$rawBumps = isset($inputData['orderBumps']) && is_array($inputData['orderBumps']) ? $inputData['orderBumps'] : [];
+$uniqueBumps = array_unique($rawBumps);
+
+$bumpTotalCents = 0;
+$validBumpsLabels = [];
+$validBumpsIds = [];
+
+foreach ($uniqueBumps as $bumpId) {
+    if (isset($ORDER_BUMP_PRICES[$bumpId])) {
+        $bumpTotalCents += $ORDER_BUMP_PRICES[$bumpId]['priceCents'];
+        $validBumpsLabels[] = $ORDER_BUMP_PRICES[$bumpId]['label'];
+        $validBumpsIds[] = $bumpId;
+    }
+}
 
 // Frete e Cálculo de Valores
 $shippingType = isset($inputData['shipping']['type']) ? $inputData['shipping']['type'] : 'free';
 $isExpress = ($shippingType === 'express');
 
-// Preço proporcional por quantidade + Frete
-$amountInCents = intval(($quantity * 8990) + ($isExpress ? 999 : 0));
-$amountFormatted = ($quantity * 89.90) + ($isExpress ? 9.99 : 0.00);
+$kitTotalCents = $quantity * 8990;
+$shippingCents = $isExpress ? 999 : 0;
+$amountInCents = intval($kitTotalCents + $shippingCents + $bumpTotalCents);
+$amountFormatted = $amountInCents / 100.0;
 $shippingLabel = $isExpress ? 'Frete Full Express (3 dias úteis)' : 'Frete Grátis (7 dias úteis)';
+
+$itemTitle = "{$quantity}x Kit Patriota 2026 (Tam {$size})";
+if (!empty($validBumpsLabels)) {
+    $itemTitle .= " + " . implode(" + ", $validBumpsLabels);
+}
+$itemTitle .= " - {$shippingLabel}";
 
 // Montar payload estrito para a Duttyfy
 $payload = [
@@ -70,7 +98,7 @@ $payload = [
         'phone' => $phone
     ],
     'item' => [
-        'title' => "{$quantity}x Kit Patriota 2026 (Tam {$size}) - {$shippingLabel}",
+        'title' => $itemTitle,
         'price' => $amountInCents,
         'quantity' => $quantity
     ],
@@ -110,7 +138,6 @@ if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
         $dbDir = __DIR__ . '/storage';
         if (!is_dir($dbDir)) {
             mkdir($dbDir, 0755, true);
-            // Proteger diretório de acesso HTTP direto
             file_put_contents($dbDir . '/.htaccess', "Order allow,deny\nDeny from all\n");
         }
 
@@ -142,6 +169,11 @@ if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
             pix_code TEXT
         )");
 
+        $savedShippingLabel = $shippingLabel;
+        if (!empty($validBumpsLabels)) {
+            $savedShippingLabel .= " | Bumps: " . implode(", ", $validBumpsLabels);
+        }
+
         $stmt = $pdo->prepare("INSERT OR REPLACE INTO pedidos (
             transaction_id, created_at, name, cpf, phone, email, size,
             shipping_type, shipping_label, amount, status, cep,
@@ -161,7 +193,7 @@ if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
             ':email' => $email,
             ':size' => $size,
             ':shipping_type' => $shippingType,
-            ':shipping_label' => $shippingLabel,
+            ':shipping_label' => $savedShippingLabel,
             ':amount' => $amountFormatted,
             ':cep' => $cep,
             ':street' => $street,
@@ -173,7 +205,7 @@ if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
             ':pix_code' => $pixCode
         ]);
     } catch (Exception $e) {
-        // Fallback em arquivo JSON seguro se SQLite não estiver disponível
+        // Fallback em arquivo JSON seguro
         try {
             $jsonFile = __DIR__ . '/storage/pedidos.json';
             $pedidosList = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : [];
@@ -187,6 +219,7 @@ if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
                 'phone' => $phone,
                 'email' => $email,
                 'size' => $size,
+                'order_bumps' => $validBumpsIds,
                 'shipping_type' => $shippingType,
                 'shipping_label' => $shippingLabel,
                 'amount' => $amountFormatted,
@@ -210,6 +243,7 @@ if ($data && (isset($data['pixCode']) || isset($data['pix_code']))) {
         'pix_code' => $pixCode,
         'qrcode_url' => $qrcodeUrl,
         'amount' => $amountFormatted,
+        'order_bumps' => $validBumpsIds,
         'shipping' => [
             'type' => $shippingType,
             'label' => $shippingLabel,
