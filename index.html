@@ -1382,39 +1382,82 @@
         };
 
         // ==============================================================================
-        // MOTOR DE CAPTURA DE UTMs & TRACKING (UTMIFY & META ADS)
         // ==============================================================================
-        function capturarUTMs() {
-            const params = new URLSearchParams(window.location.search);
-            const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'src', 'sck', 'fbclid', 'gclid'];
-            let utms = {};
+        // MOTOR DE ATRIBUIÇÃO ENTERPRISE (FIRST TOUCH + LAST TOUCH + FBP/FBC/FBCLID)
+        // ==============================================================================
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? decodeURIComponent(match[2]) : null;
+        }
 
+        function setCookie(name, value, days = 30) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+        }
+
+        function getAttributionContext() {
+            const params = new URLSearchParams(window.location.search);
+            const trackedKeys = [
+                'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+                'src', 'sck', 'xcod', 'campaign_id', 'adset_id', 'ad_id', 'fbclid', 'gclid'
+            ];
+
+            let storedAttr = null;
             try {
-                utms = JSON.parse(sessionStorage.getItem('brasilvendas_utms') || localStorage.getItem('brasilvendas_utms') || '{}');
+                storedAttr = JSON.parse(sessionStorage.getItem('brasilvendas_attr') || localStorage.getItem('brasilvendas_attr') || getCookie('_bv_attr') || 'null');
             } catch(e) {
-                utms = {};
+                storedAttr = null;
             }
 
-            let encontrouNova = false;
-            utmKeys.forEach(key => {
+            const currentTouch = {
+                timestamp: new Date().toISOString(),
+                landing_page: window.location.href,
+                referrer: document.referrer || '',
+                fbp: getCookie('_fbp') || null,
+                fbc: getCookie('_fbc') || null
+            };
+
+            let hasNewParams = false;
+            trackedKeys.forEach(key => {
                 const val = params.get(key);
                 if (val) {
-                    utms[key] = val;
-                    encontrouNova = true;
+                    currentTouch[key] = val;
+                    hasNewParams = true;
                 }
             });
 
-            if (encontrouNova || Object.keys(utms).length > 0) {
-                try {
-                    sessionStorage.setItem('brasilvendas_utms', JSON.stringify(utms));
-                    localStorage.setItem('brasilvendas_utms', JSON.stringify(utms));
-                } catch(e) {}
+            // Se tem fbclid e não tem fbc cookie, gera o fbc padrão
+            if (currentTouch.fbclid && !currentTouch.fbc) {
+                currentTouch.fbc = `fb.1.${Date.now()}.${currentTouch.fbclid}`;
             }
 
-            return utms;
+            if (!storedAttr) {
+                storedAttr = {
+                    first_touch: { ...currentTouch },
+                    last_touch: { ...currentTouch }
+                };
+            } else {
+                if (hasNewParams) {
+                    storedAttr.last_touch = { ...storedAttr.last_touch, ...currentTouch };
+                } else {
+                    if (!storedAttr.last_touch.fbp && currentTouch.fbp) storedAttr.last_touch.fbp = currentTouch.fbp;
+                    if (!storedAttr.last_touch.fbc && currentTouch.fbc) storedAttr.last_touch.fbc = currentTouch.fbc;
+                }
+            }
+
+            try {
+                const serialized = JSON.stringify(storedAttr);
+                sessionStorage.setItem('brasilvendas_attr', serialized);
+                localStorage.setItem('brasilvendas_attr', serialized);
+                setCookie('_bv_attr', serialized, 30);
+            } catch(e) {}
+
+            return storedAttr;
         }
 
-        const initialUTMs = capturarUTMs();
+        const attributionContext = getAttributionContext();
+        const initialUTMs = attributionContext.last_touch || attributionContext.first_touch;
 
         let currentStep = 1;
         let currentTransactionId = null;
@@ -2019,6 +2062,7 @@
                 btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando seu PIX...</span></span>`;
             }
 
+            const attrCtx = getAttributionContext();
             const payload = {
                 paymentMethod: 'PIX',
                 customer: {
@@ -2035,7 +2079,9 @@
                     type: selectedShipping,
                     label: shippingLabel,
                     amount: isExpress ? 9.99 : 0.00
-                }
+                },
+                attribution: attrCtx,
+                utms: attrCtx.last_touch || attrCtx.first_touch
             };
 
             function exibirPix(pixCode, qrcodeUrl, txId, returnedAmount) {
@@ -2085,7 +2131,8 @@
                     city: address.city,
                     state: address.state,
                     pix_code: pixCode,
-                    utms: utms
+                    attribution: attrCtx,
+                    utms: attrCtx.last_touch || attrCtx.first_touch
                 };
 
                 try {
@@ -2107,7 +2154,7 @@
                         fbq('track', 'AddPaymentInfo', {
                             value: finalAmountNum,
                             currency: 'BRL'
-                        });
+                        }, { eventID: currentTransactionId });
                     } catch(e){}
                 }
 
@@ -2194,7 +2241,7 @@
                                 value: amount || 89.90,
                                 currency: 'BRL',
                                 content_name: 'Kit Patriota Oficial 2026'
-                            });
+                            }, { eventID: txId });
                         }
                     }
                 } catch (e) {}

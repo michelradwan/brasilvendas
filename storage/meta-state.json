@@ -1,8 +1,295 @@
 {
-  "locks": {},
-  "cooldowns": {
-    "999888777": 1787522002157
+  "settings": {
+    "targetCPA": 35,
+    "maxSpendDaily": 500,
+    "maxBudgetChangePct": 15,
+    "cooldownHours": 12,
+    "autonomyMode": "ASSISTED",
+    "emergencyStopGlobal": false,
+    "emergencyStopAccounts": {},
+    "main": {
+      "emergencyStopGlobal": false
+    }
   },
+  "unit_economics": {
+    "productPrice": 89.9,
+    "cogs": 38,
+    "shippingCost": 15,
+    "gatewayFeePercent": 0.0399,
+    "taxPercent": 0.04,
+    "refundRatePercent": 0.015,
+    "verifiedByOperator": false,
+    "main": {
+      "verifiedByOperator": false
+    }
+  },
+  "audit_logs": [
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    }
+  ],
+  "approvals": [],
+  "snapshots": {
+    "CAMP_100": {
+      "before": {
+        "status": "ACTIVE",
+        "daily_budget": "5000"
+      }
+    }
+  },
+  "actions": {
+    "ACT_IDEMP_1787522840540": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1787522852397": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1787522863894": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1787522875672": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1787523200728": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ORDER_TX_TEST_1787527671247": {
+      "result": {
+        "transaction_id": "TX_TEST_1787527671247",
+        "status": "PAID",
+        "amount": 114.8,
+        "amount_in_cents": 11480,
+        "currency": "BRL",
+        "customer": {
+          "name": "Cliente Teste Tracking",
+          "email": "cliente.teste@patriotas.com.br",
+          "phone": "11988887777",
+          "document": "12345678909"
+        },
+        "address": {
+          "cep": "",
+          "street": "",
+          "city": "",
+          "state": "SP"
+        },
+        "items": [
+          {
+            "title": "Kit Patriota 2026 (Tam G)",
+            "quantity": 1,
+            "price": 114.8
+          }
+        ],
+        "attribution": {
+          "utm_source": "facebook",
+          "utm_medium": "paid",
+          "utm_campaign": "CAMP_TEST_1",
+          "utm_content": "AD_CREATIVE_A",
+          "utm_term": "ADSET_OPEN",
+          "campaign_id": "1202020202",
+          "adset_id": "2303030303",
+          "ad_id": "3404040404",
+          "src": null,
+          "sck": null,
+          "xcod": null,
+          "fbclid": "IwAR_TEST_CLICK_ID_123",
+          "fbp": "fb.1.1700000000.12345",
+          "fbc": "fb.1.1700000000.IwAR_TEST_CLICK_ID_123",
+          "client_ip": null,
+          "client_user_agent": null
+        },
+        "created_at": "2026-08-23T23:27:51.248Z",
+        "paid_at": "2026-08-23T23:27:51.262Z",
+        "meta_capi_sent": true,
+        "utmify_sale_sent": true
+      }
+    },
+    "ORDER_TX_ORGANIC_1787527671265": {
+      "result": {
+        "transaction_id": "TX_ORGANIC_1787527671265",
+        "status": "PENDING",
+        "amount": 89.9,
+        "amount_in_cents": 8990,
+        "currency": "BRL",
+        "customer": {
+          "name": "Cliente Direto",
+          "email": "",
+          "phone": "",
+          "document": ""
+        },
+        "address": {
+          "cep": "",
+          "street": "",
+          "city": "",
+          "state": "SP"
+        },
+        "items": [
+          {
+            "title": "Kit Patriota Oficial 2026",
+            "quantity": 1,
+            "price": 89.9
+          }
+        ],
+        "attribution": {
+          "utm_source": null,
+          "utm_medium": null,
+          "utm_campaign": null,
+          "utm_content": null,
+          "utm_term": null,
+          "campaign_id": null,
+          "adset_id": null,
+          "ad_id": null,
+          "src": null,
+          "sck": null,
+          "xcod": null,
+          "fbclid": null,
+          "fbp": null,
+          "fbc": null,
+          "client_ip": null,
+          "client_user_agent": null
+        },
+        "created_at": "2026-08-23T23:27:51.265Z",
+        "paid_at": null,
+        "meta_capi_sent": false,
+        "utmify_sale_sent": false
+      }
+    },
+    "ACT_IDEMP_1787527677809": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    }
+  },
+  "cooldowns": {
+    "999888777": 1787522002157,
+    "TEST_CAMP_999": {
+      "timestamp": 1787527677780,
+      "actionType": "BUDGET_CHANGE"
+    }
+  },
+  "experiments": [],
+  "knowledge_base": {
+    "winningHooks": [],
+    "winningCreatives": [],
+    "losingPatterns": [],
+    "checkoutLearnings": []
+  },
+  "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    }
+  ],
+  "campaign_intelligence": {},
+  "gamification": {
+    "level": 1,
+    "title": "Junior Performance Operator",
+    "xp": 150,
+    "missions": [
+      {
+        "id": "M1",
+        "title": "Verificar Unit Economics Real",
+        "xp": 50,
+        "completed": false
+      },
+      {
+        "id": "M2",
+        "title": "Revisar Sugestões do AI Coach",
+        "xp": 30,
+        "completed": true
+      },
+      {
+        "id": "M3",
+        "title": "Auditar Eventos no Tracking Health",
+        "xp": 40,
+        "completed": false
+      }
+    ],
+    "achievements": [
+      {
+        "id": "A1",
+        "title": "DATA CLEAN",
+        "desc": "Tracking sem inconsistências",
+        "unlocked": true
+      },
+      {
+        "id": "A2",
+        "title": "CONTROL FREAK",
+        "desc": "100% de ações auditadas",
+        "unlocked": true
+      },
+      {
+        "id": "A3",
+        "title": "PROFIT FIRST",
+        "desc": "Operação acima do break-even",
+        "unlocked": false
+      }
+    ],
+    "streaks": {
+      "tracking": 7,
+      "review": 4,
+      "zeroBypass": 12
+    }
+  },
+  "locks": {},
   "emergency_stop": false,
   "unit_economics_verified": false,
   "idempotency_keys": {
@@ -13,9 +300,5 @@
         "budget": 6000
       }
     }
-  },
-  "snapshots": {},
-  "approvals": [],
-  "audit_logs": [],
-  "shadow_decisions": []
+  }
 }

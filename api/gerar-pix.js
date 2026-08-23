@@ -70,7 +70,15 @@ module.exports = async (req, res) => {
         }
         itemTitle += ` - ${shippingLabel}`;
 
-        // Payload estrito exigido pela API da Duttyfy
+        // Captura do AttributionContext (UTMs, FBP, FBC, FBCLID, IP, User Agent)
+        const attribution = body.attribution || {
+            first_touch: body.first_touch || body.utms || {},
+            last_touch: body.last_touch || body.utms || {}
+        };
+        const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress;
+        const clientUserAgent = req.headers['user-agent'] || '';
+
+        // Payload estrito exigido pela API da Duttyfy com tracking parameters anexados
         const payload = JSON.stringify({
             paymentMethod: 'PIX',
             customer: {
@@ -84,7 +92,17 @@ module.exports = async (req, res) => {
                 price: amountInCents,
                 quantity: quantity
             },
-            amount: amountInCents
+            amount: amountInCents,
+            metadata: {
+                utm_source: attribution.last_touch.utm_source || attribution.first_touch.utm_source || '',
+                utm_medium: attribution.last_touch.utm_medium || attribution.first_touch.utm_medium || '',
+                utm_campaign: attribution.last_touch.utm_campaign || attribution.first_touch.utm_campaign || '',
+                utm_content: attribution.last_touch.utm_content || attribution.first_touch.utm_content || '',
+                utm_term: attribution.last_touch.utm_term || attribution.first_touch.utm_term || '',
+                src: attribution.last_touch.src || attribution.first_touch.src || '',
+                sck: attribution.last_touch.sck || attribution.first_touch.sck || '',
+                fbclid: attribution.last_touch.fbclid || attribution.first_touch.fbclid || ''
+            }
         });
 
         const parsed = new URL(API_URL);
@@ -124,6 +142,25 @@ module.exports = async (req, res) => {
             const pixCode = result.data.pixCode || result.data.pix_code;
             const transactionId = result.data.transactionId || result.data.transaction_id || `tx_${Date.now()}`;
             const qrcodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`;
+
+            // Persistência segura do pedido com autoridade comercial e attribution durável
+            try {
+                const trackingGateway = require('./tracking-gateway.js');
+                await trackingGateway.saveOrderWithAttribution({
+                    transaction_id: transactionId,
+                    amount: amountFormatted,
+                    customer: { name, document: cpf, email, phone },
+                    address,
+                    size,
+                    quantity,
+                    attribution,
+                    client_ip: clientIp,
+                    client_user_agent: clientUserAgent,
+                    status: 'PENDING'
+                });
+            } catch (saveErr) {
+                console.error('[Order Save Error]', saveErr);
+            }
 
             return res.status(200).json({
                 success: true,

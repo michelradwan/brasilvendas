@@ -54,6 +54,14 @@ module.exports = async (req, res) => {
         let status = 'pending';
         if (data && data.status && ['paid', 'approved', 'pago', 'completed'].includes(data.status.toLowerCase())) {
             status = 'paid';
+
+            // Disparo Seguro de CAPI + UTMify de forma assíncrona / idempotente
+            try {
+                const trackingGateway = require('./tracking-gateway.js');
+                await trackingGateway.processPaymentConfirmed(txId, data.amount || data.value);
+            } catch (trackErr) {
+                console.error('[Tracking Gateway Error]', trackErr);
+            }
         }
 
         return res.status(200).json({
