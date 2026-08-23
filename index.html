@@ -106,7 +106,7 @@
             border: 1px solid rgba(255, 255, 255, 0.07);
         }
 
-        /* Pulse glow suave para o botão principal sem travar o processador */
+        /* Pulse suave para o botão principal sem travar o processador */
         @keyframes pulseCta {
             0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(250, 204, 21, 0.3); }
             50% { transform: scale(1.015); box-shadow: 0 0 30px rgba(250, 204, 21, 0.5); }
@@ -135,10 +135,10 @@
 
 <body class="bg-brand-dark text-gray-200 font-inter antialiased selection:bg-brand-accent selection:text-brand-dark pb-28 sm:pb-32 md:pb-0">
 
-    <!-- 1. Barra de Notificação Superior (Discreta, Elegante e Direta) -->
+    <!-- 1. Barra de Notificação Superior (Discreta, Sem Pagamento via PIX pois já está no preço) -->
     <div class="bg-emerald-950/90 border-b border-emerald-500/20 text-emerald-300 text-center py-1.5 px-3 text-[11px] sm:text-xs font-semibold tracking-wide flex items-center justify-center space-x-2">
         <span class="inline-block w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></span>
-        <span>FRETE GRÁTIS PARA TODO O BRASIL • PAGAMENTO VIA PIX COM DESPACHO EM ATÉ 24H ÚTEIS</span>
+        <span>FRETE GRÁTIS PARA TODO BRASIL • DESPACHO EM ATÉ 24H ÚTEIS</span>
     </div>
 
     <!-- 2. Header Fixo com Blur e Acesso Rápido -->
@@ -157,10 +157,10 @@
                     <span>Ambiente 100% Seguro</span>
                 </div>
 
-                <!-- Botão de Carrinho / Acesso ao Pedido -->
+                <!-- Botão de Carrinho Natural -->
                 <button type="button" onclick="handleCartClick()" class="flex items-center space-x-2 bg-brand-accent/15 hover:bg-brand-accent/25 border border-brand-accent/40 text-white px-3 sm:px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 min-h-[40px]">
                     <span class="text-base">🛒</span>
-                    <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">Pedido</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">Carrinho</span>
                     <span id="header-cart-badge" class="bg-brand-accent text-brand-dark font-extrabold text-xs px-1.5 py-0.5 rounded-full">1</span>
                 </button>
             </div>
@@ -168,13 +168,13 @@
     </header>
 
     <main>
-        <!-- 3. PRIMEIRA DOBRA (HERO SECTION - LIMPA, DIRETA E DE ALTA CONVERSÃO) -->
-        <section class="pt-5 pb-8 sm:pb-12 md:pt-8 md:pb-16 relative overflow-hidden">
+        <!-- 3. PRIMEIRA DOBRA (HERO SECTION - LIMPA, FOTOGRAFIA EM DESTAQUE, SEM BADGE NA FOTO) -->
+        <section class="pt-4 pb-7 sm:pb-12 md:pt-8 md:pb-16 relative overflow-hidden">
             <div class="container mx-auto px-3 sm:px-4 max-w-5xl relative z-10">
                 
                 <!-- Headline e Proposta de Valor Objetiva -->
-                <div class="text-center max-w-2xl mx-auto mb-4 sm:mb-6">
-                    <h1 class="font-outfit text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight tracking-tight mb-1.5">
+                <div class="text-center max-w-2xl mx-auto mb-3.5 sm:mb-6">
+                    <h1 class="font-outfit text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight tracking-tight mb-1">
                         Kit Patriota Completo 🇧🇷
                     </h1>
                     <p class="text-base sm:text-lg font-bold text-brand-accent mb-1">
@@ -185,19 +185,14 @@
                     </p>
                 </div>
 
-                <!-- Box de Compra Principal com Imagem e Seletor -->
-                <div class="glass-panel rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-brand-border">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-center">
+                <!-- Box de Compra Principal -->
+                <div class="glass-panel rounded-3xl p-3.5 sm:p-7 md:p-8 shadow-2xl border border-brand-border">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 items-center">
                         
-                        <!-- Coluna da Foto Principal (Com Selo Limpo 4 ITENS) -->
+                        <!-- Coluna da Foto Principal (Sem badges sobrepostos, altura otimizada no mobile) -->
                         <div class="lg:col-span-6 relative">
-                            <div class="relative rounded-2xl overflow-hidden bg-brand-dark/60 border border-white/10 shadow-inner group">
-                                <img src="images/DopeXsu.png" alt="Kit Patriota Completo - Camiseta, Boné, Bandeira e Garrafa" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105" loading="eager" width="600" height="600">
-                                
-                                <div class="absolute top-3 left-3 bg-brand-dark/90 backdrop-blur-md border border-brand-accent/40 text-brand-accent text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-xl shadow-lg flex items-center space-x-1.5">
-                                    <span>⭐</span>
-                                    <span>4 ITENS COMPLETOS</span>
-                                </div>
+                            <div class="relative rounded-2xl overflow-hidden bg-brand-dark/60 border border-white/10 shadow-inner group flex items-center justify-center max-h-[300px] sm:max-h-[400px] lg:max-h-none">
+                                <img src="images/DopeXsu.png" alt="Kit Patriota Completo - Camiseta, Boné, Bandeira e Garrafa" class="w-full h-auto max-h-[290px] sm:max-h-[390px] lg:max-h-none object-contain transform transition-transform duration-500 group-hover:scale-105" loading="eager" width="600" height="600">
                             </div>
                         </div>
 
@@ -205,8 +200,8 @@
                         <div class="lg:col-span-6 flex flex-col justify-center">
                             
                             <!-- O Que Você Recebe (Lista Escaneável e Leve) -->
-                            <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 mb-4">
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">O que você recebe:</p>
+                            <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:p-4 mb-3.5 sm:mb-4">
+                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">O que você recebe:</p>
                                 <ul class="space-y-1.5 text-xs sm:text-sm text-gray-200">
                                     <li class="flex items-center space-x-2">
                                         <span class="text-brand-green font-bold text-base">✓</span>
@@ -228,7 +223,7 @@
                             </div>
 
                             <!-- Preço e Oferta Transparente -->
-                            <div class="bg-brand-card/90 p-3.5 sm:p-4 rounded-2xl border border-brand-border mb-4 flex items-center justify-between">
+                            <div class="bg-brand-card/90 p-3 sm:p-4 rounded-2xl border border-brand-border mb-3.5 sm:mb-4 flex items-center justify-between">
                                 <div>
                                     <span class="text-[11px] text-gray-400 line-through block">De R$ 159,90</span>
                                     <div class="flex items-baseline space-x-2">
@@ -243,7 +238,7 @@
                             </div>
 
                             <!-- Seleção de Tamanho da Camiseta -->
-                            <div class="mb-4">
+                            <div class="mb-3.5 sm:mb-4">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <label for="tamanho" class="text-xs sm:text-sm font-bold text-gray-200">
                                         Escolha o tamanho da camiseta:
@@ -277,7 +272,7 @@
                             </div>
 
                             <!-- Botão Principal de Compra (CTA) -->
-                            <button id="comprar-btn" class="cta-pulse relative group w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 px-6 rounded-2xl shadow-glow-accent transition-all duration-300 active:scale-[0.98] uppercase tracking-wider mb-3.5 tap-target cursor-pointer flex items-center justify-center">
+                            <button id="comprar-btn" class="cta-pulse relative group w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 px-6 rounded-2xl shadow-glow-accent transition-all duration-300 active:scale-[0.98] uppercase tracking-wider mb-3 tap-target cursor-pointer flex items-center justify-center">
                                 <span class="relative flex items-center justify-center space-x-2">
                                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                     <span>QUERO MEU KIT AGORA</span>
@@ -750,22 +745,42 @@
         </button>
     </div>
 
-    <!-- 13. CHECKOUT MODAL TRANSPARENTE VIA PIX (DUTTYFY / VERCEL / PHP) -->
-    <div id="pix-checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="bg-[#0b0d14] border border-brand-green/30 w-full max-w-xl rounded-3xl p-4 sm:p-7 shadow-2xl relative text-white my-auto max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain">
-            <button type="button" onclick="closePixModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-2xl transition-colors z-20 cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10">✕</button>
+    <!-- 13. CHECKOUT MODAL TRANSPARENTE E PROFISSIONAL (PADRÃO GATEWAY MODERNO) -->
+    <div id="pix-checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="bg-[#0b0d14] border border-white/10 w-full max-w-xl rounded-3xl p-4 sm:p-7 shadow-2xl relative text-white my-auto max-h-[94dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain">
+            <button type="button" onclick="closePixModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-2xl transition-colors z-20 cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10" aria-label="Fechar checkout">✕</button>
 
             <!-- Passo 1: Formulário e Endereço -->
             <div id="pix-step-form">
-                <div class="flex items-center space-x-3 mb-4 pr-8">
-                    <div class="w-10 h-10 rounded-xl bg-brand-green/20 flex items-center justify-center text-brand-green text-xl font-bold flex-shrink-0">⚡</div>
-                    <div>
-                        <h3 id="modal-title" class="font-outfit text-lg sm:text-2xl font-bold text-white leading-tight">Finalizar Pedido via PIX</h3>
-                        <p class="text-[11px] sm:text-xs text-gray-400">Preencha seus dados para geração do PIX e envio imediato</p>
+                
+                <!-- Cabeçalho Institucional Discreto do Checkout -->
+                <div class="flex items-center space-x-3 mb-3.5 pr-8">
+                    <img src="images/IB3yGye.png" alt="Brasil Vendas" class="h-7 sm:h-8 w-auto object-contain" width="80" height="32">
+                    <div class="border-l border-white/10 pl-3">
+                        <h3 id="modal-title" class="font-outfit text-base sm:text-lg font-bold text-white leading-tight">Finalizar Compra</h3>
+                        <p class="text-[10px] sm:text-xs text-gray-400">Ambiente Criptografado • Pagamento PIX</p>
                     </div>
                 </div>
 
-                <!-- Resumo do Pedido -->
+                <!-- Barra de Progresso Discreta -->
+                <div class="flex items-center justify-between text-[11px] font-semibold text-gray-400 bg-white/[0.03] border border-white/5 rounded-xl px-3 py-2 mb-4">
+                    <span class="text-brand-green flex items-center space-x-1 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-brand-green"></span>
+                        <span>1. Dados</span>
+                    </span>
+                    <span class="text-gray-600">➔</span>
+                    <span class="text-brand-accent flex items-center space-x-1 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-brand-accent"></span>
+                        <span>2. Entrega</span>
+                    </span>
+                    <span class="text-gray-600">➔</span>
+                    <span class="flex items-center space-x-1">
+                        <span class="w-2 h-2 rounded-full bg-gray-600"></span>
+                        <span>3. PIX</span>
+                    </span>
+                </div>
+
+                <!-- Resumo Imediato do Pedido -->
                 <div class="bg-brand-dark/80 p-3 sm:p-4 rounded-2xl border border-brand-border mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner">
                     <div class="flex items-center space-x-3">
                         <img src="images/DopeXsu.png" alt="Kit Patriota" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl object-contain bg-brand-dark border border-white/10 flex-shrink-0" width="48" height="48">
@@ -802,24 +817,24 @@
                         <div class="space-y-2.5">
                             <div>
                                 <label for="pix-name" class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo *</label>
-                                <input type="text" id="pix-name" required autocomplete="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                <input type="text" id="pix-name" required autocomplete="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label for="pix-cpf" class="block text-xs font-semibold text-gray-300 mb-1">CPF (apenas números) *</label>
-                                    <input type="text" id="pix-cpf" required inputmode="numeric" placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                    <input type="text" id="pix-cpf" required inputmode="numeric" placeholder="000.000.000-00" maxlength="14" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                     <p id="cpf-erro" class="text-[11px] text-red-400 mt-1 hidden">⚠️ Digite um CPF válido.</p>
                                 </div>
                                 <div>
                                     <label for="pix-phone" class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp / Celular *</label>
-                                    <input type="tel" id="pix-phone" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                    <input type="tel" id="pix-phone" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="15" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                 </div>
                             </div>
 
                             <div>
                                 <label for="pix-email" class="block text-xs font-semibold text-gray-300 mb-1">E-mail para envio do rastreamento *</label>
-                                <input type="email" id="pix-email" required inputmode="email" autocomplete="email" placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                <input type="email" id="pix-email" required inputmode="email" autocomplete="email" placeholder="seuemail@exemplo.com" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                             </div>
                         </div>
                     </div>
@@ -834,7 +849,7 @@
                             <div>
                                 <label for="pix-cep" class="block text-xs font-semibold text-gray-300 mb-1">CEP * <span class="text-[10px] text-brand-accent font-normal">(Busca automática)</span></label>
                                 <div class="relative">
-                                    <input type="text" id="pix-cep" required inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                    <input type="text" id="pix-cep" required inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                     <div id="cep-loading" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
                                         <div class="w-4 h-4 border-2 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
                                     </div>
@@ -844,33 +859,33 @@
 
                             <div>
                                 <label for="pix-street" class="block text-xs font-semibold text-gray-300 mb-1">Rua / Logradouro *</label>
-                                <input type="text" id="pix-street" required autocomplete="address-line1" placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                <input type="text" id="pix-street" required autocomplete="address-line1" placeholder="Ex: Av. Paulista ou Rua das Flores" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label for="pix-number" class="block text-xs font-semibold text-gray-300 mb-1">Número *</label>
-                                    <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                    <input type="text" id="pix-number" required placeholder="Ex: 123 ou S/N" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                 </div>
                                 <div>
                                     <label for="pix-complement" class="block text-xs font-semibold text-gray-300 mb-1">Complemento <span class="text-gray-500 font-normal">(Opcional)</span></label>
-                                    <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                    <input type="text" id="pix-complement" placeholder="Ex: Apto 42, Bloco B" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label for="pix-neighborhood" class="block text-xs font-semibold text-gray-300 mb-1">Bairro *</label>
-                                    <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                    <input type="text" id="pix-neighborhood" required placeholder="Ex: Centro" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                 </div>
                                 <div class="grid grid-cols-3 gap-2">
                                     <div class="col-span-2">
                                         <label for="pix-city" class="block text-xs font-semibold text-gray-300 mb-1">Cidade *</label>
-                                        <input type="text" id="pix-city" required autocomplete="address-level2" placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                        <input type="text" id="pix-city" required autocomplete="address-level2" placeholder="Ex: São Paulo" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                     </div>
                                     <div>
                                         <label for="pix-state" class="block text-xs font-semibold text-gray-300 mb-1">UF *</label>
-                                        <input type="text" id="pix-state" required autocomplete="address-level1" placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm">
+                                        <input type="text" id="pix-state" required autocomplete="address-level1" placeholder="SP" maxlength="2" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white placeholder-gray-500 uppercase text-center focus:outline-none focus:border-brand-green transition-colors text-base sm:text-sm min-h-[48px]">
                                     </div>
                                 </div>
                             </div>
@@ -912,8 +927,28 @@
                         </div>
                     </div>
 
-                    <!-- Botão de Ação -->
-                    <button type="submit" id="btn-gerar-pix" class="w-full bg-brand-green hover:bg-brand-greenHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 rounded-2xl shadow-glow-green transition-all flex items-center justify-center space-x-2 mt-4 active:scale-[0.98] tap-target cursor-pointer">
+                    <!-- Resumo Financeiro Final Antes do PIX -->
+                    <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 text-xs space-y-2">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Subtotal Produtos:</span>
+                            <span class="text-gray-200 font-semibold" id="checkout-subtotal">R$ 89,90</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>Frete:</span>
+                            <span class="text-brand-green font-semibold" id="checkout-frete-label">Grátis</span>
+                        </div>
+                        <div class="flex justify-between items-baseline border-t border-white/5 pt-2 text-sm">
+                            <span class="font-bold text-white uppercase">Total a pagar:</span>
+                            <span class="font-outfit font-black text-xl sm:text-2xl text-brand-green" id="checkout-total-final">R$ 89,90</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 text-center pt-1 flex items-center justify-center space-x-1.5">
+                            <span class="text-brand-green">🔒</span>
+                            <span>Pagamento seguro e instantâneo via PIX</span>
+                        </p>
+                    </div>
+
+                    <!-- Botão de Ação com Proteção contra Duplo Envio -->
+                    <button type="submit" id="btn-gerar-pix" class="w-full bg-brand-green hover:bg-brand-greenHover text-brand-dark font-outfit font-black text-base sm:text-lg py-4 rounded-2xl shadow-glow-green transition-all flex items-center justify-center space-x-2 mt-4 active:scale-[0.98] tap-target cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                         <span id="btn-text">GERAR PIX DE R$ 89,90</span>
                         <span>➔</span>
                     </button>
@@ -935,8 +970,8 @@
                 <div class="mb-4 sm:mb-5 text-left">
                     <label for="pix-copia-cola" class="block text-xs font-semibold text-gray-400 mb-1.5">Código PIX Copia e Cola:</label>
                     <div class="flex items-center space-x-2">
-                        <input type="text" id="pix-copia-cola" readonly class="flex-1 bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-gray-300 font-mono select-all focus:outline-none min-h-[44px]">
-                        <button type="button" onclick="copiarPixCode()" id="btn-copiar-pix" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold text-xs px-3.5 sm:px-4 py-3 rounded-xl transition-colors whitespace-nowrap cursor-pointer min-h-[44px] flex items-center justify-center">
+                        <input type="text" id="pix-copia-cola" readonly class="flex-1 bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-gray-300 font-mono select-all focus:outline-none min-h-[48px]">
+                        <button type="button" onclick="copiarPixCode()" id="btn-copiar-pix" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold text-xs px-3.5 sm:px-4 py-3 rounded-xl transition-colors whitespace-nowrap cursor-pointer min-h-[48px] flex items-center justify-center">
                             Copiar Código
                         </button>
                     </div>
@@ -983,7 +1018,7 @@
     <!-- 14. MODAL DA TABELA DE MEDIDAS (CM) -->
     <div id="tamanhos-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50 hidden" role="dialog" aria-modal="true">
         <div class="bg-[#0e1017] border border-white/10 w-full max-w-md rounded-3xl p-4 sm:p-6 shadow-2xl relative text-white max-h-[90vh] overflow-y-auto">
-            <button type="button" onclick="closeTamanhosModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-xl transition-colors w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer">✕</button>
+            <button type="button" onclick="closeTamanhosModal()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white text-xl transition-colors w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer" aria-label="Fechar tabela de medidas">✕</button>
             
             <div class="flex items-center space-x-3 mb-4 pr-8">
                 <span class="text-2xl">📏</span>
@@ -1027,6 +1062,15 @@
     <script data-cfasync="false" src="js/email-decode.min.js"></script>
     <script>
         // ==============================================================================
+        // CONFIGURAÇÕES GLOBAIS DE PREÇOS (CENTAVOS PARA PRECISÃO TOTAL)
+        // ==============================================================================
+        const PRICING_CONFIG = {
+            kitUnitPriceCents: 8990,
+            originalKitPriceCents: 15990,
+            expressShippingCents: 999
+        };
+
+        // ==============================================================================
         // MOTOR DE CAPTURA DE UTMs & TRACKING (UTMIFY & META ADS)
         // ==============================================================================
         function capturarUTMs() {
@@ -1065,8 +1109,9 @@
         let pixCheckInterval = null;
         let selectedShipping = 'free'; // 'free' (R$ 89,90) ou 'express' (+R$ 9,99)
         let currentQuantity = 1;
+        let isCreatingOrder = false;
 
-        // Disparo do ViewContent no carregamento
+        // Disparo do ViewContent no carregamento inicial
         if (typeof fbq === 'function') {
             try {
                 fbq('track', 'ViewContent', {
@@ -1108,7 +1153,7 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        // Função de Abertura do Pedido / Carrinho
+        // Função de Abertura do Carrinho
         function handleCartClick() {
             const tamanhoSelect = document.getElementById('tamanho');
             const tamanhoSelecionado = tamanhoSelect ? tamanhoSelect.value : '';
@@ -1133,16 +1178,19 @@
             recalculateTotals();
         }
 
-        // Recálculo Dinâmico de Valores
+        // Recálculo Dinâmico de Valores com Centavos Exatos
         function recalculateTotals() {
             const radioChecked = document.querySelector('input[name="shipping_type"]:checked');
             const isExpress = radioChecked ? (radioChecked.value === 'express') : (selectedShipping === 'express');
-            const shippingFee = isExpress ? 9.99 : 0.00;
-            const unitPrice = 89.90;
-            const originalUnitPrice = 159.90;
             
-            const totalFormatted = (currentQuantity * unitPrice) + shippingFee;
-            const originalTotal = currentQuantity * originalUnitPrice;
+            const kitSubtotalCents = currentQuantity * PRICING_CONFIG.kitUnitPriceCents;
+            const originalSubtotalCents = currentQuantity * PRICING_CONFIG.originalKitPriceCents;
+            const shippingCents = isExpress ? PRICING_CONFIG.expressShippingCents : 0;
+            const totalCents = kitSubtotalCents + shippingCents;
+
+            const totalFormatted = (totalCents / 100).toFixed(2).replace('.', ',');
+            const subtotalFormatted = (kitSubtotalCents / 100).toFixed(2).replace('.', ',');
+            const originalFormatted = (originalSubtotalCents / 100).toFixed(2).replace('.', ',');
 
             const qtdDisplay = document.getElementById('modal-qtd-display');
             if (qtdDisplay) qtdDisplay.textContent = currentQuantity;
@@ -1151,10 +1199,19 @@
             if (cartBadge) cartBadge.textContent = currentQuantity;
 
             const totalDisplay = document.getElementById('modal-total-display');
-            if (totalDisplay) totalDisplay.textContent = `R$ ${totalFormatted.toFixed(2).replace('.', ',')}`;
+            if (totalDisplay) totalDisplay.textContent = `R$ ${totalFormatted}`;
 
             const originalDisplay = document.getElementById('modal-original-price');
-            if (originalDisplay) originalDisplay.textContent = `R$ ${originalTotal.toFixed(2).replace('.', ',')}`;
+            if (originalDisplay) originalDisplay.textContent = `R$ ${originalFormatted}`;
+
+            const subtotalEl = document.getElementById('checkout-subtotal');
+            if (subtotalEl) subtotalEl.textContent = `R$ ${subtotalFormatted}`;
+
+            const freteLabelEl = document.getElementById('checkout-frete-label');
+            if (freteLabelEl) freteLabelEl.textContent = isExpress ? '+ R$ 9,99' : 'Grátis';
+
+            const totalFinalEl = document.getElementById('checkout-total-final');
+            if (totalFinalEl) totalFinalEl.textContent = `R$ ${totalFormatted}`;
 
             const freteDisplay = document.getElementById('modal-frete-display');
             if (freteDisplay) {
@@ -1163,7 +1220,7 @@
 
             const btnText = document.getElementById('btn-text');
             if (btnText) {
-                btnText.textContent = `GERAR PIX DE R$ ${totalFormatted.toFixed(2).replace('.', ',')}`;
+                btnText.textContent = `GERAR PIX DE R$ ${totalFormatted}`;
             }
         }
 
@@ -1209,7 +1266,7 @@
             return true;
         }
 
-        // Máscaras de Digitação
+        // Máscaras de Digitação & Validações
         const cpfInput = document.getElementById('pix-cpf');
         if (cpfInput) {
             cpfInput.addEventListener('input', function(e) {
@@ -1381,11 +1438,14 @@
             if (pixCheckInterval) clearInterval(pixCheckInterval);
         }
 
-        // Submissão do PIX com Validação Estrita & Endereço
+        // Submissão do PIX com Trava de Duplo Envio & Validação Estrita
         async function handlePixSubmit(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-gerar-pix');
             
+            // Prevenção de duplo envio (lock)
+            if (isCreatingOrder) return;
+            
+            const btn = document.getElementById('btn-gerar-pix');
             const cpfRaw = document.getElementById('pix-cpf') ? document.getElementById('pix-cpf').value : '';
             const cpf = cpfRaw.replace(/\D/g, '');
             
@@ -1401,9 +1461,10 @@
                 return;
             }
 
+            isCreatingOrder = true;
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando o PIX...</span></span>`;
+                btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando seu PIX...</span></span>`;
             }
 
             const name = (document.getElementById('pix-name') && document.getElementById('pix-name').value) || 'Cliente Patriota';
@@ -1425,8 +1486,9 @@
             const currentShipping = radioChecked ? radioChecked.value : selectedShipping;
             const isExpress = (currentShipping === 'express');
             currentQuantity = Math.min(10, Math.max(1, currentQuantity));
-            const totalAmountCents = Math.round((currentQuantity * 8990) + (isExpress ? 999 : 0));
-            const totalAmountFormatted = (currentQuantity * 89.90) + (isExpress ? 9.99 : 0);
+            
+            const totalAmountCents = Math.round((currentQuantity * PRICING_CONFIG.kitUnitPriceCents) + (isExpress ? PRICING_CONFIG.expressShippingCents : 0));
+            const totalAmountFormatted = (totalAmountCents / 100);
             const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (Correios)';
             const utms = capturarUTMs();
 
@@ -1455,6 +1517,7 @@
             };
 
             function exibirPix(pixCode, qrcodeUrl, txId) {
+                isCreatingOrder = false;
                 currentTransactionId = txId || 'tx_' + Date.now();
                 const stepForm = document.getElementById('pix-step-form');
                 const stepQrcode = document.getElementById('pix-step-qrcode');
@@ -1556,6 +1619,7 @@
                 }
             } catch (err) {}
 
+            isCreatingOrder = false;
             alert("Atenção: Não foi possível processar a chave PIX no momento. Por favor, verifique sua conexão e tente novamente.");
             if (btn) {
                 btn.disabled = false;
