@@ -444,42 +444,43 @@
                 </div>
 
                 <div class="glass-panel rounded-3xl overflow-hidden border border-brand-border shadow-xl">
-                    <div class="grid grid-cols-2 text-xs sm:text-sm">
-                        <!-- Coluna 1: Compras Avulsas -->
-                        <div class="p-5 sm:p-6 bg-brand-dark/50 border-r border-brand-border">
-                            <h3 class="font-bold text-gray-400 uppercase text-xs mb-3 text-center">Itens Comprados Separados</h3>
-                            <ul class="space-y-3 text-gray-400">
-                                <li class="flex justify-between border-b border-white/5 pb-2">
-                                    <span>Camiseta 100% Algodão</span>
-                                    <span class="line-through">R$ 59,90</span>
-                                </li>
-                                <li class="flex justify-between border-b border-white/5 pb-2">
-                                    <span>Boné Bordado Premium</span>
-                                    <span class="line-through">R$ 49,90</span>
-                                </li>
-                                <li class="flex justify-between border-b border-white/5 pb-2">
-                                    <span>Bandeira 1,50m Oficial</span>
-                                    <span class="line-through">R$ 39,90</span>
-                                </li>
-                                <li class="flex justify-between border-b border-white/5 pb-2">
-                                    <span>Garrafa Térmica 500ml</span>
-                                    <span class="line-through">R$ 49,90</span>
-                                </li>
-                                <li class="flex justify-between border-b border-white/5 pb-2">
-                                    <span>Frete Médio dos Correios</span>
-                                    <span class="line-through">R$ 29,90</span>
-                                </li>
-                                <li class="flex justify-between font-bold text-gray-300 pt-2">
-                                    <span>Total Separado:</span>
-                                    <span class="text-red-400 line-through font-extrabold text-base">R$ 229,50</span>
-                                </li>
-                            </ul>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 text-xs sm:text-sm">
+                        <!-- Coluna 1: Valores de Referência - Itens Similares -->
+                        <div class="p-5 sm:p-6 bg-brand-dark/50 border-b sm:border-b-0 sm:border-r border-brand-border flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-gray-400 uppercase text-xs mb-4 text-center">Valores de Referência — Itens Similares</h3>
+                                <ul class="space-y-3 text-gray-300">
+                                    <li class="flex justify-between items-center border-b border-white/5 pb-2">
+                                        <span>Camiseta 100% Algodão</span>
+                                        <span class="font-semibold text-gray-400 line-through">R$ 59,90</span>
+                                    </li>
+                                    <li class="flex justify-between items-center border-b border-white/5 pb-2">
+                                        <span>Boné Brasil Bordado</span>
+                                        <span class="font-semibold text-gray-400 line-through">R$ 39,90</span>
+                                    </li>
+                                    <li class="flex justify-between items-center border-b border-white/5 pb-2">
+                                        <span>Bandeira do Brasil 1,50m × 0,90m</span>
+                                        <span class="font-semibold text-gray-400 line-through">R$ 29,90</span>
+                                    </li>
+                                    <li class="flex justify-between items-center border-b border-white/5 pb-2">
+                                        <span>Garrafa Térmica 500ml</span>
+                                        <span class="font-semibold text-gray-400 line-through">R$ 39,90</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-4 mt-4 border-t border-white/10">
+                                <div class="flex justify-between items-baseline">
+                                    <span class="text-xs text-gray-400">Total estimado separadamente:</span>
+                                    <span class="text-red-400 line-through font-outfit font-extrabold text-lg sm:text-xl">R$ 169,60</span>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Coluna 2: Nosso Kit Oficial -->
                         <div class="p-5 sm:p-6 bg-brand-green/10 flex flex-col justify-between">
                             <div>
-                                <h3 class="font-black text-brand-green uppercase text-xs mb-3 text-center flex items-center justify-center space-x-1">
+                                <h3 class="font-black text-brand-green uppercase text-xs mb-4 text-center flex items-center justify-center space-x-1.5">
                                     <span>⭐</span>
                                     <span>Kit Patriota Completo</span>
                                 </h3>
@@ -490,11 +491,11 @@
                                     </li>
                                     <li class="flex items-center space-x-2 border-b border-brand-green/20 pb-2">
                                         <span class="text-brand-green font-bold">✓</span>
-                                        <span>Boné Bordado Premium</span>
+                                        <span>Boné Brasil Bordado</span>
                                     </li>
                                     <li class="flex items-center space-x-2 border-b border-brand-green/20 pb-2">
                                         <span class="text-brand-green font-bold">✓</span>
-                                        <span>Bandeira 1,50m Oficial</span>
+                                        <span>Bandeira 1,50m × 0,90m</span>
                                     </li>
                                     <li class="flex items-center space-x-2 border-b border-brand-green/20 pb-2">
                                         <span class="text-brand-green font-bold">✓</span>
@@ -507,14 +508,33 @@
                                 </ul>
                             </div>
                             
-                            <div class="pt-4 mt-3 border-t border-brand-green/30 text-center">
-                                <span class="text-[11px] text-gray-300 block">Tudo em uma única caixa:</span>
-                                <span class="font-outfit font-black text-2xl sm:text-3xl text-brand-green">R$ 89,90</span>
-                                <span class="text-[10px] text-brand-accent block font-bold mt-0.5">Pagamento via PIX</span>
+                            <div class="pt-4 mt-4 border-t border-brand-green/30 text-center">
+                                <span class="text-[11px] text-gray-300 block mb-0.5">Tudo em uma única compra:</span>
+                                <div class="flex items-baseline justify-center space-x-1.5">
+                                    <span class="font-outfit font-black text-3xl sm:text-4xl text-brand-green">R$ 89,90</span>
+                                </div>
+                                <span class="inline-block text-[10px] text-brand-accent font-bold uppercase tracking-wider bg-brand-dark/60 px-2 py-0.5 rounded-md mt-1">
+                                    Pagamento via PIX
+                                </span>
+
+                                <!-- Box de Economia -->
+                                <div class="mt-3.5 bg-brand-green/20 border border-brand-green/30 rounded-2xl p-2.5 shadow-sm">
+                                    <p class="text-xs font-black text-white uppercase tracking-wide">
+                                        VOCÊ ECONOMIZA R$ 79,70
+                                    </p>
+                                    <p class="text-[11px] text-brand-accent font-bold mt-0.5">
+                                        Aproximadamente 47% de economia
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Aviso Legal Discreto de Referência de Mercado -->
+                <p class="text-[11px] text-gray-500 text-center mt-3.5 max-w-xl mx-auto italic leading-relaxed">
+                    *Valores de referência baseados em produtos similares disponíveis no varejo online. Os preços podem variar conforme loja, modelo e promoção.
+                </p>
             </div>
         </section>
 
