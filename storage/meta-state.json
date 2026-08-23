@@ -1,0 +1,21 @@
+{
+  "locks": {},
+  "cooldowns": {
+    "999888777": 1787522002157
+  },
+  "emergency_stop": false,
+  "unit_economics_verified": false,
+  "idempotency_keys": {
+    "ACT_TEST_1787522002128": {
+      "executedAt": "2026-08-23T21:53:22.153Z",
+      "result": {
+        "success": true,
+        "budget": 6000
+      }
+    }
+  },
+  "snapshots": {},
+  "approvals": [],
+  "audit_logs": [],
+  "shadow_decisions": []
+}

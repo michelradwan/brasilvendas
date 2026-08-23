@@ -1,188 +1,261 @@
 // ==============================================================================
-// VERCEL SERVERLESS BACKEND - META ADS AUTOPILOT CRON / BACKGROUND WORKER
+// VERCEL SERVERLESS BACKEND - SECURE AUTOPILOT CRON & BACKGROUND WORKER
 // ==============================================================================
 
 const https = require('https');
+const { GRAPH_VERSION, GRAPH_BASE_URL, ALLOWED_AD_ACCOUNT_ID, RATE_LIMIT_ERROR_CODES } = require('../config/meta-constants.js');
+const serverState = require('./meta-state.js');
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-const DEFAULT_TOKEN = process.env.META_ACCESS_TOKEN || 'EAA6kKz1qBV8BSZAIyOatrEf3ZBvLE0uAP0xi7pIeFdDuxDLr7S4lXbHTlHohasRuUJvW6PbiFDBD0YhfZBHTJFGtATD6WNbyI7bn1y4uDbpH0cztZBAA5s9R98iG7uooUMGbqNHFDbVWBXEDeYnX4rKCWb0GpNjgZBjDDptLq8Q4PINiLPdnsreVtoVI4FmAiZAsZCm7iZAwNJydKp56zSoyXfj1uXE34mymGc2yKw3ODzFMRe8ZBKTFE5Gl4ODUDLLdbkoKKmfZBl5L8Qng6f7BSMURbX';
-const GRAPH_VERSION = 'v20.0';
+const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+const CRON_SECRET = process.env.CRON_SECRET || process.env.ADMIN_PASSWORD;
 
-// Armazenamento em memória de estado dos ciclos
-let autopilotExecutionState = {
-    lastRunTime: null,
-    totalCycles: 0,
-    actionsToday: 0,
-    errorsToday: 0,
-    status: 'ACTIVE_STANDBY'
-};
+function validateEnvironment() {
+    if (!META_ACCESS_TOKEN) {
+        throw new Error('CONFIGURATION_ERROR: META_ACCESS_TOKEN obrigatório não configurado no servidor.');
+    }
+    if (!CRON_SECRET) {
+        throw new Error('CONFIGURATION_ERROR: CRON_SECRET / ADMIN_PASSWORD obrigatório não configurado no servidor.');
+    }
+}
 
-async function graphCall(endpoint, method = 'GET', params = {}, payload = null, token = DEFAULT_TOKEN) {
-    const query = new URLSearchParams({ ...params, access_token: token }).toString();
-    const fullUrl = `https://graph.facebook.com/${GRAPH_VERSION}/${endpoint}?${query}`;
-    const parsed = new URL(fullUrl);
+async function graphCallWithRetry(endpoint, method = 'GET', params = {}, payload = null, maxRetries = 3) {
+    const query = new URLSearchParams({ ...params, access_token: META_ACCESS_TOKEN }).toString();
+    const cleanEndpoint = endpoint.replace(/^\/+/, '');
+    const url = `${GRAPH_BASE_URL}/${cleanEndpoint}?${query}`;
+    const parsed = new URL(url);
 
-    const options = {
-        hostname: parsed.hostname,
-        path: parsed.pathname + parsed.search,
-        method: method,
-        headers: { 'Accept': 'application/json' }
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const options = {
+                hostname: parsed.hostname,
+                path: parsed.pathname + parsed.search,
+                method: method,
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'MetaAdsAutopilotWorker/2.0'
+                }
+            };
+
+            let bodyData = null;
+            if (payload && method === 'POST') {
+                bodyData = JSON.stringify(payload);
+                options.headers['Content-Type'] = 'application/json';
+                options.headers['Content-Length'] = Buffer.byteLength(bodyData);
+            }
+
+            const response = await new Promise((resolve, reject) => {
+                const req = https.request(options, (res) => {
+                    let data = '';
+                    res.on('data', chunk => data += chunk);
+                    res.on('end', () => {
+                        try {
+                            resolve({ statusCode: res.statusCode, data: JSON.parse(data) });
+                        } catch (e) {
+                            resolve({ statusCode: res.statusCode, data: { raw: data } });
+                        }
+                    });
+                });
+                req.on('error', err => reject(err));
+                req.setTimeout(25000, () => {
+                    req.destroy();
+                    reject(new Error('Timeout de 25s na chamada da Graph API.'));
+                });
+                if (bodyData) req.write(bodyData);
+                req.end();
+            });
+
+            if (response.data && response.data.error) {
+                const errCode = response.data.error.code;
+                if (RATE_LIMIT_ERROR_CODES.includes(errCode) || response.statusCode >= 500) {
+                    if (attempt < maxRetries) {
+                        const jitter = Math.floor(Math.random() * 500);
+                        const backoffMs = Math.pow(2, attempt) * 1000 + jitter;
+                        await new Promise(r => setTimeout(r, backoffMs));
+                        continue;
+                    }
+                }
+            }
+
+            return response;
+
+        } catch (netErr) {
+            if (attempt === maxRetries) throw netErr;
+            const backoffMs = Math.pow(2, attempt) * 1000;
+            await new Promise(r => setTimeout(r, backoffMs));
+        }
+    }
+}
+
+// Paginação Completa de Campanhas
+async function fetchAllCampaigns(adAccountId) {
+    let allCampaigns = [];
+    let nextUrl = null;
+    let params = {
+        fields: 'id,name,status,daily_budget,lifetime_budget,objective,buying_type',
+        limit: 50
     };
 
-    let bodyData = null;
-    if (payload && method === 'POST') {
-        bodyData = JSON.stringify(payload);
-        options.headers['Content-Type'] = 'application/json';
-        options.headers['Content-Length'] = Buffer.byteLength(bodyData);
-    }
+    let endpoint = `${adAccountId}/campaigns`;
 
-    return new Promise((resolve, reject) => {
-        const req = https.request(options, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    resolve(JSON.parse(data));
-                } catch (e) {
-                    resolve({ raw: data });
-                }
-            });
-        });
-        req.on('error', (err) => reject(err));
-        if (bodyData) req.write(bodyData);
-        req.end();
-    });
+    do {
+        const res = await graphCallWithRetry(endpoint, 'GET', params);
+        if (res.data && res.data.data) {
+            allCampaigns = allCampaigns.concat(res.data.data);
+            if (res.data.paging && res.data.paging.cursors && res.data.paging.cursors.after && res.data.data.length === 50) {
+                params.after = res.data.paging.cursors.after;
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
+    } while (allCampaigns.length < 250); // Limite de segurança de 250 campanhas por ciclo
+
+    return allCampaigns;
 }
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Auth');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Cron-Auth, X-Admin-Auth');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const authHeader = req.headers['x-admin-auth'] || req.headers['authorization'];
-    if (authHeader && authHeader.replace('Bearer ', '') !== ADMIN_PASSWORD) {
-        return res.status(401).json({ error: { message: 'Acesso não autorizado ao worker.' } });
-    }
-
-    // GET: Retornar status e telemetria do autopilot
-    if (req.method === 'GET') {
-        return res.status(200).json({
-            success: true,
-            telemetry: autopilotExecutionState,
-            server_time: new Date().toISOString(),
-            engine_version: '2.0.0-PRO'
+    try {
+        validateEnvironment();
+    } catch (configErr) {
+        return res.status(500).json({
+            error: { message: configErr.message, type: 'CONFIGURATION_ERROR', code: 500 }
         });
     }
 
-    // POST: Disparar ciclo autônomo de varredura (Health Check / Otimização)
-    if (req.method === 'POST') {
-        const { ad_account_id = 'act_846780837970771', target_cpa = 35, dry_run = true, mode = 'ASSISTED' } = req.body || {};
+    // 1. Validação de Autorização (Cron Secret ou Admin Password)
+    const authHeader = req.headers['x-cron-auth'] || req.headers['x-admin-auth'] || req.headers['authorization'];
+    const providedToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-        const cycleReport = {
-            cycle_id: `CYCLE_${Date.now()}`,
-            timestamp: new Date().toISOString(),
-            mode: mode,
-            dry_run: dry_run,
-            campaigns_analyzed: 0,
-            actions_proposed: [],
-            actions_executed: [],
-            warnings: []
-        };
+    if (providedToken !== CRON_SECRET) {
+        return res.status(401).json({ error: { message: 'Acesso não autorizado ao Autopilot Worker.', code: 401 } });
+    }
 
-        try {
-            // 1. Sincronizar campanhas ativas
-            const campRes = await graphCall(`${ad_account_id}/campaigns`, 'GET', {
-                fields: 'name,status,daily_budget,lifetime_budget',
-                limit: 30
+    const adAccountId = ALLOWED_AD_ACCOUNT_ID;
+
+    // 2. Bloqueio por Emergency Stop no Servidor
+    if (serverState.isEmergencyStopped()) {
+        return res.status(403).json({
+            error: { message: 'EXECUÇÃO BLOQUEADA: Emergency Stop ativo no servidor.', code: 403 }
+        });
+    }
+
+    // 3. Aquisição de Distributed Lock para Evitar Concorrência
+    const lockResult = serverState.acquireLock(adAccountId, 300); // 5 min TTL
+    if (!lockResult.acquired) {
+        return res.status(409).json({
+            error: { message: `CONCORRÊNCIA BLOQUEADA: ${lockResult.reason}`, type: 'LOCK_ACQUISITION_FAILED', code: 409 }
+        });
+    }
+
+    const cycleId = `CYCLE_${Date.now()}`;
+    const report = {
+        cycle_id: cycleId,
+        timestamp: new Date().toISOString(),
+        ad_account_id: adAccountId,
+        campaigns_analyzed: 0,
+        actions_taken: [],
+        actions_blocked: [],
+        shadow_recommendations: []
+    };
+
+    try {
+        const { target_cpa = 35.00, mode = 'AUTOPILOT', dry_run = false } = req.body || {};
+        const isUnitEconomicsVerified = serverState.isUnitEconomicsVerified();
+
+        // 4. Busca Paginada de Todas as Campanhas
+        const campaigns = await fetchAllCampaigns(adAccountId);
+        report.campaigns_analyzed = campaigns.length;
+
+        for (const camp of campaigns) {
+            if (camp.status !== 'ACTIVE') continue;
+
+            // Busca Insights de Hoje
+            const insRes = await graphCallWithRetry(`${camp.id}/insights`, 'GET', {
+                fields: 'spend,actions,action_values,cpc,cpm,ctr,frequency',
+                date_preset: 'today'
             });
 
-            if (!campRes.data || campRes.error) {
-                throw new Error(campRes.error?.message || 'Falha ao sincronizar campanhas.');
-            }
-
-            cycleReport.campaigns_analyzed = campRes.data.length;
-
-            for (const camp of campRes.data) {
-                if (camp.status !== 'ACTIVE') continue;
-
-                // 2. Buscar insights de hoje
-                const insRes = await graphCall(`${camp.id}/insights`, 'GET', {
-                    fields: 'spend,actions,cpc,cpm,ctr,frequency',
-                    date_preset: 'today'
-                });
-
-                if (insRes.data && insRes.data[0]) {
-                    const ins = insRes.data[0];
-                    const spend = parseFloat(ins.spend) || 0;
-                    let purchases = 0;
-                    if (ins.actions) {
-                        const p = ins.actions.find(a => a.action_type === 'purchase');
-                        if (p) purchases = parseInt(p.value) || 0;
+            if (insRes.data && insRes.data.data && insRes.data.data[0]) {
+                const ins = insRes.data.data[0];
+                const spend = parseFloat(ins.spend) || 0;
+                
+                // Deduplicação Estrita de Purchase (Prioritário: purchase > omni_purchase)
+                let purchases = 0;
+                if (ins.actions && Array.isArray(ins.actions)) {
+                    const pAction = ins.actions.find(a => a.action_type === 'purchase');
+                    if (pAction) {
+                        purchases = parseInt(pAction.value) || 0;
+                    } else {
+                        const omniP = ins.actions.find(a => a.action_type === 'omni_purchase');
+                        if (omniP) purchases = parseInt(omniP.value) || 0;
                     }
+                }
 
-                    // Regra: Stop-Loss Inteligente
-                    if (purchases === 0 && spend > target_cpa * 1.15) {
-                        const actionItem = {
-                            type: 'PAUSE_STOP_LOSS',
-                            object_id: camp.id,
-                            object_name: camp.name,
-                            reason: `Spend de R$ ${spend.toFixed(2)} acima do teto de CPA (R$ ${target_cpa}) com 0 conversões.`,
-                            risk: 'MEDIUM',
-                            executed: false
-                        };
+                // REGRA 1: Stop-Loss Inteligente
+                if (purchases === 0 && spend >= target_cpa * 1.15) {
+                    const actionId = `ACT_STOPLOSS_${camp.id}_${new Date().toISOString().split('T')[0]}`;
+                    const idemp = serverState.checkIdempotency(actionId);
 
-                        if (!dry_run && mode === 'AUTOPILOT') {
-                            const pauseRes = await graphCall(camp.id, 'POST', {}, { status: 'PAUSED' });
-                            actionItem.executed = pauseRes.success === true;
-                            cycleReport.actions_executed.push(actionItem);
+                    if (!idemp.isDuplicate) {
+                        if (mode === 'AUTOPILOT' && !dry_run) {
+                            // Salva snapshot persistente antes de pausar
+                            serverState.saveSnapshot(camp.id, { status: 'ACTIVE', beforeSpend: spend });
+                            await graphCallWithRetry(camp.id, 'POST', {}, { status: 'PAUSED' });
+                            serverState.recordIdempotency(actionId, { action: 'PAUSED', spend });
+                            report.actions_taken.push(`[PAUSED] Campanha "${camp.name}" pausada por Stop-Loss (Gasto: R$ ${spend.toFixed(2)} sem compras).`);
                         } else {
-                            cycleReport.actions_proposed.push(actionItem);
+                            report.shadow_recommendations.push(`Pausar campanha "${camp.name}" por Stop-Loss.`);
                         }
                     }
+                }
 
-                    // Regra: Escala Controlada (+15%)
-                    if (purchases >= 3) {
-                        const currentCpa = spend / purchases;
-                        if (currentCpa < target_cpa * 0.85 && camp.daily_budget) {
-                            const curBudget = parseFloat(camp.daily_budget);
-                            const newBudget = Math.round(curBudget * 1.15);
+                // REGRA 2: Escala Controlada (+15%) com Verificação de Unit Economics
+                if (purchases >= 3 && camp.daily_budget) {
+                    const curCpa = spend / purchases;
+                    if (curCpa <= target_cpa * 0.85) {
+                        if (!isUnitEconomicsVerified) {
+                            report.actions_blocked.push(`Escala de "${camp.name}" bloqueada: Unit Economics ainda não verificado pelo operador.`);
+                            continue;
+                        }
 
-                            const scaleAction = {
-                                type: 'BUDGET_SCALE',
-                                object_id: camp.id,
-                                object_name: camp.name,
-                                before: curBudget,
-                                after: newBudget,
-                                reason: `CPA consistente de R$ ${currentCpa.toFixed(2)} (${purchases} vendas). Escala preventiva +15%.`,
-                                risk: 'LOW',
-                                executed: false
-                            };
+                        // Verificação de Cooldown no Servidor
+                        const cooldown = serverState.isUnderCooldown(camp.id);
+                        if (cooldown.underCooldown) {
+                            report.actions_blocked.push(`Escala de "${camp.name}" ignorada: Em cooldown (restam ${cooldown.remainingHours}h).`);
+                            continue;
+                        }
 
-                            if (!dry_run && mode === 'AUTOPILOT') {
-                                const bRes = await graphCall(camp.id, 'POST', {}, { daily_budget: newBudget });
-                                scaleAction.executed = bRes.success === true;
-                                cycleReport.actions_executed.push(scaleAction);
-                            } else {
-                                cycleReport.actions_proposed.push(scaleAction);
-                            }
+                        const curBudget = parseInt(camp.daily_budget);
+                        const newBudget = Math.round(curBudget * 1.15); // +15%
+                        const actionId = `ACT_SCALE_${camp.id}_${Date.now()}`;
+
+                        if (mode === 'AUTOPILOT' && !dry_run) {
+                            serverState.saveSnapshot(camp.id, { daily_budget: curBudget });
+                            await graphCallWithRetry(camp.id, 'POST', {}, { daily_budget: newBudget });
+                            serverState.setCooldown(camp.id);
+                            serverState.recordIdempotency(actionId, { before: curBudget, after: newBudget });
+                            report.actions_taken.push(`[SCALE] Orçamento de "${camp.name}" aumentado em 15% (R$ ${(curBudget/100).toFixed(2)} -> R$ ${(newBudget/100).toFixed(2)}).`);
+                        } else {
+                            report.shadow_recommendations.push(`Escalar orçamento de "${camp.name}" de R$ ${(curBudget/100).toFixed(2)} para R$ ${(newBudget/100).toFixed(2)}.`);
                         }
                     }
                 }
             }
-
-            autopilotExecutionState.lastRunTime = cycleReport.timestamp;
-            autopilotExecutionState.totalCycles++;
-            autopilotExecutionState.actionsToday += cycleReport.actions_executed.length;
-
-            return res.status(200).json({ success: true, report: cycleReport });
-
-        } catch (err) {
-            autopilotExecutionState.errorsToday++;
-            return res.status(500).json({ success: false, error: err.message, report: cycleReport });
         }
-    }
 
-    return res.status(405).json({ error: 'Método não suportado' });
+        return res.status(200).json({ success: true, report });
+
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err.message, report });
+    } finally {
+        // Libera o lock no servidor
+        serverState.releaseLock(adAccountId);
+    }
 };

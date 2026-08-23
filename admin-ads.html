@@ -23,6 +23,28 @@
     <!-- Container de Notificações Toast -->
     <div id="toast-container"></div>
 
+    <!-- TELA DE LOGIN ADMINISTRATIVO SEGURO (SESSION AUTH) -->
+    <div id="login-screen-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 flex items-center justify-center mx-auto text-xl font-bold font-mono">
+                🔒
+            </div>
+            <div>
+                <h3 class="font-outfit text-lg font-bold text-white">Meta Ads Command Center</h3>
+                <p class="text-xs text-gray-400 mt-1">Acesso administrativo restrito</p>
+            </div>
+            <form onsubmit="window.dashboard.handleLoginSubmit(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Senha do Servidor</label>
+                    <input type="password" id="login-password-input" required placeholder="••••••••" class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-400 text-center tracking-widest">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3.5 text-xs uppercase tracking-wider">
+                    Desbloquear Painel
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Top Bar Persistente -->
     <header class="border-b border-white/[0.08] bg-[#0b0f17]/90 sticky top-0 z-40 backdrop-blur-md">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
@@ -244,7 +266,7 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 3: CRIATIVOS (CREATIVE INTELLIGENCE) -->
+            <!-- SEÇÃO 3: CRIATIVOS -->
             <section id="view-creatives" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div>
@@ -257,7 +279,7 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 4: FUNIL (FUNNEL VIEW) -->
+            <!-- SEÇÃO 4: FUNIL -->
             <section id="view-funnel" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div>
@@ -361,7 +383,7 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 9: AUDITORIA (LOGS & CHANGELOG) -->
+            <!-- SEÇÃO 9: AUDITORIA -->
             <section id="view-audit" class="view-section hidden space-y-4">
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
                     <div class="flex items-center justify-between">
@@ -394,6 +416,13 @@
                             <label class="block text-[11px] text-gray-400 uppercase font-bold mb-1">Teto Máximo Diário da Conta (R$)</label>
                             <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-2.5 text-white">
                         </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                            <div>
+                                <p class="font-bold text-white">Validar Unit Economics Real</p>
+                                <p class="text-[10px] text-gray-400">Permite escala autônoma baseada em margem</p>
+                            </div>
+                            <input type="checkbox" id="setting-unit-verified" class="w-4 h-4 text-yellow-400 rounded">
+                        </div>
                         <button onclick="alert('Configurações salvas!')" class="btn-primary w-full py-2.5">
                             Salvar Configurações
                         </button>
@@ -410,7 +439,7 @@
         <div class="glass-panel w-full max-w-lg rounded-2xl p-4 shadow-2xl space-y-3">
             <div class="flex items-center space-x-2 pb-2 border-b border-white/10">
                 <span>🔍</span>
-                <input type="text" placeholder="Digite um comando ou nome de campanha..." class="w-full bg-transparent text-sm text-white focus:outline-none placeholder-gray-500">
+                <input type="text" placeholder="Digite um comando..." class="w-full bg-transparent text-sm text-white focus:outline-none placeholder-gray-500">
                 <button onclick="window.dashboard.toggleCommandPalette()" class="text-xs text-gray-500 hover:text-white">Esc</button>
             </div>
             <div class="space-y-1 text-xs text-gray-300 max-h-60 overflow-y-auto">
