@@ -1,644 +1,488 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="dark scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Gestor Ads IA | Central de Campanhas</title>
-    
-    <!-- Fonts -->
+    <title>Meta Ads Command Center — Institutional Performance Operations</title>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Core Framework) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'inter': ['Inter', 'sans-serif'],
-                        'outfit': ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            dark: '#07090e',
-                            darker: '#040508',
-                            card: '#0e121a',
-                            border: 'rgba(255, 255, 255, 0.08)',
-                            accent: '#FACC15',
-                            accentHover: '#EAB308',
-                            green: '#10B981',
-                            greenHover: '#059669',
-                            red: '#EF4444',
-                        }
-                    },
-                    boxShadow: {
-                        'glow-accent': '0 0 25px rgba(250, 204, 21, 0.25)',
-                        'glow-green': '0 0 25px rgba(16, 185, 129, 0.25)',
-                    }
-                }
-            }
-        }
-    </script>
 
-    <style>
-        body { background-color: #07090e; }
-        .glass-panel {
-            background: rgba(14, 18, 26, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #07090e; }
-        ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #374151; }
-    </style>
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/admin-ads.css">
 </head>
 
-<body class="text-gray-200 font-inter antialiased min-h-screen pb-16">
+<body class="bg-[#07090e] text-gray-200 min-h-screen antialiased flex flex-col selection:bg-yellow-400 selection:text-black">
 
-    <!-- Configuração Inicial / Modal de Chaves (Exibido apenas se não houver Token) -->
-    <div id="setup-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative text-white">
-            <div class="text-center mb-6">
-                <span class="text-4xl">🔑</span>
-                <h3 class="font-outfit text-xl font-bold mt-3">Configurar Acesso Meta Ads</h3>
-                <p class="text-xs text-gray-400 mt-1">Insira suas credenciais para conectar o painel ao vivo</p>
-            </div>
+    <!-- Container de Notificações Toast -->
+    <div id="toast-container"></div>
+
+    <!-- Top Bar Persistente -->
+    <header class="border-b border-white/[0.08] bg-[#0b0f17]/90 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
             
-            <form id="setup-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Conta de Anúncios (Ad Account ID)</label>
-                    <input type="text" id="setup-act-id" required placeholder="Ex: act_846780837970771" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-brand-accent">
+            <!-- Contexto da Conta / BM -->
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    M
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Token de Acesso (Access Token)</label>
-                    <input type="password" id="setup-token" required placeholder="Inserir token EAA..." class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-brand-accent">
+                <div class="min-w-0">
+                    <div class="flex items-center space-x-2">
+                        <span id="topbar-account-name" class="font-bold text-white text-xs sm:text-sm truncate">Brasil Vendas</span>
+                        <span id="topbar-account-id" class="text-[10px] text-gray-500 font-mono hidden sm:inline">act_846780837970771</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-[10px] text-gray-400">
+                        <span id="topbar-currency">BRL</span>
+                        <span>•</span>
+                        <span id="topbar-timezone" class="hidden md:inline">America/Sao_Paulo</span>
+                    </div>
                 </div>
-                <button type="submit" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold py-3.5 rounded-xl transition-all active:scale-[0.98]">
-                    Conectar e Salvar Localmente
+            </div>
+
+            <!-- Quick Actions & Status -->
+            <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+                <button onclick="window.dashboard.runWarRoomAudit()" class="btn-danger text-[11px] py-1 px-2.5 hidden sm:inline-flex">
+                    🚨 War Room
                 </button>
+                <button onclick="window.dashboard.toggleCommandPalette()" class="btn-secondary text-[11px] py-1 px-2.5 hidden md:inline-flex">
+                    <span>⌘K</span>
+                    <span class="text-gray-400 font-normal">Buscar</span>
+                </button>
+                <button onclick="window.dashboard.syncAllData()" class="btn-secondary text-[11px] py-1 px-2.5">
+                    <span>🔄 Sincronizar</span>
+                </button>
+                <span class="text-[10px] text-gray-500 hidden lg:inline">Sync: <b id="topbar-last-sync" class="text-gray-400">--:--</b></span>
+                <span class="badge badge-active text-[10px]">MCP Online</span>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Layout Principal: Sidebar + Conteúdo -->
+    <div class="flex-1 flex max-w-[1600px] w-full mx-auto">
+
+        <!-- Sidebar de Navegação -->
+        <aside class="w-56 border-r border-white/[0.08] bg-[#07090e] p-3 hidden md:flex flex-col justify-between flex-shrink-0">
+            <nav class="space-y-1">
+                <div class="nav-item active" data-nav-target="overview">
+                    <span>📊</span>
+                    <span>Visão Geral</span>
+                </div>
+                <div class="nav-item" data-nav-target="campaigns">
+                    <span>📢</span>
+                    <span>Campanhas</span>
+                </div>
+                <div class="nav-item" data-nav-target="creatives">
+                    <span>🎨</span>
+                    <span>Criativos</span>
+                </div>
+                <div class="nav-item" data-nav-target="funnel">
+                    <span>🌪</span>
+                    <span>Funil</span>
+                </div>
+                <div class="nav-item" data-nav-target="experiments">
+                    <span>🧪</span>
+                    <span>Experimentos</span>
+                </div>
+                <div class="nav-item" data-nav-target="tracking">
+                    <span>🎯</span>
+                    <span>Tracking & Pixel</span>
+                </div>
+                <div class="nav-item" data-nav-target="business">
+                    <span>🏢</span>
+                    <span>Business Manager</span>
+                </div>
+                <div class="nav-item" data-nav-target="autopilot">
+                    <span>🤖</span>
+                    <span>IA / Autopilot</span>
+                </div>
+                <div class="nav-item" data-nav-target="audit">
+                    <span>📜</span>
+                    <span>Auditoria</span>
+                </div>
+                <div class="nav-item" data-nav-target="settings">
+                    <span>⚙️</span>
+                    <span>Configurações</span>
+                </div>
+            </nav>
+
+            <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] space-y-1">
+                <div class="flex items-center justify-between text-gray-400">
+                    <span>Modo IA</span>
+                    <span id="sidebar-ai-mode" class="text-yellow-400 font-bold">Assistido</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-400">
+                    <span>Autonomia</span>
+                    <span class="text-emerald-400 font-bold">Ativa</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Área Principal de Conteúdo -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-y-auto space-y-6">
+
+            <!-- Filtros de Período & Busca Global -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-white/[0.05]">
+                <div class="flex items-center space-x-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 text-xs">
+                    <button data-date-preset="today" class="btn-secondary active bg-white/10 text-yellow-400 py-1 px-3">Hoje</button>
+                    <button data-date-preset="yesterday" class="btn-secondary py-1 px-3">Ontem</button>
+                    <button data-date-preset="last_3d" class="btn-secondary py-1 px-3">3 Dias</button>
+                    <button data-date-preset="last_7d" class="btn-secondary py-1 px-3">7 Dias</button>
+                    <button data-date-preset="last_30d" class="btn-secondary py-1 px-3">30 Dias</button>
+                </div>
+                <div class="w-full sm:w-64">
+                    <input type="text" id="global-search-input" placeholder="Buscar campanhas..." class="w-full bg-[#0b0f17] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400">
+                </div>
+            </div>
+
+            <!-- SEÇÃO 1: VISÃO GERAL (OVERVIEW) -->
+            <section id="view-overview" class="view-section space-y-6">
+                <!-- Top 4 KPIs -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Investimento Total</p>
+                        <h3 class="text-xl sm:text-2xl font-bold font-mono text-white" id="kpi-spend">R$ 0,00</h3>
+                        <span class="text-[10px] text-gray-500 block">Orçamento consumido</span>
+                    </div>
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Receita Estimada</p>
+                        <h3 class="text-xl sm:text-2xl font-bold font-mono text-emerald-400" id="kpi-revenue">R$ 0,00</h3>
+                        <span class="text-[10px] text-gray-500 block">Vendas confirmadas</span>
+                    </div>
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">CPA Médio</p>
+                        <h3 class="text-xl sm:text-2xl font-bold font-mono text-white" id="kpi-cpa">R$ 0,00</h3>
+                        <span class="text-[10px] text-gray-500 block">Custo por aquisição</span>
+                    </div>
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl space-y-1">
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">ROAS Geral</p>
+                        <h3 class="text-xl sm:text-2xl font-bold font-mono text-yellow-400" id="kpi-roas">0.00x</h3>
+                        <span class="text-[10px] text-gray-500 block">Retorno sobre gasto</span>
+                    </div>
+                </div>
+
+                <!-- Secondary Row: Health Score & Top Opportunities -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Account Health Score -->
+                    <div class="glass-panel p-5 rounded-2xl space-y-4 lg:col-span-1">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-white text-xs uppercase tracking-wider">Saúde da Conta</h4>
+                            <span id="account-health-badge" class="badge badge-active">SAUDÁVEL</span>
+                        </div>
+                        <div class="text-center py-3">
+                            <span id="account-health-number" class="text-4xl font-extrabold font-mono text-white">92/100</span>
+                            <p class="text-[11px] text-gray-400 mt-1">Algoritmo ponderado de eficiência e entrega</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-white/5">
+                            <div>
+                                <span class="text-[10px] text-gray-400 uppercase">Compras</span>
+                                <p class="font-bold text-white font-mono" id="kpi-purchases">0 un</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 uppercase">CTR Link</span>
+                                <p class="font-bold text-white font-mono" id="kpi-ctr">0.00%</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 uppercase">CPC Link</span>
+                                <p class="font-bold text-white font-mono" id="kpi-cpc">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top 10 Opportunities Ranking -->
+                    <div class="glass-panel p-5 rounded-2xl space-y-3 lg:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-white text-xs uppercase tracking-wider">Oportunidades de Otimização (IA)</h4>
+                            <span class="text-[11px] text-gray-400">Classificação por Impacto</span>
+                        </div>
+                        <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1" id="top-opportunities-container">
+                            <p class="text-xs text-gray-500 italic text-center py-4">Calculando oportunidades...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 2: CAMPANHAS (CAMPAIGNS TABLE 2.0) -->
+            <section id="view-campaigns" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Gerenciamento de Campanhas</h3>
+                            <p class="text-xs text-gray-400">Inspeção detalhada de performance e ajustes de orçamento</p>
+                        </div>
+                    </div>
+
+                    <!-- Tabela Desktop -->
+                    <div class="table-desktop overflow-x-auto rounded-xl border border-white/5">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-[#0e121a] text-gray-400 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3.5">Campanha</th>
+                                    <th class="p-3.5">Investimento</th>
+                                    <th class="p-3.5">Vendas</th>
+                                    <th class="p-3.5">CPA</th>
+                                    <th class="p-3.5">ROAS</th>
+                                    <th class="p-3.5">CTR</th>
+                                    <th class="p-3.5">Classificação</th>
+                                    <th class="p-3.5 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5 text-gray-200" id="campaigns-table-body">
+                                <tr><td colspan="8" class="p-8 text-center text-gray-500 italic">Carregando dados da Meta...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cards Mobile -->
+                    <div class="cards-mobile" id="campaigns-mobile-cards"></div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 3: CRIATIVOS (CREATIVE INTELLIGENCE) -->
+            <section id="view-creatives" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Inteligência de Criativos & Detecção de Fadiga</h3>
+                        <p class="text-xs text-gray-400">Classificação de criativos por score de atratividade e saturação de frequência</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="creatives-grid-container">
+                        <p class="text-xs text-gray-500 italic text-center py-8 col-span-full">Processando criativos...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 4: FUNIL (FUNNEL VIEW) -->
+            <section id="view-funnel" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Funil Completo de Conversão</h3>
+                        <p class="text-xs text-gray-400">Taxas de passagem entre cliques, visualizações, checkout e PIX confirmados</p>
+                    </div>
+                    <div class="space-y-3" id="funnel-steps-container">
+                        <p class="text-xs text-gray-500 italic text-center py-8">Carregando funil...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 5: EXPERIMENTOS -->
+            <section id="view-experiments" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Central de Experimentos e Testes A/B</h3>
+                        <p class="text-xs text-gray-400">Validação científica de hipóteses de criativos, hooks e públicos</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-white/[0.02] border border-white/5 text-center text-xs text-gray-400 space-y-2">
+                        <p class="font-bold text-white">Nenhum experimento ativo no momento.</p>
+                        <p>Para iniciar um teste controlado, selecione um criativo ou público na tabela de campanhas.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 6: TRACKING & PIXEL -->
+            <section id="view-tracking" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Auditoria de Rastreamento (Pixel & CAPI)</h3>
+                        <p class="text-xs text-gray-400">Verificação de integridade dos eventos PageView, InitiateCheckout e Purchase</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <span class="text-gray-400 font-bold uppercase text-[10px]">Pixel ID</span>
+                            <p class="font-bold text-white font-mono">2292987404797869</p>
+                            <span class="badge badge-active">Ativo</span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <span class="text-gray-400 font-bold uppercase text-[10px]">CAPI Server-Side</span>
+                            <p class="font-bold text-white font-mono">Node.js Vercel</p>
+                            <span class="badge badge-active">Conectado</span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <span class="text-gray-400 font-bold uppercase text-[10px]">Event Match Quality</span>
+                            <p class="font-bold text-emerald-400 font-mono">8.8 / 10</p>
+                            <span class="badge badge-winner">Excelente</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 7: BUSINESS MANAGER -->
+            <section id="view-business" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Inventário do Business Manager</h3>
+                        <p class="text-xs text-gray-400">Ativos vinculados, páginas, contas e faturamento</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-xs space-y-2">
+                        <p><b class="text-white">Conta Selecionada:</b> C.A 01 (act_846780837970771)</p>
+                        <p><b class="text-white">Status de Pagamento:</b> Regular 🟢</p>
+                        <p><b class="text-white">Limite Diário da Conta:</b> Ilimitado / Gerenciado</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 8: IA / AUTOPILOT -->
+            <section id="view-autopilot" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Central do Autopilot IA</h3>
+                            <p class="text-xs text-gray-400">Modos de autonomia, regras de escala e histórico de decisões</p>
+                        </div>
+                        <button onclick="window.autopilotEngine.runCycle(true)" class="btn-primary text-xs">
+                            Executar Ciclo Agora
+                        </button>
+                    </div>
+
+                    <!-- Seletor de Modo de Autonomia -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <div onclick="window.autopilotEngine.setMode('SAFE')" class="p-3.5 rounded-xl border border-white/10 hover:border-yellow-400 cursor-pointer bg-white/[0.02]">
+                            <p class="font-bold text-white">🔵 Safe Mode</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Somente leitura e alertas.</p>
+                        </div>
+                        <div onclick="window.autopilotEngine.setMode('ASSISTED')" class="p-3.5 rounded-xl border border-yellow-400/30 bg-yellow-400/5 cursor-pointer">
+                            <p class="font-bold text-yellow-400">🟢 Assistido</p>
+                            <p class="text-[10px] text-gray-400 mt-1">IA sugere, você aprova.</p>
+                        </div>
+                        <div onclick="window.autopilotEngine.setMode('SEMI_AUTO')" class="p-3.5 rounded-xl border border-white/10 hover:border-yellow-400 cursor-pointer bg-white/[0.02]">
+                            <p class="font-bold text-white">🟡 Semi-Autônomo</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Executa baixo risco.</p>
+                        </div>
+                        <div onclick="window.autopilotEngine.setMode('AUTOPILOT')" class="p-3.5 rounded-xl border border-white/10 hover:border-yellow-400 cursor-pointer bg-white/[0.02]">
+                            <p class="font-bold text-white">🔴 Autopilot Total</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Otimização contínua.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 9: AUDITORIA (LOGS & CHANGELOG) -->
+            <section id="view-audit" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Changelog e Auditoria Estruturada</h3>
+                            <p class="text-xs text-gray-400">Registro imutável de todas as ações tomadas pelo operador e pela IA</p>
+                        </div>
+                        <div class="space-x-2">
+                            <button onclick="window.auditEngine.exportCSV()" class="btn-secondary text-xs">Exportar CSV</button>
+                            <button onclick="window.auditEngine.exportJSON()" class="btn-secondary text-xs">Exportar JSON</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto" id="audit-timeline-container">
+                        <p class="text-xs text-gray-500 italic text-center py-6">Nenhum log registrado.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 10: CONFIGURAÇÕES -->
+            <section id="view-settings" class="view-section hidden space-y-4">
+                <div class="glass-panel p-5 rounded-2xl space-y-4 max-w-xl">
+                    <h3 class="font-bold text-white text-sm">Parâmetros & Guardrails</h3>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-[11px] text-gray-400 uppercase font-bold mb-1">CPA Alvo de Segurança (R$)</label>
+                            <input type="number" id="setting-target-cpa" value="35.00" class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-2.5 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-gray-400 uppercase font-bold mb-1">Teto Máximo Diário da Conta (R$)</label>
+                            <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-2.5 text-white">
+                        </div>
+                        <button onclick="alert('Configurações salvas!')" class="btn-primary w-full py-2.5">
+                            Salvar Configurações
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- MODAL 1: COMMAND PALETTE (CTRL+K) -->
+    <div id="command-palette-modal" class="modal-overlay fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center pt-24 p-4 hidden">
+        <div class="glass-panel w-full max-w-lg rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex items-center space-x-2 pb-2 border-b border-white/10">
+                <span>🔍</span>
+                <input type="text" placeholder="Digite um comando ou nome de campanha..." class="w-full bg-transparent text-sm text-white focus:outline-none placeholder-gray-500">
+                <button onclick="window.dashboard.toggleCommandPalette()" class="text-xs text-gray-500 hover:text-white">Esc</button>
+            </div>
+            <div class="space-y-1 text-xs text-gray-300 max-h-60 overflow-y-auto">
+                <div onclick="window.dashboard.switchView('campaigns'); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between">
+                    <span>📢 Ir para Campanhas</span>
+                    <span class="text-[10px] text-gray-500">Navegar</span>
+                </div>
+                <div onclick="window.dashboard.runWarRoomAudit(); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between">
+                    <span>🚨 Abrir War Room</span>
+                    <span class="text-[10px] text-gray-500">Auditoria</span>
+                </div>
+                <div onclick="window.dashboard.syncAllData(); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between">
+                    <span>🔄 Sincronizar Agora</span>
+                    <span class="text-[10px] text-gray-500">Ação</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: WAR ROOM AUDIT -->
+    <div id="war-room-modal" class="modal-overlay fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">🚨</span>
+                    <h3 class="font-bold text-white text-base">War Room — Auditoria Imediata de Performance</h3>
+                </div>
+                <button onclick="document.getElementById('war-room-modal').classList.add('hidden')" class="text-xs text-gray-400 hover:text-white">✕ Fechar</button>
+            </div>
+            <div id="war-room-content" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ALTERAÇÃO DE ORÇAMENTO (SEM PROMPT()) -->
+    <div id="budget-modal" class="modal-overlay fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4">
+            <h3 class="font-bold text-white text-sm">Alterar Orçamento Diário</h3>
+            <p class="text-xs text-gray-400">Valor Atual: <b id="budget-modal-current" class="text-white">R$ 0,00</b></p>
+            <form onsubmit="window.dashboard.submitBudgetModal(event)" class="space-y-3">
+                <input type="hidden" id="budget-modal-camp-id">
+                <div>
+                    <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Novo Orçamento (R$/dia)</label>
+                    <input type="number" step="0.01" id="budget-modal-input" required class="w-full bg-[#0b0f17] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-400 text-sm">
+                </div>
+                <div class="flex items-center justify-end space-x-2 pt-2">
+                    <button type="button" onclick="document.getElementById('budget-modal').classList.add('hidden')" class="btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" class="btn-primary text-xs">Aplicar com Verificação</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- Header Principal -->
-    <header class="border-b border-brand-border bg-brand-card/90 sticky top-0 z-30 backdrop-blur-md">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-3xl">🤖</span>
-                <div>
-                    <h1 class="font-outfit text-lg sm:text-xl font-black text-white tracking-tight flex items-center space-x-2">
-                        <span>Gestor Ads IA</span>
-                        <span class="text-[10px] bg-brand-accent/20 text-brand-accent font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Ao Vivo</span>
-                    </h1>
-                    <p class="text-[10px] sm:text-xs text-gray-400">Otimização e Gerenciamento em Tempo Real</p>
-                </div>
+    <!-- DRAWER LATERAL: DETALHES DA CAMPANHA -->
+    <div id="campaign-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#0b0f17] border-l border-white/10 z-50 transform translate-x-full transition-transform duration-300 shadow-2xl p-6 flex flex-col justify-between">
+        <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="font-bold text-white text-sm">Detalhes da Campanha</h3>
+                <button onclick="window.dashboard.closeDrawer()" class="text-xs text-gray-400 hover:text-white">✕</button>
             </div>
-            
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <span id="conn-badge" class="text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 flex items-center space-x-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-green animate-ping"></span>
-                    <span>Conectado</span>
-                </span>
-                <button onclick="limparCredenciais()" class="text-xs bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-xl border border-white/5 transition-colors">
-                    Desconectar
-                </button>
-            </div>
+            <div id="drawer-content" class="space-y-3"></div>
         </div>
-    </header>
-
-    <main class="container mx-auto px-4 mt-6 max-w-6xl space-y-6">
-
-        <!-- Cards de Métricas Gerais -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass-panel p-5 rounded-2xl">
-                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Total Investido (Geral)</p>
-                <h3 class="text-2xl font-bold font-outfit text-white mt-1.5" id="metric-spent">R$ 0,00</h3>
-            </div>
-            <div class="glass-panel p-5 rounded-2xl">
-                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Status da Conta</p>
-                <h3 class="text-2xl font-bold font-outfit text-white mt-1.5" id="metric-status">Consultando...</h3>
-            </div>
-            <div class="glass-panel p-5 rounded-2xl">
-                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Moeda / País</p>
-                <h3 class="text-2xl font-bold font-outfit text-white mt-1.5" id="metric-currency">Consultando...</h3>
-            </div>
-            <div class="glass-panel p-5 rounded-2xl border-brand-accent/20 bg-brand-accent/[0.02]">
-                <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Piloto Automático IA</p>
-                <h3 class="text-2xl font-bold font-outfit text-brand-accent mt-1.5" id="metric-ai-status">Inativo 😴</h3>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Coluna de Regras e Logs da IA -->
-            <div class="space-y-6 lg:col-span-1">
-                
-                <!-- Card de Configuração da IA -->
-                <div class="glass-panel p-5 rounded-3xl space-y-4">
-                    <h3 class="font-outfit text-base font-bold text-white flex items-center space-x-2">
-                        <span>⚙️</span>
-                        <span>Regras do Otimizador IA</span>
-                    </h3>
-                    
-                    <div class="space-y-3.5 text-xs">
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">CPA Máximo Aceitável (R$)</label>
-                            <input type="number" id="cfg-cpa" value="40" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white focus:outline-none focus:border-brand-accent text-sm">
-                            <p class="text-[10px] text-gray-400 mt-1">Anúncios que gastarem mais que isso sem vendas serão pausados.</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Teto de Escala Diária (R$)</label>
-                            <input type="number" id="cfg-budget-limit" value="500" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-white focus:outline-none focus:border-brand-accent text-sm">
-                            <p class="text-[10px] text-gray-400 mt-1">Limite máximo de gasto acumulado para escala automática.</p>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/5 mt-2">
-                            <div>
-                                <p class="text-xs font-bold text-white">Ativar Robô Otimizador</p>
-                                <p class="text-[10px] text-gray-400">Verificação automática ativa</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="ai-toggle" class="sr-only peer" onchange="toggleAiPilot()">
-                                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-accent"></div>
-                            </label>
-                        </div>
-
-                        <button onclick="salvarConfiguracoesIA()" class="w-full bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-bold py-3 rounded-xl transition-all text-xs uppercase tracking-wider">
-                            Salvar Parâmetros
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Histórico de Ações da IA (Terminal de Logs) -->
-                <div class="glass-panel p-5 rounded-3xl space-y-3">
-                    <h3 class="font-outfit text-base font-bold text-white flex items-center space-x-2">
-                        <span>🚀</span>
-                        <span>Histórico de Ações da IA</span>
-                    </h3>
-                    <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1" id="log-container">
-                        <p class="text-xs text-gray-400 italic text-center py-4">Nenhuma ação registrada neste ciclo.</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Coluna Principal (Tabela de Campanhas & Insights) -->
-            <div class="lg:col-span-2 space-y-6">
-
-                <!-- Campanhas -->
-                <div class="glass-panel p-5 rounded-3xl space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-outfit text-base font-bold text-white flex items-center space-x-2">
-                            <span>📢</span>
-                            <span>Campanhas Ativas</span>
-                        </h3>
-                        <button onclick="carregarCampanhas()" class="text-xs font-semibold px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center space-x-1.5">
-                            <span>🔄</span>
-                            <span>Sincronizar Meta Ads</span>
-                        </button>
-                    </div>
-
-                    <!-- Tabela Responsiva -->
-                    <div class="overflow-x-auto rounded-2xl border border-brand-border">
-                        <table class="w-full text-xs text-left">
-                            <thead class="bg-[#0e121a] text-gray-400 uppercase font-semibold">
-                                <tr>
-                                    <th class="p-3.5">Campanha / Status</th>
-                                    <th class="p-3.5">Orçamento</th>
-                                    <th class="p-3.5">Vendas / CPA</th>
-                                    <th class="p-3.5 text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-brand-border text-gray-200" id="campaigns-tbody">
-                                <tr>
-                                    <td colspan="4" class="p-8 text-center text-gray-400 italic">Nenhuma credencial configurada ainda.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Execução Rápida do Robô -->
-                <div class="glass-panel p-6 rounded-3xl border-brand-accent/20 bg-brand-accent/[0.02] flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h4 class="font-bold text-white text-sm">Forçar Varredura Completa da IA agora?</h4>
-                        <p class="text-xs text-gray-400 mt-0.5">Analisa todas as métricas do dia, pausa criativos ruins e escala os vencedores instantaneamente.</p>
-                    </div>
-                    <button onclick="rodarOtimizadorIA()" class="bg-brand-accent hover:bg-brand-accentHover text-brand-dark font-extrabold text-xs px-5 py-3.5 rounded-xl transition-all shadow-lg active:scale-95 whitespace-nowrap uppercase tracking-wider">
-                        🤖 Rodar Varredura IA
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <script>
-        // Configurações do Estado Local (Salvas no Browser)
-        let META_TOKEN = localStorage.getItem('meta_access_token') || '';
-        let AD_ACCOUNT_ID = localStorage.getItem('meta_ad_account_id') || '';
-        let aiEnabled = localStorage.getItem('meta_ai_enabled') === 'true';
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!META_TOKEN || !AD_ACCOUNT_ID) {
-                document.getElementById('setup-modal').classList.remove('hidden');
-            } else {
-                inicializarPainel();
-            }
-        });
-
-        // Configuração do Setup Inicial
-        document.getElementById('setup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            let actId = document.getElementById('setup-act-id').value.trim();
-            let token = document.getElementById('setup-token').value.trim();
-
-            if (!actId.startsWith('act_')) {
-                actId = 'act_' + actId;
-            }
-
-            localStorage.setItem('meta_access_token', token);
-            localStorage.setItem('meta_ad_account_id', actId);
-            
-            META_TOKEN = token;
-            AD_ACCOUNT_ID = actId;
-
-            document.getElementById('setup-modal').classList.add('hidden');
-            inicializarPainel();
-        });
-
-        function limparCredenciais() {
-            if (confirm('Deseja desconectar sua conta e apagar as chaves deste navegador?')) {
-                localStorage.clear();
-                window.location.reload();
-            }
-        }
-
-        // Funções de Inicialização e Chamadas à Graph API
-        function inicializarPainel() {
-            carregarContaInfo();
-            carregarCampanhas();
-            
-            const aiToggle = document.getElementById('ai-toggle');
-            if (aiToggle) aiToggle.checked = aiEnabled;
-            atualizarBadgeAI();
-
-            carregarLogsLocais();
-        }
-
-        async function graphRequest(endpoint, method = 'GET', params = {}) {
-            params['access_token'] = META_TOKEN;
-            const query = new URLSearchParams(params).toString();
-            const url = `https://graph.facebook.com/v20.0/${endpoint}?${query}`;
-
-            const options = { method: method };
-            
-            const res = await fetch(url, options);
-            return await res.json();
-        }
-
-        async function graphPostRequest(endpoint, payload = {}) {
-            const url = `https://graph.facebook.com/v20.0/${endpoint}?access_token=${META_TOKEN}`;
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            return await res.json();
-        }
-
-        // Carregar Informações Básicas da Conta de Anúncios
-        async function carregarContaInfo() {
-            try {
-                const info = await graphRequest(AD_ACCOUNT_ID, 'GET', { fields: 'name,account_status,currency,amount_spent' });
-                
-                if (info && !info.error) {
-                    const spent = (parseFloat(info.amount_spent) || 0).toLocaleString('pt-BR', { style: 'currency', currency: info.currency || 'BRL' });
-                    document.getElementById('metric-spent').textContent = spent;
-                    
-                    document.getElementById('metric-status').textContent = info.account_status === 1 ? 'Ativa 🟢' : 'Inativa 🔴';
-                    document.getElementById('metric-currency').textContent = `${info.currency || 'BRL'} / BR`;
-                } else {
-                    tratarErroAPI(info.error);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        // Carregar Campanhas e seus Insights de Conversão
-        async function carregarCampanhas() {
-            const tbody = document.getElementById('campaigns-tbody');
-            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400 italic animate-pulse">Buscando campanhas direto do Meta Ads...</td></tr>`;
-
-            try {
-                const res = await graphRequest(`${AD_ACCOUNT_ID}/campaigns`, 'GET', {
-                    fields: 'name,status,daily_budget,lifetime_budget,buying_type',
-                    limit: 20
-                });
-
-                if (res.error) {
-                    tratarErroAPI(res.error);
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-brand-red">⚠️ Erro de conexão com o Meta. Verifique seu Token.</td></tr>`;
-                    return;
-                }
-
-                if (!res.data || res.data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400">Nenhuma campanha localizada nesta conta.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = '';
-
-                for (const camp of res.data) {
-                    // Pega insights de hoje
-                    const insRes = await graphRequest(`${camp.id}/insights`, 'GET', {
-                        fields: 'spend,actions',
-                        date_preset: 'today'
-                    });
-
-                    let spend = 0;
-                    let purchases = 0;
-                    let cpa = 0;
-
-                    if (insRes.data && insRes.data[0]) {
-                        const insight = insRes.data[0];
-                        spend = parseFloat(insight.spend) || 0;
-                        if (insight.actions) {
-                            const pAction = insight.actions.find(act => act.action_type === 'purchase');
-                            if (pAction) purchases = parseInt(pAction.value) || 0;
-                        }
-                        if (purchases > 0) {
-                            cpa = spend / purchases;
-                        }
-                    }
-
-                    const isChecked = camp.status === 'ACTIVE';
-                    const budgetRaw = camp.daily_budget ? camp.daily_budget : camp.lifetime_budget;
-                    const budgetFormatted = budgetRaw ? (parseFloat(budgetRaw) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta';
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-white/[0.02] transition-colors border-b border-brand-border";
-                    tr.innerHTML = `
-                        <td class="p-3.5">
-                            <p class="font-semibold text-white text-sm truncate max-w-[200px]" title="${camp.name}">${camp.name}</p>
-                            <span class="text-[10px] text-gray-400 flex items-center space-x-1.5 mt-0.5">
-                                <span class="w-1.5 h-1.5 rounded-full ${isChecked ? 'bg-brand-green' : 'bg-brand-red'}"></span>
-                                <span>${camp.status}</span>
-                            </span>
-                        </td>
-                        <td class="p-3.5 font-bold text-white">
-                            ${budgetFormatted}
-                            <span class="text-[9px] text-gray-400 font-normal block">${camp.daily_budget ? 'Diário' : 'Total'}</span>
-                        </td>
-                        <td class="p-3.5">
-                            <span class="font-bold text-white">${purchases} conversões</span>
-                            <span class="text-[10px] text-gray-400 block mt-0.5">CPA Hoje: ${cpa > 0 ? cpa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'}</span>
-                        </td>
-                        <td class="p-3.5 text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                <button onclick="alterarStatus('${camp.id}', '${camp.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'}')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold ${isChecked ? 'bg-brand-red/10 text-brand-red border border-brand-red/20' : 'bg-brand-green/10 text-brand-green border border-brand-green/20'} hover:opacity-85 transition-opacity">
-                                    ${isChecked ? 'Pausar' : 'Ativar'}
-                                </button>
-                                <button onclick="ajustarOrcamentoPrompt('${camp.id}', '${camp.daily_budget ? 'daily_budget' : 'lifetime_budget'}', ${budgetRaw || 0})" class="px-2.5 py-1.5 rounded-lg bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:opacity-85 text-[10px] font-bold">
-                                    Orçamento
-                                </button>
-                                <button onclick="duplicarCampanha('${camp.id}')" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:opacity-85 text-[10px] font-bold">
-                                    Duplicar
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                }
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-brand-red">Erro técnico de rede.</td></tr>`;
-            }
-        }
-
-        // Alterar status
-        async function alterarStatus(campId, newStatus) {
-            try {
-                const res = await graphPostRequest(campId, { status: newStatus });
-                if (res.success) {
-                    adicionarLog(`Alterado status da campanha ${campId} para ${newStatus}.`);
-                    carregarCampanhas();
-                } else {
-                    alert('Erro: ' + (res.error?.message || 'Falha ao atualizar'));
-                }
-            } catch (e) {
-                alert('Erro de conexão.');
-            }
-        }
-
-        // Duplicar campanha
-        async function duplicarCampanha(campId) {
-            if (!confirm('Deseja duplicar esta campanha estruturalmente?')) return;
-
-            try {
-                const info = await graphRequest(campId, 'GET', { fields: 'name,buying_type,objective' });
-                if (info.error) {
-                    alert('Erro ao ler dados da campanha.');
-                    return;
-                }
-
-                const res = await graphPostRequest(`${AD_ACCOUNT_ID}/campaigns`, {
-                    name: info.name + ' - CÓPIA AUTÔNOMA IA',
-                    buying_type: info.buying_type,
-                    objective: info.objective,
-                    status: 'PAUSED'
-                });
-
-                if (res.id) {
-                    adicionarLog(`Campanha ${campId} duplicada com sucesso. Nova criada sob ID: ${res.id}`);
-                    alert(`Duplicada sob o ID: ${res.id}`);
-                    carregarCampanhas();
-                } else {
-                    alert('Erro ao duplicar.');
-                }
-            } catch (e) {
-                alert('Erro na requisição.');
-            }
-        }
-
-        // Ajustar Orçamento
-        async function ajustarOrcamentoPrompt(campId, field, rawValue) {
-            const current = rawValue / 100;
-            const input = prompt(`Ajustar orçamento (Atual: R$ ${current.toFixed(2)}):`, current.toFixed(2));
-            if (input === null) return;
-
-            const newVal = parseFloat(input);
-            if (isNaN(newVal) || newVal <= 0) {
-                alert('Orçamento inválido.');
-                return;
-            }
-
-            const valCents = Math.round(newVal * 100);
-
-            try {
-                const res = await graphPostRequest(campId, { [field]: valCents });
-                if (res.success) {
-                    adicionarLog(`Alterado orçamento da campanha ${campId} de R$ ${current.toFixed(2)} para R$ ${newVal.toFixed(2)}.`);
-                    carregarCampanhas();
-                } else {
-                    alert('Erro ao atualizar: ' + (res.error?.message || 'Falha'));
-                }
-            } catch (e) {
-                alert('Erro de conexão.');
-            }
-        }
-
-        // Otimizador e Varredura da IA
-        async function rodarOtimizadorIA() {
-            adicionarLog("IA iniciou varredura completa das campanhas do dia...");
-            
-            const targetCpa = parseFloat(document.getElementById('cfg-cpa').value) || 40;
-            const budgetLimit = parseFloat(document.getElementById('cfg-budget-limit').value) || 500;
-
-            try {
-                const res = await graphRequest(`${AD_ACCOUNT_ID}/campaigns`, 'GET', {
-                    fields: 'name,status,daily_budget,lifetime_budget'
-                });
-
-                if (!res.data || res.data.length === 0) {
-                    adicionarLog("Varredura concluída. Nenhuma campanha ativa.");
-                    return;
-                }
-
-                let acoes = 0;
-
-                for (const camp of res.data) {
-                    if (camp.status !== 'ACTIVE') continue;
-
-                    const insRes = await graphRequest(`${camp.id}/insights`, 'GET', {
-                        fields: 'spend,actions',
-                        date_preset: 'today'
-                    });
-
-                    if (insRes.data && insRes.data[0]) {
-                        const insight = insRes.data[0];
-                        const spend = parseFloat(insight.spend) || 0;
-                        let purchases = 0;
-                        if (insight.actions) {
-                            const pAction = insight.actions.find(act => act.action_type === 'purchase');
-                            if (pAction) purchases = parseInt(pAction.value) || 0;
-                        }
-
-                        // REGRA 1: Stop-loss (Campanha gastando muito sem vendas)
-                        if (purchases === 0 && spend > targetCpa) {
-                            await graphPostRequest(camp.id, { status: 'PAUSED' });
-                            adicionarLog(`[PAUSADA] IA pausou campanha "${camp.name}" por Stop-loss. Gasto: R$ ${spend.toFixed(2)} sem conversões.`);
-                            acoes++;
-                        }
-
-                        // REGRA 2: Escala (+15% no orçamento se o CPA estiver abaixo da meta)
-                        if (purchases >= 3) {
-                            const currentCpa = spend / purchases;
-                            if (currentCpa < targetCpa && camp.daily_budget) {
-                                const currentBudget = parseFloat(camp.daily_budget);
-                                const newBudget = Math.round(currentBudget * 1.15);
-                                
-                                if ((newBudget / 100) <= budgetLimit) {
-                                    await graphPostRequest(camp.id, { daily_budget: newBudget });
-                                    adicionarLog(`[ESCALA] IA aumentou orçamento de "${camp.name}" em 15%. Novo: R$ ${(newBudget/100).toFixed(2)}/dia.`);
-                                    acoes++;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (acoes === 0) {
-                    adicionarLog("Varredura concluída. Métricas saudáveis e estáveis, nenhuma ação necessária.");
-                } else {
-                    adicionarLog(`Varredura concluída. ${acoes} ações corretivas foram tomadas.`);
-                }
-                carregarCampanhas();
-                alert('Varredura e otimização IA concluídas!');
-
-            } catch (err) {
-                adicionarLog("⚠️ Erro na varredura da IA: falha na conexão.");
-            }
-        }
-
-        // Funções da Configuração Local de IA
-        function toggleAiPilot() {
-            const checked = document.getElementById('ai-toggle').checked;
-            localStorage.setItem('meta_ai_enabled', checked ? 'true' : 'false');
-            aiEnabled = checked;
-            atualizarBadgeAI();
-            adicionarLog(`Modo piloto automático IA foi ${checked ? 'ATIVADO' : 'DESATIVADO'}.`);
-        }
-
-        function atualizarBadgeAI() {
-            document.getElementById('metric-ai-status').textContent = aiEnabled ? 'Ativo 🤖' : 'Inativo 😴';
-        }
-
-        function salvarConfiguracoesIA() {
-            alert('Parâmetros salvos com sucesso!');
-            adicionarLog("Novos parâmetros de CPA e orçamento foram salvos no otimizador.");
-        }
-
-        // Sistema de Logs no LocalStorage
-        function adicionarLog(msg) {
-            const time = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR');
-            let logs = [];
-            try {
-                logs = JSON.parse(localStorage.getItem('meta_ai_logs') || '[]');
-            } catch(e){}
-
-            logs.unshift({ time: time, message: msg });
-            logs = logs.slice(0, 40); // Limite de 40 logs
-            localStorage.setItem('meta_ai_logs', JSON.stringify(logs));
-
-            renderizarLogs(logs);
-        }
-
-        function carregarLogsLocais() {
-            let logs = [];
-            try {
-                logs = JSON.parse(localStorage.getItem('meta_ai_logs') || '[]');
-            } catch(e){}
-            renderizarLogs(logs);
-        }
-
-        function renderizarLogs(logs) {
-            const container = document.getElementById('log-container');
-            if (logs.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma ação registrada neste ciclo.</p>`;
-                return;
-            }
-
-            container.innerHTML = logs.map(log => `
-                <div class="p-2.5 rounded-xl bg-white/[0.02] border border-brand-border text-[11px] space-y-1">
-                    <div class="flex justify-between font-semibold text-brand-accent">
-                        <span>Ação IA</span>
-                        <span class="text-gray-500 font-normal">${log.time}</span>
-                    </div>
-                    <p class="text-gray-300 leading-relaxed">${log.message}</p>
-                </div>
-            `).join('');
-        }
-
-        function tratarErroAPI(error) {
-            if (error) {
-                console.error('Meta API Error:', error);
-                if (error.code === 190) {
-                    alert('Token de acesso expirado ou inválido. Por favor, desconecte e configure novamente.');
-                }
-            }
-        }
-    </script>
+    </div>
+
+    <!-- Scripts da Aplicação em Camadas -->
+    <script src="js/meta-adapter.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/guardrails.js"></script>
+    <script src="js/decisions.js"></script>
+    <script src="js/execution.js"></script>
+    <script src="js/audit.js"></script>
+    <script src="js/autopilot.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 
 </html>
