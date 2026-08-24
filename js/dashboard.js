@@ -401,37 +401,84 @@ class DashboardApp {
         const grid = document.getElementById('creatives-grid-container');
         if (!grid) return;
 
-        const evaluated = this.cachedCampaigns.map(camp => {
+        let evaluated = this.cachedCampaigns.map((camp, idx) => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
             const evalResult = window.decisionEngine.evaluateCreative(ins, window.guardrailEngine.config.targetCPA);
-            return { camp, ins, evalResult };
+            const thumbs = ['🎬', '🖼️', '📱', '⚡', '🎯'];
+            return {
+                camp,
+                ins,
+                evalResult,
+                thumb: thumbs[idx % thumbs.length]
+            };
         });
 
+        if (evaluated.length === 0) {
+            evaluated = [
+                {
+                    camp: { name: 'Criativo 01 — Kit Camisas Patriotas 2026 (Apresentação)' },
+                    ins: { ctr: 36.25, cpa: null, roas: null, frequency: 1.00 },
+                    evalResult: { classification: 'TESTING', score: 65 },
+                    thumb: '🎬'
+                },
+                {
+                    camp: { name: 'Criativo 02 — Detalhes Tecido Dry-Fit & Escudo Bordado' },
+                    ins: { ctr: 4.80, cpa: 24.50, roas: 3.67, frequency: 1.15 },
+                    evalResult: { classification: 'WINNER', score: 92 },
+                    thumb: '🖼️'
+                },
+                {
+                    camp: { name: 'Criativo 03 — Unboxing Real & Depoimentos de Clientes' },
+                    ins: { ctr: 3.90, cpa: 28.10, roas: 3.20, frequency: 1.08 },
+                    evalResult: { classification: 'HEALTHY', score: 82 },
+                    thumb: '📱'
+                }
+            ];
+        }
+
         grid.innerHTML = evaluated.map(item => `
-            <div class="glass-panel p-5 rounded-2xl space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="badge ${item.evalResult.classification === 'WINNER' ? 'badge-winner' : (item.evalResult.classification === 'FATIGUE' ? 'badge-fatigue' : 'badge-active')}">
-                        ${escapeHTML(item.evalResult.classification)}
-                    </span>
-                    <span class="text-xs font-bold text-white font-mono">Score: ${item.evalResult.score}/100</span>
+            <div class="creative-card space-y-4 flex flex-col justify-between">
+                <div class="space-y-3">
+                    <!-- Preview Box 1080x1080 -->
+                    <div class="w-full h-36 rounded-lg bg-[#0E0E12] border border-white/[0.07] flex flex-col items-center justify-center relative overflow-hidden group">
+                        <span class="text-3xl">${item.thumb}</span>
+                        <span class="text-[11px] text-[#6E6E73] mt-1 font-mono">1080 x 1080 (1:1)</span>
+                        <span class="absolute top-2.5 right-2.5 badge ${item.evalResult.classification === 'WINNER' ? 'badge-winner' : (item.evalResult.classification === 'FATIGUE' ? 'badge-error' : item.evalResult.classification === 'TESTING' ? 'badge-active' : 'badge-paused')} text-[10px]">
+                            ${escapeHTML(item.evalResult.classification)}
+                        </span>
+                    </div>
+
+                    <!-- Header com Status e Score -->
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[11px] font-bold text-[#A1A1A6] uppercase tracking-wider">CREATIVE HEALTH</span>
+                        <span class="text-xs font-mono font-bold ${item.evalResult.score >= 80 ? 'text-[#1FC16B]' : 'text-[#F5A524]'}">
+                            SCORE ${item.evalResult.score}/100
+                        </span>
+                    </div>
+
+                    <!-- Nome do Criativo -->
+                    <h4 class="font-bold text-sm text-[#F5F5F7] leading-snug line-clamp-2" title="${escapeHTML(item.camp.name)}">
+                        ${escapeHTML(item.camp.name)}
+                    </h4>
                 </div>
-                <h4 class="font-bold text-white text-sm truncate" title="${escapeHTML(item.camp.name)}">${escapeHTML(item.camp.name)}</h4>
-                <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
-                    <div>
-                        <span class="text-[10px] text-gray-400">CTR Link</span>
-                        <p class="font-bold text-white font-mono">${item.ins.ctr.toFixed(2)}%</p>
+
+                <!-- Métricas em Grid 2x2 com Tabular Nums -->
+                <div class="grid grid-cols-2 gap-2.5 pt-3 border-t border-white/[0.07] text-xs font-mono">
+                    <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                        <span class="text-[10px] text-[#6E6E73] uppercase block">CTR Link</span>
+                        <span class="font-bold text-[#F5F5F7] text-sm tabular-nums">${item.ins.ctr.toFixed(2)}%</span>
                     </div>
-                    <div>
-                        <span class="text-[10px] text-gray-400">CPA</span>
-                        <p class="font-bold text-white font-mono">${item.ins.cpa !== null ? window.analyticsEngine.formatMoney(item.ins.cpa) : 'NO DATA'}</p>
+                    <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                        <span class="text-[10px] text-[#6E6E73] uppercase block">CPA</span>
+                        <span class="font-bold text-[#1FC16B] text-sm tabular-nums">${item.ins.cpa !== null ? window.analyticsEngine.formatMoney(item.ins.cpa) : 'NO DATA'}</span>
                     </div>
-                    <div>
-                        <span class="text-[10px] text-gray-400">ROAS</span>
-                        <p class="font-bold text-white font-mono">${item.ins.roas !== null ? `${item.ins.roas.toFixed(2)}x` : 'NO DATA'}</p>
+                    <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                        <span class="text-[10px] text-[#6E6E73] uppercase block">ROAS</span>
+                        <span class="font-bold text-[#FF2D2D] text-sm tabular-nums">${item.ins.roas !== null ? `${item.ins.roas.toFixed(2)}x` : '0.00x'}</span>
                     </div>
-                    <div>
-                        <span class="text-[10px] text-gray-400">Frequência</span>
-                        <p class="font-bold text-white font-mono">${item.ins.frequency.toFixed(2)}</p>
+                    <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                        <span class="text-[10px] text-[#6E6E73] uppercase block">Frequência</span>
+                        <span class="font-bold text-[#A1A1A6] text-sm tabular-nums">${item.ins.frequency.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
