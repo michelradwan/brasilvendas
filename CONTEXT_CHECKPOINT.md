@@ -1,8 +1,8 @@
 # CHECKPOINT MASTER DE CONTEXTO & MEMÓRIA CONTÍNUA (BRASIL VENDAS)
 
 **ID da Conversa:** `0309f06b-ef41-46f4-b08c-a82e50e0eedc`  
-**Última Atualização:** 24/08/2026 - 00:02  
-**Repositório Ativo:** `C:\Users\Michel\.gemini\antigravity-ide\scratch\brasilvendas`  
+**Última Atualização:** 24/08/2026 - 15:53  
+**Repositório Ativo:** `C:\Users\vanny\.gemini\antigravity-ide\scratch\brasilvendas`  
 **Branch:** `main` (Sincronizada no GitHub: `https://github.com/michelradwan/brasilvendas.git`)  
 **Restore Point Git Tag:** `restore-point-real-data-audit`  
 
