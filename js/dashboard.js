@@ -679,6 +679,82 @@ class DashboardApp {
 
         this.showToast('Configurações e Unit Economics salvos com sucesso.', 'success');
     }
+
+    openTokenModal() {
+        const modal = document.getElementById('token-modal');
+        const feedback = document.getElementById('token-modal-feedback');
+        const input = document.getElementById('token-modal-input');
+        if (feedback) feedback.classList.add('hidden');
+        if (input) input.value = '';
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    async submitNewToken(e) {
+        e.preventDefault();
+        const input = document.getElementById('token-modal-input');
+        const feedback = document.getElementById('token-modal-feedback');
+        const btn = document.getElementById('btn-save-token');
+        const token = input ? input.value.trim() : '';
+
+        if (!token || !token.startsWith('EAA')) {
+            alert('Por favor, insira um token válido da Meta iniciando com EAA...');
+            return;
+        }
+
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Validando na Meta...';
+        }
+
+        try {
+            const res = await fetch('/api/meta-proxy?action=test_token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token })
+            });
+            const data = await res.json();
+
+            if (data.success && data.valid) {
+                if (feedback) {
+                    feedback.className = 'text-xs p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
+                    feedback.innerHTML = `✅ <b>Token Válido!</b> App: ${data.app || 'Gestor Ads IA'}. Atualize a variável META_ACCESS_TOKEN na Vercel para persistência permanente.`;
+                }
+                this.showToast('Token Meta validado com sucesso!', 'success');
+                setTimeout(() => {
+                    document.getElementById('token-modal')?.classList.add('hidden');
+                    this.syncAllData();
+                }, 2000);
+            } else {
+                if (feedback) {
+                    feedback.className = 'text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 block';
+                    feedback.innerHTML = `❌ <b>Erro no Token:</b> ${data.error?.message || 'Token rejeitado pela Meta.'}`;
+                }
+            }
+        } catch(err) {
+            if (feedback) {
+                feedback.className = 'text-xs p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 block';
+                feedback.innerHTML = `⚠️ Token inserido localmente. Reinicie a sincronização.`;
+            }
+            setTimeout(() => {
+                document.getElementById('token-modal')?.classList.add('hidden');
+                this.syncAllData();
+            }, 2000);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Testar & Salvar Token ➔';
+            }
+        }
+    }
+
+    async logout() {
+        if (!confirm('Deseja realmente sair da conta e desconectar do painel?')) return;
+        try {
+            await fetch('/api/meta-proxy?action=logout');
+        } catch(e) {}
+        document.cookie = 'meta_admin_session=; Path=/; Max-Age=0';
+        window.location.reload();
+    }
 }
 
 window.dashboard = new DashboardApp();

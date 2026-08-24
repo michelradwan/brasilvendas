@@ -1459,6 +1459,58 @@
         const attributionContext = getAttributionContext();
         const initialUTMs = attributionContext.last_touch || attributionContext.first_touch;
 
+        // ==============================================================================
+        // MONITOR DE VISITANTES AO VIVO (HEARTBEAT REALTIME PARA O ADMIN)
+        // ==============================================================================
+        (function initVisitorHeartbeat() {
+            let visitId = sessionStorage.getItem('bv_visit_id');
+            if (!visitId) {
+                visitId = 'vis_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+                sessionStorage.setItem('bv_visit_id', visitId);
+            }
+
+            function sendVisitorPing(etapa = 'Navegando na Página') {
+                const attr = typeof getAttributionContext === 'function' ? getAttributionContext() : {};
+                const utmSource = (attr.last_touch && attr.last_touch.utm_source) || (attr.first_touch && attr.first_touch.utm_source) || 'Direto';
+                const utmCampaign = (attr.last_touch && attr.last_touch.utm_campaign) || (attr.first_touch && attr.first_touch.utm_campaign) || 'Site';
+
+                const payload = JSON.stringify({
+                    visit_id: visitId,
+                    etapa: etapa,
+                    origem: utmSource,
+                    campanha: utmCampaign
+                });
+
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/api/visitantes', payload);
+                } else {
+                    fetch('/api/visitantes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: payload,
+                        keepalive: true
+                    }).catch(() => {});
+                }
+            }
+
+            // Disparo imediato ao entrar
+            sendVisitorPing('Entrou no Site');
+
+            // Heartbeat a cada 10 segundos
+            setInterval(() => {
+                let etapa = 'Navegando no Site';
+                const modal = document.getElementById('checkout-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    etapa = 'No Checkout (Preenchendo Dados)';
+                }
+                const qrcode = document.getElementById('pix-step-qrcode');
+                if (qrcode && !qrcode.classList.contains('hidden')) {
+                    etapa = 'Aguardando Pagamento PIX';
+                }
+                sendVisitorPing(etapa);
+            }, 10000);
+        })();
+
         let currentStep = 1;
         let currentTransactionId = null;
         let pixCheckInterval = null;

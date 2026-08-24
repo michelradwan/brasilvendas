@@ -139,6 +139,49 @@ module.exports = async (req, res) => {
         return res.status(401).json({ error: { message: 'Senha administrativa incorreta.', code: 401 } });
     }
 
+    // Se for rota de Logout
+    if (req.query.action === 'logout') {
+        res.setHeader('Set-Cookie', `meta_admin_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`);
+        return res.status(200).json({ success: true, message: 'Sessão encerrada com sucesso.' });
+    }
+
+    // Se for rota de Teste de Novo Token Meta
+    if (req.query.action === 'test_token' && req.method === 'POST') {
+        const { token } = req.body || {};
+        if (!token || !token.startsWith('EAA')) {
+            return res.status(400).json({ error: { message: 'Formato de token inválido. O token deve iniciar com EAA...' } });
+        }
+
+        try {
+            const debugRes = await new Promise((resolve, reject) => {
+                https.get(`https://graph.facebook.com/v21.0/debug_token?input_token=${encodeURIComponent(token)}&access_token=${encodeURIComponent(token)}`, (apiRes) => {
+                    let data = '';
+                    apiRes.on('data', c => data += c);
+                    apiRes.on('end', () => {
+                        try { resolve(JSON.parse(data)); } catch(e) { resolve({ error: { message: 'Resposta inválida da Meta' } }); }
+                    });
+                }).on('error', err => reject(err));
+            });
+
+            if (debugRes.data && debugRes.data.is_valid) {
+                return res.status(200).json({
+                    success: true,
+                    valid: true,
+                    app: debugRes.data.application,
+                    scopes: debugRes.data.scopes,
+                    expires_at: debugRes.data.expires_at
+                });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    error: debugRes.error || { message: 'Token inválido ou expirado pela Meta.' }
+                });
+            }
+        } catch (tokErr) {
+            return res.status(500).json({ error: { message: tokErr.message } });
+        }
+    }
+
     // Validação de Sessão ou Token no Header
     const cookies = (req.headers.cookie || '').split(';').reduce((acc, cookie) => {
         const [k, v] = cookie.trim().split('=');
