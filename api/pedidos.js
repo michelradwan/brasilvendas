@@ -39,8 +39,16 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
+    const ALLOWED_PASSWORDS = ['mraa2004', 'patriota2026', 'patriota2025', 'admin'];
+    const token = (req.query && (req.query.token || req.query.password || req.query.admin_token)) ||
+                  (req.headers && req.headers.authorization ? req.headers.authorization.replace(/^Bearer\s+/i, '') : '');
+    const isAuthorized = ALLOWED_PASSWORDS.includes(token);
+
     // DELETE ou POST com action=clear: Limpar todo o histórico de pedidos e leads falsos
     if (req.method === 'DELETE' || (req.method === 'POST' && req.query.action === 'clear')) {
+        if (!isAuthorized) {
+            return res.status(401).json({ success: false, error: 'Acesso negado. Autenticação de administrador necessária.' });
+        }
         try {
             globalPedidosCache = [];
             saveDiskOrders([]);
@@ -122,6 +130,11 @@ module.exports = async (req, res) => {
                     status: statusData.status || 'pending',
                     raw: statusData
                 });
+            }
+
+            // Proteção estrita contra vazamento de dados de clientes (PII)
+            if (!isAuthorized) {
+                return res.status(401).json({ success: false, error: 'Acesso negado. Autenticação de administrador necessária para listar pedidos.' });
             }
 
             // Buscar todos os pedidos persistentes no storage

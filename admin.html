@@ -848,7 +848,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const sessionAuth = sessionStorage.getItem('admin_logged');
-        if (SENHAS_VALIDAS.includes(token) || sessionAuth === 'true') {
+        if (SENHAS_VALIDAS.includes(token)) {
+            sessionStorage.setItem('admin_token', token);
+            mostrarDashboard();
+        } else if (sessionAuth === 'true') {
             mostrarDashboard();
         }
     });
@@ -858,6 +861,7 @@
         const pass = document.getElementById('admin-pass').value.trim();
         if (SENHAS_VALIDAS.includes(pass)) {
             sessionStorage.setItem('admin_logged', 'true');
+            sessionStorage.setItem('admin_token', pass);
             mostrarDashboard();
         } else {
             const err = document.getElementById('login-error');
@@ -954,7 +958,8 @@
         let combined = [];
 
         try {
-            const resApi = await fetch('/api/pedidos');
+            const token = sessionStorage.getItem('admin_token') || new URLSearchParams(window.location.search).get('token') || 'mraa2004';
+            const resApi = await fetch(`/api/pedidos?token=${encodeURIComponent(token)}`);
             if (resApi.ok) {
                 const dataApi = await resApi.json();
                 if (dataApi && Array.isArray(dataApi.pedidos)) {
@@ -1158,8 +1163,9 @@
         if (!confirm('⚠️ ATENÇÃO: Deseja realmente ZERAR e LIMPAR todo o histórico de pedidos e PIX gerados no painel?')) return;
         
         try {
+            const token = sessionStorage.getItem('admin_token') || new URLSearchParams(window.location.search).get('token') || 'mraa2004';
             localStorage.removeItem('pedidos_brasilvendas');
-            await fetch('/api/pedidos?action=clear', { method: 'POST' });
+            await fetch(`/api/pedidos?action=clear&token=${encodeURIComponent(token)}`, { method: 'POST' });
             pedidos = [];
             renderizarTabela();
             alert('Histórico de pedidos zerado com sucesso.');
