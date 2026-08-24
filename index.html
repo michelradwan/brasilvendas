@@ -2110,8 +2110,7 @@
             const isExpress = (selectedShipping === 'express');
             currentQuantity = Math.min(10, Math.max(1, currentQuantity));
             const shippingLabel = isExpress ? 'Full Express (3 dias úteis)' : 'Frete Grátis (Correios)';
-            const utms = capturarUTMs();
-
+            const attrCtx = getAttributionContext();
             const orderBumpsArray = Array.from(selectedBumps);
 
             isCreatingOrder = true;
@@ -2120,7 +2119,6 @@
                 btn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span class="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin"></span><span class="animate-pulse">Gerando seu PIX...</span></span>`;
             }
 
-            const attrCtx = getAttributionContext();
             const payload = {
                 paymentMethod: 'PIX',
                 customer: {
