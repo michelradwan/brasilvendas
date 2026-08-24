@@ -48,6 +48,11 @@ class MetaDataProvider {
                 'X-Admin-Auth': this.adminPassword
             };
 
+            const customToken = localStorage.getItem('meta_user_token');
+            if (customToken) {
+                headers['X-Meta-Token'] = customToken;
+            }
+
             if (method === 'GET') {
                 const q = new URLSearchParams({ endpoint, ...params }).toString();
                 const res = await fetch(`${this.proxyEndpoint}?${q}`, {
