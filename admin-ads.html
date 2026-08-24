@@ -14,8 +14,79 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Design System CSS Black & Red Apple-Grade -->
+    <!-- Design System CSS Black & Red Apple-Grade (Embedded + External Link) -->
     <link rel="stylesheet" href="assets/admin-ads.css?v=4.0">
+    <style>
+        :root {
+            --bg-main: #080808;
+            --bg-secondary: #0D0D0F;
+            --surface-1: #111114;
+            --surface-2: #161619;
+            --surface-3: #1C1C20;
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --border-active: rgba(255, 43, 43, 0.35);
+            --text-primary: #F5F5F7;
+            --text-secondary: #A1A1A6;
+            --text-tertiary: #6E6E73;
+            --accent-red: #FF2B2B;
+            --accent-red-hover: #FF4141;
+            --accent-red-pressed: #E61F1F;
+            --accent-red-muted: rgba(255, 43, 43, 0.10);
+            --accent-red-border: rgba(255, 43, 43, 0.25);
+            --status-active: #30D158;
+            --status-warning: #FF9F0A;
+            --status-error: #FF453A;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.6);
+            --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { background-color: var(--bg-main); color: var(--text-primary); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .panel { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-subtle); transition: all 180ms ease-out; }
+        .panel:hover { border-color: var(--border-hover); }
+        .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+        .sidebar.collapsed { width: 64px; }
+        .sidebar-group-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); padding: 0.75rem 0.85rem 0.35rem 0.85rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.85rem; border-radius: var(--radius-md); color: var(--text-secondary); font-size: 12.5px; font-weight: 500; cursor: pointer; position: relative; transition: all 140ms ease-out; }
+        .nav-item:hover { color: var(--text-primary); background: var(--surface-2); }
+        .nav-item.active { color: var(--text-primary); background: var(--surface-2); font-weight: 600; }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--accent-red); border-radius: 0 3px 3px 0; }
+        .topbar { height: 54px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; font-size: 12px; font-weight: 600; line-height: 1; border-radius: var(--radius-sm); padding: 0.5rem 0.85rem; cursor: pointer; border: 1px solid transparent; transition: all 140ms ease-out; white-space: nowrap; }
+        .btn-primary { background: var(--accent-red); color: #FFF; border-color: var(--accent-red); }
+        .btn-primary:hover { background: var(--accent-red-hover); }
+        .btn-secondary { background: var(--surface-2); color: var(--text-primary); border-color: var(--border-subtle); }
+        .btn-secondary:hover { background: var(--surface-3); border-color: var(--border-hover); }
+        .btn-danger { background: var(--accent-red-muted); color: var(--accent-red); border-color: var(--accent-red-border); }
+        .btn-danger:hover { background: var(--accent-red); color: #FFF; }
+        .btn-sm { padding: 0.35rem 0.6rem; font-size: 11px; }
+        .badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 10.5px; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); text-transform: uppercase; }
+        .badge-winner { background: var(--accent-red-muted); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
+        .badge-active { background: rgba(48, 209, 88, 0.1); color: var(--status-active); border: 1px solid rgba(48, 209, 88, 0.25); }
+        .badge-paused { background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
+        .badge-warning { background: rgba(255, 159, 10, 0.1); color: var(--status-warning); border: 1px solid rgba(255, 159, 10, 0.25); }
+        .badge-error { background: rgba(255, 69, 58, 0.1); color: var(--status-error); border: 1px solid rgba(255, 69, 58, 0.25); }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .status-dot-active { background: var(--status-active); box-shadow: 0 0 6px rgba(48, 209, 88, 0.6); }
+        .status-dot-paused { background: var(--text-tertiary); }
+        .segmented-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 11.5px; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 140ms ease-out; }
+        .segmented-btn.active { background: var(--surface-2); color: var(--text-primary); font-weight: 600; }
+        .data-table-container { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        .data-table th { background: var(--bg-secondary); color: var(--text-tertiary); font-size: 10.5px; font-weight: 700; text-transform: uppercase; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-subtle); }
+        .data-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+        .data-table tbody tr:hover td { background: var(--surface-2); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { background: var(--surface-1); border: 1px solid var(--border-hover); border-radius: var(--radius-xl); box-shadow: var(--shadow-modal); width: 100%; max-height: 90vh; overflow-y: auto; }
+        .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 480px; background: var(--surface-1); border-left: 1px solid var(--border-subtle); box-shadow: -12px 0 36px rgba(0, 0, 0, 0.8); z-index: 1000; transform: translateX(100%); transition: transform 220ms ease-out; }
+        .drawer.open { transform: translateX(0); }
+    </style>
 </head>
 
 <body class="bg-[#080808] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2B2B] selection:text-white">
