@@ -2318,6 +2318,38 @@
                 }
             }
         }
+
+        // Monitor de Visitantes em Tempo Real (Heartbeat 10s)
+        (function initVisitorHeartbeat() {
+            function sendPing(etapa = 'Visualizando Página') {
+                try {
+                    const attr = JSON.parse(sessionStorage.getItem('brasilvendas_attr') || '{}');
+                    const payload = {
+                        visit_id: sessionStorage.getItem('bv_visit_id') || ('v_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7)),
+                        etapa: etapa,
+                        origem: (attr.last_touch && attr.last_touch.utm_source) ? 'Meta Ads' : 'Direto',
+                        campanha: (attr.last_touch && attr.last_touch.utm_campaign) ? attr.last_touch.utm_campaign : 'Direto'
+                    };
+                    sessionStorage.setItem('bv_visit_id', payload.visit_id);
+                    
+                    const proxyBase = (window.location.protocol === 'file:') ? 'https://brasilvendas.vercel.app' : '';
+                    if (navigator.sendBeacon) {
+                        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                        navigator.sendBeacon(`${proxyBase}/api/visitantes`, blob);
+                    } else {
+                        fetch(`${proxyBase}/api/visitantes`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
+                            keepalive: true
+                        }).catch(() => {});
+                    }
+                } catch(e) {}
+            }
+
+            sendPing('Visualizando Página');
+            setInterval(() => sendPing('Visualizando Página'), 10000);
+        })();
     </script>
 </body>
 </html>
