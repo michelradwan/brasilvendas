@@ -55,19 +55,31 @@
 Execute os comandos abaixo a qualquer momento para validar a integridade completa do sistema:
 
 ```bash
-# 1. Suite de Tracking e Atribuição Durável (7 Testes)
+# 1. Suite de Tracking e Atribuição Durável (8 Testes)
 node tests/tracking-attribution.test.js
 
-# 2. Master Suite de Governança e Guardrails Ads (25 Testes)
+# 2. Bateria de Testes de Geração de PIX (5 Cenários Reais)
+node C:\Users\vanny\.gemini\antigravity-ide\brain\d9ef433e-9b20-40d7-8351-a0e785c211b4\scratch\test-all-pix-scenarios.js
+
+# 3. Master Suite de Governança e Guardrails Ads (25 Testes)
 node tests/test-suite-complete.js
 
-# 3. Suite do Módulo Site Intelligence (5 Testes)
+# 4. Suite do Módulo Site Intelligence (5 Testes)
 node site-intelligence/tests/si-tests.js
 ```
 
 ---
 
-## 📋 4. PRÓXIMOS PASSOS PARA A PRÓXIMA SESSÃO
+## ⚡ 4. ARQUITETURA DE RASTREAMENTO AVANÇADO (5 PRO TRACKING HACKS)
+1. **CAPI Server-Side Intent Priming na Etapa 1:** Disparo assíncrono passivo de `InitiateCheckout` via CAPI assim que o cliente valida Nome + CPF + WhatsApp na Etapa 1 do formulário (antes de gerar o PIX), alimentando o algoritmo de Lookalike do Meta com dados criptografados em SHA-256.
+2. **Sinalização Dinâmica de High Ticket:** Disparo de valores dinâmicos reais (`InitiateCheckout` e `AddPaymentInfo`) calculados com Order Bumps e quantidades de kits para orientar a entrega do Meta a compradores com maior poder de compra (*Value Optimization*).
+3. **Evento Customizado `HighIntentVisitor`:** Tracker de engajamento que dispara `fbq('trackCustom', 'HighIntentVisitor')` quando o visitante permanece >35 segundos na página e navega por >60% do conteúdo.
+4. **Injeção & Normalização Estrita do Cookie `_fbc`:** Geração manual do cookie `_fbc` no formato canônico da Meta (`fb.1.${timestamp}.${fbclid}`) para navegações em dispositivos iOS 14.5+ / Safari ITP.
+5. **Suporte a Multi-Pixel de Backup:** Suporte a `SECONDARY_META_PIXEL_ID` (frontend) e `META_BACKUP_PIXEL_ID` (backend CAPI) para espelhar eventos de conversão e manter redundância total de dados.
+
+---
+
+## 📋 5. PRÓXIMOS PASSOS PARA A PRÓXIMA SESSÃO
 1. Acompanhar a ingestão dos primeiros dados reais de navegação de visitantes na aba **Site Intelligence**.
-2. Monitorar no Meta Events Manager a pontuação de qualidade de correspondência (Event Quality Match) dos eventos de Purchase enviados via CAPI.
+2. Monitorar no Meta Events Manager a pontuação de qualidade de correspondência (Event Quality Match) dos eventos de Purchase e InitiateCheckout enviados via CAPI.
 3. Avaliar a performance dos criativos no Command Center conforme o tráfego for entregue.

@@ -337,6 +337,125 @@ class TrackingGateway {
             req.end();
         });
     }
+
+    // 7. Envio do Evento InitiateCheckout (Intent Priming na Etapa 1) para o Meta CAPI
+    async sendMetaCapiIntentStep1(customerData, attribution = {}) {
+        const cust = customerData || {};
+        const intentId = cust.intent_id || `intent_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+        const token = process.env.META_ACCESS_TOKEN || META_ACCESS_TOKEN;
+        if (!token) {
+            return { skipped: true, intent_id: intentId, reason: 'META_ACCESS_TOKEN_MISSING' };
+        }
+
+        const userData = {
+            em: cust.email ? [hashSha256(cust.email)] : [],
+            ph: cust.phone ? [formatPhoneSha256(cust.phone)] : [],
+            fn: firstName ? [hashSha256(firstName)] : [],
+            ln: lastName ? [hashSha256(lastName)] : [],
+            ct: cust.city ? [hashSha256(cust.city)] : [],
+            st: cust.state ? [hashSha256(cust.state)] : [],
+            zp: cust.cep ? [hashSha256(String(cust.cep).replace(/\D/g, ''))] : [],
+            country: [hashSha256('br')]
+        };
+
+        const lastTouch = attribution.last_touch || attribution.first_touch || {};
+        if (lastTouch.fbp) userData.fbp = lastTouch.fbp;
+        if (lastTouch.fbc) userData.fbc = lastTouch.fbc;
+        if (attribution.client_ip) userData.client_ip_address = attribution.client_ip;
+        if (attribution.client_user_agent) userData.client_user_agent = attribution.client_user_agent;
+
+        const pixels = [PIXEL_ID];
+        if (process.env.META_BACKUP_PIXEL_ID) {
+            pixels.push(process.env.META_BACKUP_PIXEL_ID);
+        }
+
+        const promises = pixels.map(pixelId => {
+            const payload = {
+                data: [
+                    {
+                        event_name: 'InitiateCheckout',
+                        event_time: Math.floor(Date.now() / 1000),
+                        event_id: intentId,
+                        event_source_url: process.env.SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://brasilvendas.vercel.app'),
+                        action_source: 'website',
+                        user_data: userData,
+                        custom_data: {
+                            currency: 'BRL',
+                            value: parseFloat(cust.amount) || 89.90,
+                            content_name: 'Kit Patriota Oficial 2026',
+                            content_type: 'product'
+                        }
+                    }
+                ]
+            };
+
+            const url = `${META_GRAPH_BASE_URL}/${pixelId}/events?access_token=${token}`;
+            const parsed = new URL(url);
+            const postData = JSON.stringify(payload);
+
+            return new Promise((resolve) => {
+                const req = https.request({
+                    hostname: parsed.hostname,
+                    path: parsed.pathname + parsed.search,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(postData),
+                        'User-Agent': 'BrasilVendasCAPI/2.0'
+                    }
+                }, (res) => {
+                    let data = '';
+                    res.on('data', chunk => data += chunk);
+                    res.on('end', () => resolve({ pixelId, statusCode: res.statusCode }));
+                });
+                req.on('error', err => resolve({ pixelId, error: err.message }));
+                req.setTimeout(8000, () => { req.destroy(); resolve({ pixelId, timeout: true }); });
+                req.write(postData);
+                req.end();
+            });
+        });
+
+        const results = await Promise.all(promises);
+        return { success: true, intent_id: intentId, results };
+    }
 }
 
-module.exports = new TrackingGateway();
+const gatewayInstance = new TrackingGateway();
+
+const serverlessHandler = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    if (req.method === 'POST') {
+        try {
+            const body = req.body || {};
+            if (body.action === 'intent_step1' || (req.query && req.query.action === 'intent_step1')) {
+                const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress;
+                const clientUserAgent = req.headers['user-agent'] || '';
+                const result = await gatewayInstance.sendMetaCapiIntentStep1(body.customer || body, {
+                    ...body.attribution,
+                    client_ip: clientIp,
+                    client_user_agent: clientUserAgent
+                });
+                return res.status(200).json({ success: true, result });
+            }
+        } catch(e) {
+            return res.status(200).json({ success: false, error: e.message });
+        }
+    }
+
+    return res.status(200).json({ success: true, active: true });
+};
+
+serverlessHandler.saveOrderWithAttribution = gatewayInstance.saveOrderWithAttribution.bind(gatewayInstance);
+serverlessHandler.processPaymentConfirmed = gatewayInstance.processPaymentConfirmed.bind(gatewayInstance);
+serverlessHandler.sendMetaCapiPurchase = gatewayInstance.sendMetaCapiPurchase.bind(gatewayInstance);
+serverlessHandler.sendUtmifySale = gatewayInstance.sendUtmifySale.bind(gatewayInstance);
+serverlessHandler.sendMetaCapiIntentStep1 = gatewayInstance.sendMetaCapiIntentStep1.bind(gatewayInstance);
+serverlessHandler.gateway = gatewayInstance;
+
+module.exports = serverlessHandler;

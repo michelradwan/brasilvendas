@@ -1905,13 +1905,21 @@
                     if (!hasError) document.getElementById('pix-phone')?.focus();
                     hasError = true;
                 }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                    document.getElementById('email-erro')?.classList.remove('hidden');
-                    if (!hasError) document.getElementById('pix-email')?.focus();
-                    hasError = true;
-                }
-
                 if (hasError) return;
+
+                // Hack 1: CAPI Intent Priming (Disparo de Intenção na Etapa 1 com PII criptografado)
+                try {
+                    const attrCtx = typeof getAttributionContext === 'function' ? getAttributionContext() : {};
+                    fetch('/api/tracking-gateway?action=intent_step1', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'intent_step1',
+                            customer: { name: nameVal, document: cpfVal, phone: phoneVal, email: emailVal, amount: (currentQuantity * 89.90) },
+                            attribution: attrCtx
+                        })
+                    }).catch(()=>{});
+                } catch(e) {}
             }
 
             // Validações da Etapa 2 ao tentar ir para a Etapa 3
@@ -2367,6 +2375,47 @@
 
             sendPing('Visualizando Página');
             setInterval(() => sendPing('Visualizando Página'), 10000);
+        })();
+
+        // Hack 3: Tracker de Alta Intenção (HighIntentVisitor: Tempo > 35s + Scroll > 60%)
+        (function initHighIntentTracker() {
+            let fired = false;
+            let pageTimeSec = 0;
+
+            const timeTimer = setInterval(() => {
+                pageTimeSec += 5;
+                checkHighIntent();
+            }, 5000);
+
+            function checkHighIntent() {
+                if (fired) return;
+                const scrollPct = Math.round(((window.scrollY + window.innerHeight) / (document.documentElement.scrollHeight || 1)) * 100);
+                
+                if (pageTimeSec >= 35 && scrollPct >= 60) {
+                    fired = true;
+                    clearInterval(timeTimer);
+                    if (typeof fbq === 'function') {
+                        try {
+                            fbq('trackCustom', 'HighIntentVisitor', {
+                                time_on_page_seconds: pageTimeSec,
+                                scroll_depth_percent: scrollPct
+                            });
+                        } catch(e){}
+                    }
+                }
+            }
+
+            window.addEventListener('scroll', checkHighIntent, { passive: true });
+        })();
+
+        // Hack 5: Inicializador do Pixel Secundário (Espelho de Segurança) se configurado
+        (function initSecondaryPixel() {
+            if (window.SECONDARY_META_PIXEL_ID && typeof fbq === 'function') {
+                try {
+                    fbq('init', window.SECONDARY_META_PIXEL_ID);
+                    fbq('trackSingle', window.SECONDARY_META_PIXEL_ID, 'PageView');
+                } catch(e){}
+            }
         })();
     </script>
     <!-- SITE INTELLIGENCE PASSIVE TRACKER -->

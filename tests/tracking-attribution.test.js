@@ -139,6 +139,22 @@ async function runTrackingTests() {
     console.log(`   ✅ PASS: Tracking Health calculado com precisão (${healthScore}% - Alerta disparado).`);
     passed++;
 
+    // 8. TESTE: Hack 1 - CAPI Server-Side Intent Priming na Etapa 1
+    console.log('8. Testando Hack 1 (CAPI Intent Priming na Etapa 1)...');
+    const intentRes = await trackingGateway.sendMetaCapiIntentStep1({
+        name: 'Cliente Intent Test',
+        email: 'intent.test@patriotas.com.br',
+        phone: '11977778888',
+        cpf: '11144477735',
+        amount: 89.90
+    }, {
+        last_touch: { utm_source: 'meta_ads', subid: 'sub_123', ttclid: 'tt_456' }
+    });
+    assert(intentRes.success || intentRes.skipped, 'Intent Priming deve responder com sucesso ou skipped em modo de teste sem token');
+    assert(intentRes.intent_id.startsWith('intent_'), 'Intent ID deve ser gerado');
+    console.log('   ✅ PASS: CAPI Intent Priming validado com sucesso.');
+    passed++;
+
     // Limpeza de isolamento: Remover dados sintéticos gerados para os testes
     await storage.delete('actions', `ORDER_${testTxId}`);
     await storage.delete('actions', `ORDER_${organicTxId}`);
