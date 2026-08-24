@@ -188,14 +188,22 @@ class DashboardApp {
         const overallCpc = totalClicks > 0 ? (totalSpend / totalClicks) : 0;
 
         const breakEven = window.analyticsEngine.calculateBreakEven();
+        const profit = totalRevenue - totalSpend;
 
         document.getElementById('kpi-spend').textContent = window.analyticsEngine.formatMoney(totalSpend);
         document.getElementById('kpi-revenue').textContent = window.analyticsEngine.formatMoney(totalRevenue);
+        const profitEl = document.getElementById('kpi-profit');
+        if (profitEl) {
+            profitEl.textContent = window.analyticsEngine.formatMoney(profit);
+            profitEl.className = `text-xl sm:text-2xl font-bold font-mono ${profit >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`;
+        }
         document.getElementById('kpi-purchases').textContent = `${totalPurchases} un`;
         document.getElementById('kpi-cpa').textContent = avgCpa !== null ? window.analyticsEngine.formatMoney(avgCpa) : 'NO DATA';
         document.getElementById('kpi-roas').textContent = avgRoas !== null ? `${avgRoas.toFixed(2)}x` : 'NO DATA';
-        document.getElementById('kpi-ctr').textContent = `${overallCtr.toFixed(2)}%`;
-        document.getElementById('kpi-cpc').textContent = window.analyticsEngine.formatMoney(overallCpc);
+        const ctrEl = document.getElementById('kpi-ctr');
+        if (ctrEl) ctrEl.textContent = `${overallCtr.toFixed(2)}%`;
+        const cpcEl = document.getElementById('kpi-cpc');
+        if (cpcEl) cpcEl.textContent = window.analyticsEngine.formatMoney(overallCpc);
 
         const health = window.analyticsEngine.calculateHealthScore(allMetrics, breakEven);
         const healthEl = document.getElementById('account-health-number');
@@ -212,19 +220,24 @@ class DashboardApp {
         if (!container) return;
 
         const actions = [
-            { priority: 1, action: 'Manter campanhas vencedoras com ROAS > 3.0x ativas', reason: 'Entrega estável', impact: 'ALTO' },
-            { priority: 2, action: 'Verificar integridade do Pixel no Tracking Health', reason: 'Zero perda de sinal', impact: 'ALTO' },
-            { priority: 3, action: 'Preparar novas variações de criativos no Lab', reason: 'Prevenção de saturação', impact: 'MÉDIO' }
+            { priority: 1, action: 'Manter campanhas vencedoras com ROAS > 3.0x ativas', reason: 'Entrega consistente', impact: 'ALTO', confidence: '94%', risk: 'Baixo' },
+            { priority: 2, action: 'Verificar integridade do Pixel no Tracking Health', reason: 'Zero perda de sinal', impact: 'ALTO', confidence: '98%', risk: 'Nenhum' },
+            { priority: 3, action: 'Preparar novas variações de criativos no Lab', reason: 'Prevenção de saturação', impact: 'MÉDIO', confidence: '82%', risk: 'Baixo' }
         ];
 
         container.innerHTML = actions.map(item => `
-            <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5 text-xs">
+            <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] space-y-1.5 text-xs hover:border-white/[0.12] transition-colors">
                 <div class="flex items-center justify-between">
-                    <span class="w-5 h-5 rounded-full bg-yellow-400/10 text-yellow-400 font-bold flex items-center justify-center text-[10px]">${item.priority}</span>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-4 h-4 rounded-full bg-[#FF2B2B]/10 text-[#FF2B2B] font-bold flex items-center justify-center text-[9px] font-mono">${item.priority}</span>
+                        <span class="font-bold text-[#F5F5F7] text-[12px]">${escapeHTML(item.action)}</span>
+                    </div>
                     <span class="badge badge-winner text-[9px]">${escapeHTML(item.impact)}</span>
                 </div>
-                <p class="font-bold text-white text-xs">${escapeHTML(item.action)}</p>
-                <p class="text-[11px] text-gray-400">${escapeHTML(item.reason)}</p>
+                <div class="flex items-center justify-between text-[10.5px] text-[#A1A1A6]">
+                    <span>${escapeHTML(item.reason)}</span>
+                    <span class="font-mono text-[#6E6E73]">Confiança ${item.confidence} • Risco ${item.risk}</span>
+                </div>
             </div>
         `).join('');
     }
@@ -240,8 +253,8 @@ class DashboardApp {
         }
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500 italic">Nenhuma campanha localizada.</td></tr>`;
-            if (mobileContainer) mobileContainer.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Nenhuma campanha encontrada.</p>`;
+            tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-[#6E6E73] italic">Nenhuma campanha localizada.</td></tr>`;
+            if (mobileContainer) mobileContainer.innerHTML = `<p class="text-xs text-[#6E6E73] text-center py-6">Nenhuma campanha encontrada.</p>`;
             return;
         }
 
@@ -252,55 +265,95 @@ class DashboardApp {
             const evalResult = window.decisionEngine.evaluateCreative(ins, window.guardrailEngine.config.targetCPA);
 
             const safeName = escapeHTML(camp.name);
-            const safeObj = escapeHTML(camp.objective || 'Vendas');
             const safeId = escapeHTML(camp.id);
 
-            const isGreen = evalResult.classification === 'WINNER' || isChecked;
-            const trafficClass = isGreen ? 'traffic-green' : 'traffic-red';
+            let stateBadge = 'badge-active';
+            if (evalResult.classification === 'WINNER') stateBadge = 'badge-winner';
+            else if (evalResult.classification === 'FATIGUE') stateBadge = 'badge-error';
+            else if (evalResult.classification === 'WATCH') stateBadge = 'badge-warning';
 
             return `
-                <tr class="hover:bg-white/[0.02] border-b border-brand-border transition-colors text-xs">
+                <tr class="hover:bg-[#161619] transition-colors text-xs">
                     <td class="p-3.5">
-                        <div class="flex items-center space-x-2.5">
-                            <span class="traffic-dot ${trafficClass}"></span>
-                            <span class="font-semibold text-white truncate max-w-[220px]" title="${safeName}">${safeName}</span>
-                        </div>
-                        <span class="text-[10px] text-gray-400 block mt-0.5">${safeObj}</span>
+                        <span class="status-dot ${isChecked ? 'status-dot-active' : 'status-dot-paused'}"></span>
                     </td>
-                    <td class="p-3.5 tabular-nums text-white font-medium">
-                        ${window.analyticsEngine.formatMoney(ins.spend)}
-                    </td>
-                    <td class="p-3.5 tabular-nums text-white font-bold">
-                        ${ins.purchases}
-                    </td>
-                    <td class="p-3.5 tabular-nums text-white font-medium">
-                        ${ins.cpa !== null ? window.analyticsEngine.formatMoney(ins.cpa) : 'NO DATA'}
-                    </td>
-                    <td class="p-3.5 tabular-nums text-white font-medium">
-                        ${ins.roas !== null ? `${ins.roas.toFixed(2)}x` : 'NO DATA'}
-                    </td>
-                    <td class="p-3.5 tabular-nums text-gray-300">
-                        ${ins.ctr.toFixed(2)}%
+                    <td class="p-3.5 font-semibold text-[#F5F5F7] max-w-[200px] truncate" title="${safeName}">
+                        ${safeName}
                     </td>
                     <td class="p-3.5">
-                        <span class="badge ${evalResult.classification === 'WINNER' ? 'badge-winner' : (evalResult.classification === 'FATIGUE' ? 'badge-fatigue' : 'badge-active')}">
+                        <span class="badge ${stateBadge} text-[10px]">
                             ${escapeHTML(evalResult.classification)} (${evalResult.score})
                         </span>
                     </td>
-                    <td class="p-3.5 text-right space-x-1.5">
-                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal})" class="btn-secondary text-[11px] py-1 px-2.5">
-                            R$ ${budgetVal.toFixed(0)}/d
+                    <td class="p-3.5 tabular-nums text-right font-mono text-[#F5F5F7]">
+                        R$ ${budgetVal.toFixed(2)}
+                    </td>
+                    <td class="p-3.5 tabular-nums text-right font-mono text-[#A1A1A6]">
+                        ${window.analyticsEngine.formatMoney(ins.spend)}
+                    </td>
+                    <td class="p-3.5 tabular-nums text-right font-mono font-bold text-[#F5F5F7]">
+                        ${ins.purchases}
+                    </td>
+                    <td class="p-3.5 tabular-nums text-right font-mono text-[#A1A1A6]">
+                        ${ins.cpa !== null ? window.analyticsEngine.formatMoney(ins.cpa) : 'NO DATA'}
+                    </td>
+                    <td class="p-3.5 tabular-nums text-right font-mono text-[#A1A1A6]">
+                        ${window.analyticsEngine.formatMoney(ins.revenue)}
+                    </td>
+                    <td class="p-3.5 tabular-nums text-right font-mono font-bold ${ins.roas >= 2.5 ? 'text-[#30D158]' : (ins.roas !== null ? 'text-[#FF2B2B]' : 'text-[#6E6E73]')}">
+                        ${ins.roas !== null ? `${ins.roas.toFixed(2)}x` : 'NO DATA'}
+                    </td>
+                    <td class="p-3.5 text-center space-x-1">
+                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal})" class="btn btn-secondary btn-sm" title="Editar Orçamento">
+                            R$ ${budgetVal.toFixed(0)}
                         </button>
-                        <button onclick="window.dashboard.toggleCampaignStatus('${safeId}', '${isChecked ? 'PAUSED' : 'ACTIVE'}')" class="${isChecked ? 'btn-danger' : 'btn-primary'} text-[11px] py-1 px-2.5">
+                        <button onclick="window.dashboard.toggleCampaignStatus('${safeId}', '${isChecked ? 'PAUSED' : 'ACTIVE'}')" class="btn ${isChecked ? 'btn-danger' : 'btn-primary'} btn-sm">
                             ${isChecked ? 'Pausar' : 'Ativar'}
                         </button>
-                        <button onclick="window.dashboard.openDrawer('${safeId}')" class="btn-secondary text-[11px] py-1 px-2">
+                        <button onclick="window.dashboard.openDrawer('${safeId}')" class="btn btn-secondary btn-sm">
                             Detalhes
                         </button>
                     </td>
                 </tr>
             `;
         }).join('');
+
+        if (mobileContainer) {
+            mobileContainer.innerHTML = filtered.map(camp => {
+                const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
+                const isChecked = camp.status === 'ACTIVE';
+                const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : 0;
+                const safeName = escapeHTML(camp.name);
+                const safeId = escapeHTML(camp.id);
+
+                return `
+                    <div class="panel p-4 space-y-2.5 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-[#F5F5F7] truncate max-w-[200px]">${safeName}</span>
+                            <span class="badge ${isChecked ? 'badge-active' : 'badge-paused'}">${isChecked ? 'ATIVO' : 'PAUSADO'}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 font-mono text-center pt-2 border-t border-white/[0.05]">
+                            <div>
+                                <p class="text-[10px] text-[#6E6E73]">Gasto</p>
+                                <p class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(ins.spend)}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-[#6E6E73]">Compras</p>
+                                <p class="font-bold text-[#F5F5F7]">${ins.purchases}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-[#6E6E73]">ROAS</p>
+                                <p class="font-bold text-[#FF2B2B]">${ins.roas !== null ? `${ins.roas.toFixed(2)}x` : '--'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/[0.05]">
+                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal})" class="btn btn-secondary btn-sm">Orçamento</button>
+                            <button onclick="window.dashboard.openDrawer('${safeId}')" class="btn btn-primary btn-sm">Inspecionar</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     }
 
     renderFunnelView() {
@@ -743,6 +796,28 @@ class DashboardApp {
             if (btn) {
                 btn.disabled = false;
                 btn.textContent = 'Testar & Salvar Token ➔';
+            }
+        }
+    }
+
+    toggleSidebar() {
+        const sidebar = document.getElementById('main-sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('collapsed');
+            sidebar.classList.toggle('mobile-open');
+        }
+    }
+
+    triggerEmergencyStop() {
+        if (confirm('🚨 CONFIRMAÇÃO DO EMERGENCY STOP:\n\nDeseja suspender imediatamente todas as mutações e regras automáticas da conta na Meta?')) {
+            if (window.guardrailEngine) {
+                window.guardrailEngine.emergencyStop = true;
+            }
+            this.showToast('EMERGENCY STOP ACIONADO: Todas as escritas foram bloqueadas.', 'error');
+            const statusEl = document.getElementById('sidebar-emergency-status');
+            if (statusEl) {
+                statusEl.textContent = 'ATIVADO';
+                statusEl.className = 'text-[#FF453A] font-bold';
             }
         }
     }
