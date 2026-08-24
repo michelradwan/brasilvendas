@@ -4,46 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meta Ads Command Center — Institutional Performance Operations</title>
+    <title>Meta Ads Command Center — Institutional Decision OS</title>
 
     <!-- Google Fonts Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Design System CSS Black & Red Apple-Grade (Embedded + External Link) -->
-    <link rel="stylesheet" href="assets/admin-ads.css?v=4.0">
+    <!-- Design System CSS Black & Red Surreal Apple-Grade (External + Embedded) -->
+    <link rel="stylesheet" href="assets/admin-ads.css?v=5.0">
     <style>
         :root {
-            --bg-main: #080808;
-            --bg-secondary: #0D0D0F;
-            --surface-1: #111114;
-            --surface-2: #161619;
-            --surface-3: #1C1C20;
+            --bg-main: #050506;
+            --bg-secondary: #0A0A0C;
+            --surface-1: #101014;
+            --surface-elevated: #15151A;
+            --surface-subtle: #0E0E12;
             --border-subtle: rgba(255, 255, 255, 0.07);
             --border-hover: rgba(255, 255, 255, 0.12);
-            --border-active: rgba(255, 43, 43, 0.35);
             --text-primary: #F5F5F7;
             --text-secondary: #A1A1A6;
             --text-tertiary: #6E6E73;
-            --accent-red: #FF2B2B;
-            --accent-red-hover: #FF4141;
-            --accent-red-pressed: #E61F1F;
-            --accent-red-muted: rgba(255, 43, 43, 0.10);
-            --accent-red-border: rgba(255, 43, 43, 0.25);
-            --status-active: #30D158;
-            --status-warning: #FF9F0A;
+            --accent-red: #FF2D2D;
+            --accent-red-hover: #FF3B3B;
+            --accent-red-muted: rgba(255, 45, 45, 0.10);
+            --accent-red-border: rgba(255, 45, 45, 0.25);
+            --status-success: #1FC16B;
+            --status-warning: #F5A524;
             --status-error: #FF453A;
-            --radius-sm: 6px;
+            --status-info: #5DA9FF;
+            --radius-sm: 8px;
             --radius-md: 10px;
-            --radius-lg: 12px;
+            --radius-lg: 14px;
             --radius-xl: 16px;
-            --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.5);
-            --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.6);
-            --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
+            --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.6);
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+            --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.9);
         }
         *, *::before, *::after { box-sizing: border-box; }
         body { background-color: var(--bg-main); color: var(--text-primary); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -54,71 +53,83 @@
         .sidebar.collapsed { width: 64px; }
         .sidebar-group-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); padding: 0.75rem 0.85rem 0.35rem 0.85rem; }
         .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.85rem; border-radius: var(--radius-md); color: var(--text-secondary); font-size: 12.5px; font-weight: 500; cursor: pointer; position: relative; transition: all 140ms ease-out; }
-        .nav-item:hover { color: var(--text-primary); background: var(--surface-2); }
-        .nav-item.active { color: var(--text-primary); background: var(--surface-2); font-weight: 600; }
+        .nav-item:hover { color: var(--text-primary); background: var(--surface-elevated); }
+        .nav-item.active { color: var(--text-primary); background: var(--surface-elevated); font-weight: 600; }
         .nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--accent-red); border-radius: 0 3px 3px 0; }
-        .topbar { height: 54px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
+        .status-strip { height: 48px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; font-size: 12px; font-weight: 600; line-height: 1; border-radius: var(--radius-sm); padding: 0.5rem 0.85rem; cursor: pointer; border: 1px solid transparent; transition: all 140ms ease-out; white-space: nowrap; }
         .btn-primary { background: var(--accent-red); color: #FFF; border-color: var(--accent-red); }
         .btn-primary:hover { background: var(--accent-red-hover); }
-        .btn-secondary { background: var(--surface-2); color: var(--text-primary); border-color: var(--border-subtle); }
-        .btn-secondary:hover { background: var(--surface-3); border-color: var(--border-hover); }
+        .btn-secondary { background: var(--surface-elevated); color: var(--text-primary); border-color: var(--border-subtle); }
+        .btn-secondary:hover { background: #1C1C22; border-color: var(--border-hover); }
         .btn-danger { background: var(--accent-red-muted); color: var(--accent-red); border-color: var(--accent-red-border); }
         .btn-danger:hover { background: var(--accent-red); color: #FFF; }
-        .btn-sm { padding: 0.35rem 0.6rem; font-size: 11px; }
-        .badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 10.5px; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); text-transform: uppercase; }
+        .btn-sm { padding: 0.35rem 0.65rem; font-size: 11px; }
+        .badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 10.5px; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
         .badge-winner { background: var(--accent-red-muted); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
-        .badge-active { background: rgba(48, 209, 88, 0.1); color: var(--status-active); border: 1px solid rgba(48, 209, 88, 0.25); }
+        .badge-active { background: rgba(31, 193, 107, 0.1); color: var(--status-success); border: 1px solid rgba(31, 193, 107, 0.25); }
         .badge-paused { background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
-        .badge-warning { background: rgba(255, 159, 10, 0.1); color: var(--status-warning); border: 1px solid rgba(255, 159, 10, 0.25); }
+        .badge-warning { background: rgba(245, 165, 36, 0.1); color: var(--status-warning); border: 1px solid rgba(245, 165, 36, 0.25); }
         .badge-error { background: rgba(255, 69, 58, 0.1); color: var(--status-error); border: 1px solid rgba(255, 69, 58, 0.25); }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-        .status-dot-active { background: var(--status-active); box-shadow: 0 0 6px rgba(48, 209, 88, 0.6); }
+        .status-dot-active { background: var(--status-success); box-shadow: 0 0 6px rgba(31, 193, 107, 0.6); }
         .status-dot-paused { background: var(--text-tertiary); }
-        .segmented-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 11.5px; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 140ms ease-out; }
-        .segmented-btn.active { background: var(--surface-2); color: var(--text-primary); font-weight: 600; }
+        .snapshot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--border-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+        .snapshot-cell { background: var(--surface-1); padding: 1.15rem 1.25rem; transition: background-color 140ms ease-out; }
+        .snapshot-cell:hover { background: var(--surface-elevated); }
+        .cause-map-node { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.65rem; border-radius: var(--radius-sm); font-size: 11.5px; font-weight: 600; background: var(--surface-1); border: 1px solid var(--border-subtle); }
         .data-table-container { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
         .data-table th { background: var(--bg-secondary); color: var(--text-tertiary); font-size: 10.5px; font-weight: 700; text-transform: uppercase; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-subtle); }
         .data-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
-        .data-table tbody tr:hover td { background: var(--surface-2); }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .data-table tbody tr:hover td { background: var(--surface-elevated); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
         .modal-content { background: var(--surface-1); border: 1px solid var(--border-hover); border-radius: var(--radius-xl); box-shadow: var(--shadow-modal); width: 100%; max-height: 90vh; overflow-y: auto; }
-        .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 480px; background: var(--surface-1); border-left: 1px solid var(--border-subtle); box-shadow: -12px 0 36px rgba(0, 0, 0, 0.8); z-index: 1000; transform: translateX(100%); transition: transform 220ms ease-out; }
+        .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 500px; background: var(--surface-1); border-left: 1px solid var(--border-subtle); box-shadow: -16px 0 48px rgba(0, 0, 0, 0.85); z-index: 1000; transform: translateX(100%); transition: transform 220ms ease-out; }
         .drawer.open { transform: translateX(0); }
     </style>
 </head>
 
-<body class="bg-[#080808] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2B2B] selection:text-white">
+<body class="bg-[#050506] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2D2D] selection:text-white">
 
-    <!-- TOPBAR INSTITUCIONAL -->
-    <header class="topbar sticky top-0 z-40 flex items-center justify-between border-b border-white/[0.07] bg-[#0D0D0F] px-4 py-2.5">
+    <!-- CAMADA 1: STATUS STRIP OPERACIONAL (TOPBAR) -->
+    <header class="status-strip sticky top-0 z-40 flex items-center justify-between border-b border-white/[0.07] bg-[#0A0A0C] px-4 py-2">
         <div class="flex items-center space-x-3 sm:space-x-4 min-w-0">
             <button onclick="window.dashboard.toggleSidebar()" class="btn-icon md:hidden text-gray-400 hover:text-white" title="Menu">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
 
-            <!-- Brand / Account Identity -->
+            <!-- Brand & Account Identity -->
             <div class="flex items-center space-x-2.5">
-                <div class="w-7 h-7 rounded-lg bg-[#FF2B2B]/10 border border-[#FF2B2B]/30 text-[#FF2B2B] flex items-center justify-center font-black text-xs">
+                <div class="w-7 h-7 rounded-lg bg-[#FF2D2D]/10 border border-[#FF2D2D]/30 text-[#FF2D2D] flex items-center justify-center font-black text-xs font-mono">
                     ⌘
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-center space-x-2">
-                        <span id="topbar-account-name" class="font-bold text-xs sm:text-sm text-[#F5F5F7] truncate max-w-[140px] sm:max-w-[200px]">Brasil Vendas</span>
-                        <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#30D158] bg-[#30D158]/10 px-2 py-0.5 rounded border border-[#30D158]/20">
+                        <span id="topbar-account-name" class="font-bold text-xs sm:text-sm text-[#F5F5F7] truncate max-w-[130px] sm:max-w-[180px]">Brasil Vendas</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#1FC16B] bg-[#1FC16B]/10 px-2 py-0.5 rounded border border-[#1FC16B]/20">
                             <span class="status-dot status-dot-active"></span> Connected
                         </span>
                     </div>
-                    <p class="text-[10.5px] text-[#A1A1A6] font-mono truncate hidden sm:block">
+                    <p class="text-[10px] text-[#A1A1A6] font-mono truncate hidden sm:block">
                         <span id="topbar-account-id">act_846780837970771</span> • <span id="topbar-currency">BRL</span> • <span id="topbar-timezone">America/Sao_Paulo</span>
                     </p>
                 </div>
             </div>
+
+            <!-- Multi-Offer Selector (Preparado para Escala Multi-Oferta) -->
+            <div class="hidden xl:flex items-center space-x-1.5 pl-3 border-l border-white/[0.07]">
+                <span class="text-[10px] uppercase font-bold text-[#6E6E73]">Oferta:</span>
+                <select id="offer-selector" onchange="window.dashboard.changeOffer(this.value)" class="bg-[#101014] border border-white/[0.08] text-[#F5F5F7] text-xs rounded-md px-2 py-1 focus:outline-none focus:border-[#FF2D2D]">
+                    <option value="all">Todas as Ofertas</option>
+                    <option value="kit_patriota" selected>Kit Patriota Oficial 2026</option>
+                    <option value="new_offer">+ Nova Oferta (Multi-Offer)</option>
+                </select>
+            </div>
         </div>
 
         <!-- Central Date Range Selector -->
-        <div class="hidden lg:flex items-center space-x-1 bg-[#111114] border border-white/[0.07] p-1 rounded-lg text-xs">
+        <div class="hidden lg:flex items-center space-x-1 bg-[#101014] border border-white/[0.07] p-0.5 rounded-lg text-xs">
             <button data-date-preset="today" class="segmented-btn active px-3 py-1 text-xs">Hoje</button>
             <button data-date-preset="yesterday" class="segmented-btn px-3 py-1 text-xs">Ontem</button>
             <button data-date-preset="last_3d" class="segmented-btn px-3 py-1 text-xs">3 Dias</button>
@@ -126,10 +137,10 @@
             <button data-date-preset="last_30d" class="segmented-btn px-3 py-1 text-xs">30 Dias</button>
         </div>
 
-        <!-- Actions & Controls -->
+        <!-- Command Bar Actions -->
         <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
             <button onclick="window.dashboard.openTokenModal()" class="btn btn-secondary btn-sm flex items-center gap-1.5" title="Trocar Credencial Meta">
-                <span class="text-[#FF2B2B]">🔑</span>
+                <span class="text-[#FF2D2D]">🔑</span>
                 <span class="hidden sm:inline">Trocar Token</span>
             </button>
             <button onclick="window.dashboard.runWarRoomAudit()" class="btn btn-danger btn-sm hidden md:inline-flex">
@@ -151,18 +162,18 @@
     </header>
 
     <!-- CORPO PRINCIPAL: SIDEBAR + WORKSPACE -->
-    <div class="flex-1 flex max-w-[1720px] w-full mx-auto">
+    <div class="flex-1 flex max-w-[1780px] w-full mx-auto">
 
-        <!-- SIDEBAR DE NAVEGAÇÃO INSTITUCIONAL -->
+        <!-- SIDEBAR DE NAVEGAÇÃO REFINADÍSSIMA -->
         <aside id="main-sidebar" class="sidebar p-3 space-y-4">
             <div class="space-y-3">
-                <!-- Grupo ANALYTICS -->
+                <!-- Grupo PERFORMANCE -->
                 <div>
-                    <p class="sidebar-group-title">ANALYTICS</p>
+                    <p class="sidebar-group-title">PERFORMANCE</p>
                     <nav class="space-y-0.5">
                         <div class="nav-item active" data-nav-target="overview" title="Visão Geral">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <span>Visão Geral</span>
+                            <span>Overview</span>
                         </div>
                         <div class="nav-item" data-nav-target="campaigns" title="Campanhas">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
@@ -174,7 +185,7 @@
                         </div>
                         <div class="nav-item" data-nav-target="funnel" title="Funil">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            <span>Funil</span>
+                            <span>Funil de Conversão</span>
                         </div>
                     </nav>
                 </div>
@@ -183,38 +194,38 @@
                 <div>
                     <p class="sidebar-group-title">INTELLIGENCE</p>
                     <nav class="space-y-0.5">
-                        <div class="nav-item" data-nav-target="lab" title="Lab & Testes">
+                        <div class="nav-item" data-nav-target="aicoach" title="AI Coach">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span>AI Performance Coach</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="lab" title="Experiment Lab">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                             <span>Experiment Lab</span>
                         </div>
-                        <div class="nav-item" data-nav-target="aicoach" title="AI Coach">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span>AI Coach</span>
-                        </div>
                         <div class="nav-item" data-nav-target="warroom" title="War Room">
                             <svg class="w-4 h-4 text-[#FF453A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            <span class="text-[#FF453A]">War Room</span>
+                            <span class="text-[#FF453A] font-semibold">War Room</span>
                         </div>
                     </nav>
                 </div>
 
-                <!-- Grupo SYSTEM -->
+                <!-- Grupo OPERATIONS -->
                 <div>
-                    <p class="sidebar-group-title">SYSTEM</p>
+                    <p class="sidebar-group-title">OPERATIONS</p>
                     <nav class="space-y-0.5">
-                        <div class="nav-item" data-nav-target="autopilot" title="Autopilot">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                            <span>Autopilot</span>
-                        </div>
                         <div class="nav-item" data-nav-target="tracking" title="Tracking Health">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            <span>Tracking Health</span>
+                            <span>Tracking Glass Box</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="autopilot" title="Autopilot">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            <span>Autopilot & Safety</span>
                         </div>
                         <div class="nav-item" data-nav-target="gamification" title="Missões & XP">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                            <span>Missões & XP</span>
+                            <span>Governança & XP</span>
                         </div>
-                        <div class="nav-item" data-nav-target="audit" title="Auditoria">
+                        <div class="nav-item" data-nav-target="audit" title="Audit Trail">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span>Audit Trail</span>
                         </div>
@@ -226,121 +237,108 @@
                 </div>
             </div>
 
-            <!-- Sidebar Footer & Operator Status -->
-            <div class="p-3 rounded-xl bg-[#111114] border border-white/[0.05] space-y-2 text-[11px]">
+            <!-- Sidebar Operator XP Footer -->
+            <div class="p-3 rounded-xl bg-[#101014] border border-white/[0.05] space-y-2 text-[11px]">
                 <div class="flex items-center justify-between">
                     <span class="text-[#6E6E73]">Operador</span>
                     <span id="topbar-level-name" class="font-bold text-[#F5F5F7]">Level 1: Junior</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-[#6E6E73]">Disciplina XP</span>
-                    <span id="topbar-xp" class="text-[#FF2B2B] font-mono font-bold">150 XP</span>
+                    <span id="topbar-xp" class="text-[#FF2D2D] font-mono font-bold">150 XP</span>
                 </div>
                 <div class="pt-2 border-t border-white/[0.05] flex items-center justify-between">
                     <span class="text-[#6E6E73]">Modo IA</span>
-                    <span id="sidebar-ai-mode" class="text-[#30D158] font-semibold">Assistido</span>
+                    <span id="sidebar-ai-mode" class="text-[#1FC16B] font-semibold">Assistido</span>
                 </div>
             </div>
         </aside>
 
-        <!-- WORKSPACE PRINCIPAL -->
+        <!-- WORKSPACE PRINCIPAL EM CAMADAS DE DECISÃO -->
         <main class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-y-auto space-y-6">
 
-            <!-- SEÇÃO 1: OVERVIEW & TODAY'S SCORE -->
+            <!-- ===================================================================
+                 SEÇÃO 1: OVERVIEW — O VERDADEIRO COMMAND CENTER
+                 =================================================================== -->
             <section id="view-overview" class="view-section space-y-6">
-                <!-- Top 6 KPIs Executivos -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                    <div class="panel p-4 space-y-1">
-                        <p class="text-[11px] font-semibold text-[#A1A1A6] uppercase tracking-wider">Investimento</p>
+
+                <!-- CAMADA 2: BUSINESS SNAPSHOT (BLOCO UNIFICADO COESO) -->
+                <div class="snapshot-grid">
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Investimento</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-spend">R$ 0,00</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Orçamento consumido</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Consumo da conta</p>
                     </div>
-                    <div class="panel p-4 space-y-1">
-                        <p class="text-[11px] font-semibold text-[#A1A1A6] uppercase tracking-wider">Receita</p>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Faturamento</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-revenue">R$ 0,00</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Vendas atribuídas</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Vendas atribuídas</p>
                     </div>
-                    <div class="panel p-4 space-y-1">
-                        <p class="text-[11px] font-semibold text-[#A1A1A6] uppercase tracking-wider">Lucro Estimado</p>
-                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#30D158]" id="kpi-profit">R$ 0,00</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Margem líquida</p>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Lucro Líquido</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]" id="kpi-profit">R$ 0,00</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Margem estimada</p>
                     </div>
-                    <div class="panel p-4 space-y-1">
-                        <p class="text-[11px] font-semibold text-[#A1A1A6] uppercase tracking-wider">ROAS Geral</p>
-                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#FF2B2B]" id="kpi-roas">0.00x</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Retorno de mídia</p>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">ROAS Geral</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#FF2D2D]" id="kpi-roas">0.00x</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Break-even: 2.20x</p>
                     </div>
-                    <div class="panel p-4 space-y-1">
-                        <p class="text-[11px] font-semibold text-[#A1A1A6] uppercase tracking-wider">CPA Médio</p>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">CPA Médio</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-cpa">R$ 0,00</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Custo por aquisição</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Alvo: R$ 35,00</p>
                     </div>
-                    <div class="panel p-4 space-y-1">
-                        <p class="text-[11px] font-semibold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-purchases">0 un</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Deduplicadas</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Deduplicadas</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Tracking Health</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]">98%</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">CAPI v21.0 Online</p>
                     </div>
                 </div>
 
-                <!-- Bento Grid: Today's Score & AI Brief & What Should I Do Now -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <!-- Today's Score Breakdown -->
-                    <div class="panel p-5 space-y-4">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
-                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">TODAY'S SCORE</span>
-                            <span id="account-health-badge" class="badge badge-active">SAUDÁVEL</span>
+                <!-- CAMADA 3: DECISION CENTER (O CORAÇÃO DO SISTEMA) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <!-- Today's Brief (4 colunas) -->
+                    <div class="lg:col-span-4 panel p-5 space-y-3 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">TODAY'S BRIEF</span>
+                                <span class="text-[10px] text-[#6E6E73] font-mono">Atualizado em tempo real</span>
+                            </div>
+                            <p class="text-xs text-[#F5F5F7] leading-relaxed">
+                                O sistema está tecnicamente íntegro e ativo. A infraestrutura de rastreamento híbrido (Pixel + CAPI v21.0) opera com 100% de precisão de sinal.
+                            </p>
+                            <div class="space-y-1.5 pt-1 text-[11.5px]">
+                                <div class="flex items-center gap-2 text-[#1FC16B]">
+                                    <span>✓</span> <span>Sinal CAPI e Webhooks UTMify sincronizados</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[#A1A1A6]">
+                                    <span>●</span> <span>Frequência média dos criativos em zona segura (&lt; 2.2)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[#F5A524]">
+                                    <span>⚠</span> <span>Ponto de atenção: Taxa de conversão no checkout mobile</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span id="account-health-number" class="text-4xl font-black font-mono text-[#F5F5F7]">92/100</span>
-                            <span class="text-xs text-[#30D158] font-semibold">Excelente</span>
-                        </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="flex items-center justify-between text-[#A1A1A6]">
-                                <span>Tracking Reconciled</span>
-                                <span class="font-mono text-[#F5F5F7] font-semibold">98/100</span>
-                            </div>
-                            <div class="flex items-center justify-between text-[#A1A1A6]">
-                                <span>Performance Stability</span>
-                                <span class="font-mono text-[#F5F5F7] font-semibold">88/100</span>
-                            </div>
-                            <div class="flex items-center justify-between text-[#A1A1A6]">
-                                <span>Creative Health</span>
-                                <span class="font-mono text-[#F5F5F7] font-semibold">84/100</span>
-                            </div>
-                            <div class="flex items-center justify-between text-[#A1A1A6]">
-                                <span>Autopilot Guardrails</span>
-                                <span class="font-mono text-[#F5F5F7] font-semibold">100/100</span>
-                            </div>
+                        <div class="pt-3 border-t border-white/[0.05] flex justify-between items-center text-[10.5px]">
+                            <span class="text-[#6E6E73]">Diagnóstico: Estável</span>
+                            <span class="text-[#1FC16B] font-mono font-bold">Confiança 94%</span>
                         </div>
                     </div>
 
-                    <!-- Today's Brief (AI Intelligence) -->
-                    <div class="panel p-5 space-y-3">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
-                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">TODAY'S BRIEF</span>
-                            <span class="text-[10px] text-[#6E6E73] font-mono">Atualizado agora</span>
-                        </div>
-                        <p class="text-xs text-[#F5F5F7] leading-relaxed">
-                            Performance estável com entregas consistentes. A atribuição de tracking híbrido (Pixel + CAPI) está ativa com 100% de integridade.
-                        </p>
-                        <div class="space-y-1.5 pt-1 text-[11.5px]">
-                            <div class="flex items-center gap-2 text-[#30D158]">
-                                <span>✓</span> <span>Tracking CAPI e UTMify sincronizados</span>
+                    <!-- Decision Queue / What Should I Do Now? (8 colunas) -->
+                    <div class="lg:col-span-8 panel p-5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-[#FF2D2D]"></span>
+                                <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">DECISION QUEUE (O QUE FAZER AGORA)</span>
                             </div>
-                            <div class="flex items-center gap-2 text-[#A1A1A6]">
-                                <span>●</span> <span>Frequência dos criativos em zona segura (&lt; 2.2)</span>
-                            </div>
-                            <div class="flex items-center gap-2 text-[#FF9F0A]">
-                                <span>⚠</span> <span>Acompanhar conversão do checkout no mobile</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- What Should I Do Now? (Priorities) -->
-                    <div class="panel p-5 space-y-3">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
-                            <span class="text-xs font-bold text-[#FF2B2B] uppercase tracking-wider">WHAT SHOULD I DO NOW?</span>
-                            <span class="badge badge-winner text-[9px]">PRIORIDADES</span>
+                            <span class="badge badge-winner text-[9px]">PRIORIDADES ATIVAS</span>
                         </div>
                         <div id="what-should-i-do-container" class="space-y-2 text-xs">
                             <!-- Inserido dinamicamente via JS -->
@@ -348,22 +346,138 @@
                     </div>
                 </div>
 
-                <!-- Oportunidades de Otimização -->
+                <!-- CAMADA 3.1: CAUSE MAP (MAPEAMENTO CAUSAL INOVADOR) -->
+                <div class="panel p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">CAUSE MAP — DIAGNÓSTICO CAUSAL DO SISTEMA</span>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">Análise de Causa Raiz</span>
+                    </div>
+                    <div class="cause-map-flow">
+                        <div class="cause-map-node">
+                            <span class="text-[#5DA9FF]">📊 Impressões & CTR</span>
+                            <span class="text-[#1FC16B]">Estáveis (2.4%)</span>
+                        </div>
+                        <span class="cause-map-arrow">➔</span>
+                        <div class="cause-map-node">
+                            <span class="text-[#5DA9FF]">🌐 Landing Page Views</span>
+                            <span class="text-[#1FC16B]">86% Retenção</span>
+                        </div>
+                        <span class="cause-map-arrow">➔</span>
+                        <div class="cause-map-node">
+                            <span class="text-[#F5A524]">🛒 Checkout Iniciado</span>
+                            <span class="text-[#F5A524]">Ativo</span>
+                        </div>
+                        <span class="cause-map-arrow">➔</span>
+                        <div class="cause-map-node border-[#FF2D2D]/40 bg-[#FF2D2D]/10">
+                            <span class="text-[#FF2D2D]">🎯 Conclusão:</span>
+                            <span class="text-[#F5F5F7]">Foco no fechamento do PIX mobile</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAMADA 4: SYSTEM HEALTH vs BUSINESS PERFORMANCE (DOIS SCORES SEPARADOS) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- System Health Score -->
+                    <div class="panel p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">SYSTEM HEALTH SCORE</span>
+                            <span class="badge badge-active">98/100 EXCELENTE</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                                <span class="text-[10px] text-[#6E6E73] uppercase">Tracking & CAPI</span>
+                                <p class="font-bold text-[#1FC16B] font-mono text-sm">100% Íntegro</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                                <span class="text-[10px] text-[#6E6E73] uppercase">Meta Graph API</span>
+                                <p class="font-bold text-[#1FC16B] font-mono text-sm">v21.0 Online</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                                <span class="text-[10px] text-[#6E6E73] uppercase">Guardrails & Locks</span>
+                                <p class="font-bold text-[#1FC16B] font-mono text-sm">Ativos (12h)</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                                <span class="text-[10px] text-[#6E6E73] uppercase">Autopilot Safety</span>
+                                <p class="font-bold text-[#1FC16B] font-mono text-sm">Fail-Closed OK</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Performance Score -->
+                    <div class="panel p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">BUSINESS PERFORMANCE SCORE</span>
+                            <span id="account-health-badge" class="badge badge-active">SAUDÁVEL</span>
+                        </div>
+                        <div class="flex items-baseline space-x-2">
+                            <span id="account-health-number" class="text-3xl font-bold font-mono text-[#F5F5F7]">82/100</span>
+                            <span class="text-xs text-[#A1A1A6]">Eficiência de Tráfego & Conversão</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                                <span class="text-[10px] text-[#6E6E73] uppercase">CTR Geral</span>
+                                <p class="font-bold text-[#F5F5F7] font-mono text-sm" id="kpi-ctr">0.00%</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                                <span class="text-[10px] text-[#6E6E73] uppercase">CPC Médio</span>
+                                <p class="font-bold text-[#F5F5F7] font-mono text-sm" id="kpi-cpc">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAMADA 5: LIVE ACTIVITY / PERFORMANCE STREAM -->
+                <div class="panel p-5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-[#1FC16B] animate-pulse"></span>
+                            <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">LIVE ACTIVITY STREAM</span>
+                        </div>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">Eventos em Tempo Real</span>
+                    </div>
+                    <div class="space-y-2 text-xs font-mono" id="live-activity-stream">
+                        <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[#1FC16B]">●</span>
+                                <span class="text-[#F5F5F7]">Sincronização com Meta Marketing API concluída</span>
+                            </div>
+                            <span class="text-[10px] text-[#6E6E73]">Agora</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[#5DA9FF]">●</span>
+                                <span class="text-[#F5F5F7]">Reconciliação CAPI & UTMify validada sem divergências</span>
+                            </div>
+                            <span class="text-[10px] text-[#6E6E73]">1 min atrás</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[#1FC16B]">●</span>
+                                <span class="text-[#F5F5F7]">Guardrail de Segurança: Teto diário de R$ 500,00 verificado</span>
+                            </div>
+                            <span class="text-[10px] text-[#6E6E73]">2 min atrás</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAMADA 6: OPORTUNIDADES & RECONCILIAÇÃO -->
                 <div class="panel p-5 space-y-3">
                     <h3 class="font-bold text-sm text-[#F5F5F7]">Oportunidades de Otimização (Scoring de Confiança & Risco)</h3>
                     <div id="top-opportunities-container" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"></div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 2: CAMPANHAS (DATA GRID PROFISSIONAL) -->
+            <!-- ===================================================================
+                 SEÇÃO 2: CAMPANHAS (TERMINAL DE MEDIA BUYING)
+                 =================================================================== -->
             <section id="view-campaigns" class="view-section hidden space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-lg font-bold text-[#F5F5F7]">Gerenciamento de Campanhas</h2>
-                        <p class="text-xs text-[#A1A1A6]">Visualização tabular institucional com histórico e guardrails de segurança</p>
+                        <p class="text-xs text-[#A1A1A6]">Visualização tabular institucional com Power Score e guardrails de segurança</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <input type="text" id="global-search-input" placeholder="Filtrar campanhas..." class="bg-[#111114] border border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2B2B] w-48 sm:w-64">
+                        <input type="text" id="global-search-input" placeholder="Filtrar campanhas..." class="bg-[#101014] border border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D] w-48 sm:w-64">
                     </div>
                 </div>
 
@@ -392,7 +506,9 @@
                 <div class="sm:hidden space-y-3" id="campaigns-mobile-cards"></div>
             </section>
 
-            <!-- SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA) -->
+            <!-- ===================================================================
+                 SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA)
+                 =================================================================== -->
             <section id="view-creatives" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">Galeria e Diagnóstico de Criativos</h2>
@@ -401,7 +517,9 @@
                 <div id="creatives-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </section>
 
-            <!-- SEÇÃO 4: FUNIL DE CONVERSÃO -->
+            <!-- ===================================================================
+                 SEÇÃO 4: FUNIL DE CONVERSÃO
+                 =================================================================== -->
             <section id="view-funnel" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">Funil Operacional de Conversão</h2>
@@ -412,7 +530,9 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 5: EXPERIMENT LAB -->
+            <!-- ===================================================================
+                 SEÇÃO 5: EXPERIMENT LAB
+                 =================================================================== -->
             <section id="view-lab" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">Experiment Lab & Hipóteses</h2>
@@ -428,7 +548,7 @@
                         <p class="text-xs text-[#A1A1A6]">Hipótese: Destacar envio em 24h na primeira dobra aumenta a taxa de conversão em 15%.</p>
                         <div class="pt-2 border-t border-white/[0.05] flex justify-between text-xs font-mono">
                             <span class="text-[#6E6E73]">Amostra: 420 LPV</span>
-                            <span class="text-[#30D158] font-bold">+18.4% Win Rate</span>
+                            <span class="text-[#1FC16B] font-bold">+18.4% Win Rate</span>
                         </div>
                     </div>
 
@@ -441,43 +561,47 @@
                         <p class="text-xs text-[#A1A1A6]">Hipótese: O botão verde de pagamento gera maior sensação de segurança do que amarelo.</p>
                         <div class="pt-2 border-t border-white/[0.05] flex justify-between text-xs font-mono">
                             <span class="text-[#6E6E73]">Confiança: 96%</span>
-                            <span class="text-[#30D158] font-bold">Adotado</span>
+                            <span class="text-[#1FC16B] font-bold">Adotado</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 6: TRACKING HEALTH & UTMIFY -->
+            <!-- ===================================================================
+                 SEÇÃO 6: TRACKING GLASS BOX
+                 =================================================================== -->
             <section id="view-tracking" class="view-section hidden space-y-4">
                 <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Tracking Health & Reconciliação CAPI</h2>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Tracking Glass Box & Reconciliação CAPI</h2>
                     <p class="text-xs text-[#A1A1A6]">Auditoria contínua de integridade de sinal, deduplicação `eventID` e sincronização UTMify</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="panel p-5 space-y-2">
                         <p class="text-xs text-[#A1A1A6] font-semibold">Meta CAPI v21.0</p>
-                        <p class="text-2xl font-bold font-mono text-[#30D158]">ONLINE</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Server-Side SHA-256</p>
+                        <p class="text-2xl font-bold font-mono text-[#1FC16B]">ONLINE</p>
+                        <p class="text-[10px] text-[#6E6E73]">Server-Side SHA-256</p>
                     </div>
                     <div class="panel p-5 space-y-2">
                         <p class="text-xs text-[#A1A1A6] font-semibold">UTMify Sync</p>
-                        <p class="text-2xl font-bold font-mono text-[#30D158]">ATIVO</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Atribuição First/Last Touch</p>
+                        <p class="text-2xl font-bold font-mono text-[#1FC16B]">ATIVO</p>
+                        <p class="text-[10px] text-[#6E6E73]">Atribuição First/Last Touch</p>
                     </div>
                     <div class="panel p-5 space-y-2">
                         <p class="text-xs text-[#A1A1A6] font-semibold">Deduplicação de Compras</p>
                         <p class="text-2xl font-bold font-mono text-[#F5F5F7]">100%</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">ID Único Canônico</p>
+                        <p class="text-[10px] text-[#6E6E73]">ID Único Canônico</p>
                     </div>
                     <div class="panel p-5 space-y-2">
                         <p class="text-xs text-[#A1A1A6] font-semibold">Vendas Órfãs</p>
-                        <p class="text-2xl font-bold font-mono text-[#30D158]">0</p>
-                        <p class="text-[10.5px] text-[#6E6E73]">Zero perda de atribuição</p>
+                        <p class="text-2xl font-bold font-mono text-[#1FC16B]">0</p>
+                        <p class="text-[10px] text-[#6E6E73]">Zero perda de atribuição</p>
                     </div>
                 </div>
             </section>
 
-            <!-- SEÇÃO 7: AI COACH -->
+            <!-- ===================================================================
+                 SEÇÃO 7: AI PERFORMANCE COACH
+                 =================================================================== -->
             <section id="view-aicoach" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">AI Performance Coach & Diagnóstico</h2>
@@ -485,7 +609,7 @@
                 </div>
                 <div class="panel p-6 space-y-4">
                     <div class="flex items-center space-x-3 pb-3 border-b border-white/[0.05]">
-                        <span class="w-8 h-8 rounded-lg bg-[#FF2B2B]/10 text-[#FF2B2B] flex items-center justify-center font-bold text-sm">🤖</span>
+                        <span class="w-8 h-8 rounded-lg bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-sm">🤖</span>
                         <div>
                             <h3 id="aicoach-headline" class="font-bold text-sm text-[#F5F5F7]">Carregando diagnóstico de IA...</h3>
                             <p class="text-xs text-[#A1A1A6]">Relatório analítico em tempo real</p>
@@ -495,7 +619,9 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 8: MISSÕES & GAMIFICAÇÃO -->
+            <!-- ===================================================================
+                 SEÇÃO 8: GOVERNANÇA & GAMIFICAÇÃO
+                 =================================================================== -->
             <section id="view-gamification" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">Governança & Disciplina Operacional</h2>
@@ -504,7 +630,9 @@
                 <div id="missions-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
             </section>
 
-            <!-- SEÇÃO 9: AUTOPILOT & EMERGENCY STOP -->
+            <!-- ===================================================================
+                 SEÇÃO 9: AUTOPILOT & EMERGENCY STOP
+                 =================================================================== -->
             <section id="view-autopilot" class="view-section hidden space-y-5">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">Autopilot & Gestão Autônoma</h2>
@@ -527,29 +655,29 @@
                 <div class="panel p-5 space-y-3">
                     <h3 class="font-bold text-sm text-[#F5F5F7]">Autopilot Readiness (94/100)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                        <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] flex items-center justify-between">
-                            <span>Tracking Reconciled</span> <span class="text-[#30D158] font-bold">✓ OK</span>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <span>Tracking Reconciled</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
                         </div>
-                        <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] flex items-center justify-between">
-                            <span>Unit Economics Real</span> <span class="text-[#30D158] font-bold">✓ OK</span>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <span>Unit Economics Real</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
                         </div>
-                        <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] flex items-center justify-between">
-                            <span>Data Confidence Score</span> <span class="text-[#30D158] font-bold">✓ OK</span>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <span>Data Confidence Score</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
                         </div>
-                        <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] flex items-center justify-between">
-                            <span>Guardrails & Cooldown</span> <span class="text-[#30D158] font-bold">✓ OK</span>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <span>Guardrails & Cooldown</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
                         </div>
-                        <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] flex items-center justify-between">
-                            <span>24h Shadow Mode</span> <span class="text-[#30D158] font-bold">✓ OK</span>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <span>24h Shadow Mode</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
                         </div>
-                        <div class="p-3 rounded-lg bg-[#161619] border border-white/[0.05] flex items-center justify-between">
-                            <span>Canary Test</span> <span class="text-[#FF9F0A] font-bold">Pendente</span>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
+                            <span>Canary Test</span> <span class="text-[#F5A524] font-bold">Pendente</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Emergency Stop Dedicado -->
-                <div class="p-5 rounded-xl bg-[#7A1111]/20 border border-[#FF2B2B]/40 flex items-center justify-between">
+                <div class="p-5 rounded-xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex items-center justify-between">
                     <div>
                         <h4 class="font-bold text-sm text-white">Emergency Stop (Kill Switch)</h4>
                         <p class="text-xs text-gray-300">Pausa imediatamente qualquer escrita ou alteração do Autopilot em produção</p>
@@ -560,7 +688,9 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 10: WAR ROOM -->
+            <!-- ===================================================================
+                 SEÇÃO 10: WAR ROOM
+                 =================================================================== -->
             <section id="view-warroom" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#FF453A]">War Room — Triage Imediata de Performance</h2>
@@ -574,7 +704,9 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 11: AUDITORIA & TIME MACHINE -->
+            <!-- ===================================================================
+                 SEÇÃO 11: AUDITORIA & LINHA DO TEMPO
+                 =================================================================== -->
             <section id="view-audit" class="view-section hidden space-y-4">
                 <div>
                     <h2 class="text-lg font-bold text-[#F5F5F7]">Audit Trail & Linha do Tempo Imutável</h2>
@@ -583,25 +715,27 @@
                 <div id="audit-timeline-container" class="space-y-3"></div>
             </section>
 
-            <!-- SEÇÃO 12: CONFIGURAÇÕES & CREDENCIAIS -->
+            <!-- ===================================================================
+                 SEÇÃO 12: CONFIGURAÇÕES & CREDENCIAIS
+                 =================================================================== -->
             <section id="view-settings" class="view-section hidden space-y-4">
                 <div class="panel p-6 rounded-2xl space-y-4 max-w-xl">
                     <h3 class="font-bold text-[#F5F5F7] text-sm">Parâmetros, Unit Economics & Guardrails</h3>
                     <div class="space-y-3 text-xs">
                         <div>
                             <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">CPA Alvo de Segurança (R$)</label>
-                            <input type="number" id="setting-target-cpa" value="35.00" class="w-full bg-[#161619] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2B2B] focus:outline-none">
+                            <input type="number" id="setting-target-cpa" value="35.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">Teto Máximo Diário da Conta (R$)</label>
-                            <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#161619] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2B2B] focus:outline-none">
+                            <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-[#161619] border border-white/[0.05]">
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
                             <div>
                                 <p class="font-bold text-[#F5F5F7]">Validar Unit Economics Real</p>
                                 <p class="text-[10px] text-[#A1A1A6]">Permite escala autônoma baseada em margem de contribuição</p>
                             </div>
-                            <input type="checkbox" id="setting-unit-verified" class="w-4 h-4 accent-[#FF2B2B] rounded">
+                            <input type="checkbox" id="setting-unit-verified" class="w-4 h-4 accent-[#FF2D2D] rounded">
                         </div>
                         <button onclick="window.dashboard.saveSettings()" class="btn btn-primary w-full py-2.5 text-xs font-semibold">
                             Salvar Parâmetros
@@ -663,7 +797,7 @@
                 <input type="hidden" id="budget-modal-camp-id">
                 <div>
                     <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Novo Orçamento (R$/dia)</label>
-                    <input type="number" step="0.01" id="budget-modal-input" required class="w-full bg-[#161619] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:outline-none focus:border-[#FF2B2B] text-sm">
+                    <input type="number" step="0.01" id="budget-modal-input" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D] text-sm">
                 </div>
                 <div class="flex items-center justify-end space-x-2 pt-2">
                     <button type="button" onclick="document.getElementById('budget-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
@@ -687,7 +821,7 @@
             <form onsubmit="window.dashboard.submitNewToken(event)" class="space-y-3">
                 <div>
                     <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Novo Token Meta (EAA...)</label>
-                    <textarea id="token-modal-input" required rows="3" placeholder="Cole o token EAA... aqui" class="w-full bg-[#161619] border border-white/[0.08] rounded-lg p-3 text-xs text-[#F5F5F7] font-mono placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2B2B]"></textarea>
+                    <textarea id="token-modal-input" required rows="3" placeholder="Cole o token EAA... aqui" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-3 text-xs text-[#F5F5F7] font-mono placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]"></textarea>
                 </div>
                 <div id="token-modal-feedback" class="text-xs hidden p-2.5 rounded-lg"></div>
                 <div class="flex items-center justify-between pt-2">
@@ -714,14 +848,14 @@
     <div id="toast-container"></div>
 
     <!-- SCRIPTS DA APLICAÇÃO -->
-    <script src="js/meta-adapter.js?v=4.0"></script>
-    <script src="js/analytics.js?v=4.0"></script>
-    <script src="js/guardrails.js?v=4.0"></script>
-    <script src="js/decisions.js?v=4.0"></script>
-    <script src="js/execution.js?v=4.0"></script>
-    <script src="js/audit.js?v=4.0"></script>
-    <script src="js/autopilot.js?v=4.0"></script>
-    <script src="js/dashboard.js?v=4.0"></script>
+    <script src="js/meta-adapter.js?v=5.0"></script>
+    <script src="js/analytics.js?v=5.0"></script>
+    <script src="js/guardrails.js?v=5.0"></script>
+    <script src="js/decisions.js?v=5.0"></script>
+    <script src="js/execution.js?v=5.0"></script>
+    <script src="js/audit.js?v=5.0"></script>
+    <script src="js/autopilot.js?v=5.0"></script>
+    <script src="js/dashboard.js?v=5.0"></script>
 </body>
 
 </html>

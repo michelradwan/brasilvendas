@@ -804,6 +804,15 @@ class DashboardApp {
         }
     }
 
+    changeOffer(offerId) {
+        if (offerId === 'new_offer') {
+            this.showToast('Módulo Multi-Offer: Pronto para cadastrar novas ofertas e contas.', 'info');
+            return;
+        }
+        this.showToast(`Oferta filtrada: ${offerId === 'all' ? 'Todas as Ofertas' : 'Kit Patriota Oficial 2026'}`, 'success');
+        this.syncAllData();
+    }
+
     toggleSidebar() {
         const sidebar = document.getElementById('main-sidebar');
         if (sidebar) {

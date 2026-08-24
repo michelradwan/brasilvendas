@@ -89,6 +89,12 @@
       "action": "STATUS_CHANGE",
       "objectName": "Camp A",
       "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
     }
   ],
   "approvals": [],
@@ -772,12 +778,118 @@
         "success": true,
         "budget": 5750
       }
+    },
+    "ORDER_TX_TEST_1787535306328": {
+      "result": {
+        "transaction_id": "TX_TEST_1787535306328",
+        "status": "PAID",
+        "amount": 114.8,
+        "amount_in_cents": 11480,
+        "currency": "BRL",
+        "customer": {
+          "name": "Cliente Teste Tracking",
+          "email": "cliente.teste@patriotas.com.br",
+          "phone": "11988887777",
+          "document": "12345678909"
+        },
+        "address": {
+          "cep": "",
+          "street": "",
+          "city": "",
+          "state": "SP"
+        },
+        "items": [
+          {
+            "title": "Kit Patriota 2026 (Tam G)",
+            "quantity": 1,
+            "price": 114.8
+          }
+        ],
+        "attribution": {
+          "utm_source": "facebook",
+          "utm_medium": "paid",
+          "utm_campaign": "CAMP_TEST_1",
+          "utm_content": "AD_CREATIVE_A",
+          "utm_term": "ADSET_OPEN",
+          "campaign_id": "1202020202",
+          "adset_id": "2303030303",
+          "ad_id": "3404040404",
+          "src": null,
+          "sck": null,
+          "xcod": null,
+          "fbclid": "IwAR_TEST_CLICK_ID_123",
+          "fbp": "fb.1.1700000000.12345",
+          "fbc": "fb.1.1700000000.IwAR_TEST_CLICK_ID_123",
+          "client_ip": null,
+          "client_user_agent": null
+        },
+        "created_at": "2026-08-24T01:35:06.328Z",
+        "paid_at": "2026-08-24T01:35:06.337Z",
+        "meta_capi_sent": true,
+        "utmify_sale_sent": true
+      }
+    },
+    "ORDER_TX_ORGANIC_1787535306341": {
+      "result": {
+        "transaction_id": "TX_ORGANIC_1787535306341",
+        "status": "PENDING",
+        "amount": 89.9,
+        "amount_in_cents": 8990,
+        "currency": "BRL",
+        "customer": {
+          "name": "Cliente Direto",
+          "email": "",
+          "phone": "",
+          "document": ""
+        },
+        "address": {
+          "cep": "",
+          "street": "",
+          "city": "",
+          "state": "SP"
+        },
+        "items": [
+          {
+            "title": "Kit Patriota Oficial 2026",
+            "quantity": 1,
+            "price": 89.9
+          }
+        ],
+        "attribution": {
+          "utm_source": null,
+          "utm_medium": null,
+          "utm_campaign": null,
+          "utm_content": null,
+          "utm_term": null,
+          "campaign_id": null,
+          "adset_id": null,
+          "ad_id": null,
+          "src": null,
+          "sck": null,
+          "xcod": null,
+          "fbclid": null,
+          "fbp": null,
+          "fbc": null,
+          "client_ip": null,
+          "client_user_agent": null
+        },
+        "created_at": "2026-08-24T01:35:06.341Z",
+        "paid_at": null,
+        "meta_capi_sent": false,
+        "utmify_sale_sent": false
+      }
+    },
+    "ACT_IDEMP_1787535306515": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
     }
   },
   "cooldowns": {
     "999888777": 1787522002157,
     "TEST_CAMP_999": {
-      "timestamp": 1787534456530,
+      "timestamp": 1787535306509,
       "actionType": "BUDGET_CHANGE"
     }
   },
@@ -789,6 +901,10 @@
     "checkoutLearnings": []
   },
   "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
     {
       "actionId": "ACT_SHADOW_1",
       "reason": "Simulação"
