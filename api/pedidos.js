@@ -39,6 +39,28 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
+    // DELETE ou POST com action=clear: Limpar todo o histórico de pedidos e leads falsos
+    if (req.method === 'DELETE' || (req.method === 'POST' && req.query.action === 'clear')) {
+        try {
+            globalPedidosCache = [];
+            saveDiskOrders([]);
+            
+            // Limpar chave de ações persistentes do storage
+            await storage.set('actions', 'ORDER_CLEAR_FLAG', null);
+            
+            // Tentar remover arquivo físico se existir
+            try {
+                if (fs.existsSync(TMP_FILE)) {
+                    fs.unlinkSync(TMP_FILE);
+                }
+            } catch(err) {}
+
+            return res.status(200).json({ success: true, message: 'Histórico de pedidos e PIX gerados limpo com sucesso.' });
+        } catch(e) {
+            return res.status(500).json({ success: false, error: e.message });
+        }
+    }
+
     // POST: Salvar novo pedido gerado
     if (req.method === 'POST') {
         try {

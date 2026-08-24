@@ -1332,7 +1332,8 @@
         "meta_capi_sent": false,
         "utmify_sale_sent": false
       }
-    }
+    },
+    "ORDER_TEST": null
   },
   "cooldowns": {
     "999888777": 1787522002157,
