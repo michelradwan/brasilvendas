@@ -6,9 +6,8 @@
 class MetaDataProvider {
     constructor() {
         this.cache = new Map();
-        this.cacheTTL = 20000; // 20s
-        this.proxyEndpoint = '/api/meta-proxy';
-        this.adminPassword = sessionStorage.getItem('meta_admin_token') || localStorage.getItem('meta_admin_token') || 'mraa2004';
+        this.proxyEndpoint = (typeof window !== 'undefined' && window.location.protocol === 'file:') ? 'https://brasilvendas.vercel.app/api/meta-proxy' : '/api/meta-proxy';
+        this.adminPassword = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('meta_admin_token') || localStorage.getItem('meta_admin_token') || 'mraa2004') : 'mraa2004';
     }
 
     setAdminPassword(password) {

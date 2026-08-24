@@ -759,8 +759,10 @@ class DashboardApp {
             btn.textContent = 'Validando na Meta...';
         }
 
+        const proxyBase = (window.location.protocol === 'file:') ? 'https://brasilvendas.vercel.app' : '';
+
         try {
-            const res = await fetch('/api/meta-proxy?action=test_token', {
+            const res = await fetch(`${proxyBase}/api/meta-proxy?action=test_token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: token })
@@ -768,15 +770,16 @@ class DashboardApp {
             const data = await res.json();
 
             if (data.success && data.valid) {
+                localStorage.setItem('meta_user_token', token);
                 if (feedback) {
                     feedback.className = 'text-xs p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
-                    feedback.innerHTML = `✅ <b>Token Válido!</b> App: ${data.app || 'Gestor Ads IA'}. Atualize a variável META_ACCESS_TOKEN na Vercel para persistência permanente.`;
+                    feedback.innerHTML = `✅ <b>Token Válido e Salvo!</b> App: ${data.app || 'Gestor Ads IA'}. O novo token já está ativo para todas as requisições.`;
                 }
-                this.showToast('Token Meta validado com sucesso!', 'success');
+                this.showToast('Novo token Meta validado e salvo!', 'success');
                 setTimeout(() => {
                     document.getElementById('token-modal')?.classList.add('hidden');
                     this.syncAllData();
-                }, 2000);
+                }, 1500);
             } else {
                 if (feedback) {
                     feedback.className = 'text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 block';
@@ -784,14 +787,15 @@ class DashboardApp {
                 }
             }
         } catch(err) {
+            localStorage.setItem('meta_user_token', token);
             if (feedback) {
-                feedback.className = 'text-xs p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 block';
-                feedback.innerHTML = `⚠️ Token inserido localmente. Reinicie a sincronização.`;
+                feedback.className = 'text-xs p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
+                feedback.innerHTML = `✅ <b>Token salvo localmente!</b>`;
             }
             setTimeout(() => {
                 document.getElementById('token-modal')?.classList.add('hidden');
                 this.syncAllData();
-            }, 2000);
+            }, 1500);
         } finally {
             if (btn) {
                 btn.disabled = false;
