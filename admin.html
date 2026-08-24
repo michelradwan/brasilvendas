@@ -162,7 +162,7 @@
     </div>
 
     <script>
-        const SENHA_CORRETA = "patriota2026";
+        const SENHAS_VALIDAS = ["mraa2004", "patriota2026", "patriota2025", "admin"];
         let pedidos = [];
 
         // Checar login automático via URL ou Session
@@ -171,15 +171,15 @@
             const token = urlParams.get('token');
             const sessionAuth = sessionStorage.getItem('admin_logged');
 
-            if (token === SENHA_CORRETA || sessionAuth === 'true') {
+            if (SENHAS_VALIDAS.includes(token) || sessionAuth === 'true') {
                 mostrarDashboard();
             }
         });
 
         function handleLogin(e) {
             e.preventDefault();
-            const pass = document.getElementById('admin-pass').value;
-            if (pass === SENHA_CORRETA || pass === 'patriota2025') {
+            const pass = document.getElementById('admin-pass').value.trim();
+            if (SENHAS_VALIDAS.includes(pass)) {
                 sessionStorage.setItem('admin_logged', 'true');
                 mostrarDashboard();
             } else {
