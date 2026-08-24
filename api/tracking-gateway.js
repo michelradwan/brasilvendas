@@ -83,6 +83,10 @@ class TrackingGateway {
                 src: attribution.last_touch.src || attribution.first_touch.src || null,
                 sck: attribution.last_touch.sck || attribution.first_touch.sck || null,
                 xcod: attribution.last_touch.xcod || attribution.first_touch.xcod || null,
+                subid: attribution.last_touch.subid || attribution.first_touch.subid || null,
+                gclid: attribution.last_touch.gclid || attribution.first_touch.gclid || null,
+                ttclid: attribution.last_touch.ttclid || attribution.first_touch.ttclid || null,
+                kw: attribution.last_touch.kw || attribution.first_touch.kw || null,
                 fbclid: attribution.last_touch.fbclid || attribution.first_touch.fbclid || null,
                 fbp: attribution.last_touch.fbp || attribution.first_touch.fbp || null,
                 fbc: attribution.last_touch.fbc || attribution.first_touch.fbc || null,
@@ -292,7 +296,8 @@ class TrackingGateway {
                 adset_id: attr.adset_id || null,
                 ad_id: attr.ad_id || null,
                 fbclid: attr.fbclid || null,
-                xcod: attr.xcod || null
+                xcod: attr.xcod || null,
+                subid: attr.subid || null
             }
         };
 
