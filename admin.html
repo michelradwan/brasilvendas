@@ -389,10 +389,52 @@
             border-color: var(--border-hover);
             transform: translateY(-1px);
         }
-        .visitor-city { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
-        .visitor-device { font-size: 11px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+        .visitor-city { 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: var(--text-primary); 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .visitor-city svg {
+            width: 14px;
+            height: 14px;
+            color: var(--accent-red, #FF2D2D);
+            flex-shrink: 0;
+        }
+        .visitor-device { 
+            font-size: 11px; 
+            color: var(--text-tertiary); 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            white-space: nowrap;
+        }
+        .visitor-device svg {
+            width: 13px;
+            height: 13px;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+        }
         .visitor-stage { margin-top: 2px; }
-        .visitor-time { font-size: 10.5px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+        .visitor-time { 
+            font-size: 10.5px; 
+            color: var(--text-tertiary); 
+            font-variant-numeric: tabular-nums; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+        }
+        .visitor-time svg {
+            width: 12px;
+            height: 12px;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+        }
 
         /* ─── Table section ─── */
         .orders-panel {
@@ -863,20 +905,40 @@
                     const card = document.createElement('div');
                     card.className = 'visitor-card';
                     const isCheckout = v.etapa === 'No Checkout PIX';
-                    const deviceIcon = (v.dispositivo || '').toLowerCase().includes('computador') ? '💻' : '📱';
+                    const dispLower = (v.dispositivo || '').toLowerCase();
+                    
+                    let deviceSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>`; // Smartphone default
+                    if (dispLower.includes('computador') || dispLower.includes('desktop')) {
+                        deviceSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>`; // Monitor
+                    } else if (dispLower.includes('notebook') || dispLower.includes('laptop')) {
+                        deviceSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55A1 1 0 0 1 20.38 20H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>`; // Laptop
+                    } else if (dispLower.includes('tablet')) {
+                        deviceSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`; // Tablet
+                    }
+
+                    const locationSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
+                    const eyeSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+                    const clockSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+
                     card.innerHTML = `
                         <div class="visitor-city">
-                            <span>📍</span> ${v.cidade || 'Brasil'} / ${v.estado || 'BR'}
+                            ${locationSvg}
+                            <span>${v.cidade || 'Brasil'} / ${v.estado || 'BR'}</span>
                         </div>
                         <div class="visitor-device">
-                            <span>${deviceIcon}</span> ${v.dispositivo || 'Celular'}
+                            ${deviceSvg}
+                            <span>${v.dispositivo || 'Celular'}</span>
                         </div>
                         <div class="visitor-stage">
-                            <span class="badge ${isCheckout ? 'badge-pending' : 'badge-paid'}" style="text-transform:none;font-size:11px;font-weight:600;padding:3px 8px;">
+                            <span class="badge ${isCheckout ? 'badge-pending' : 'badge-paid'}" style="text-transform:none;font-size:11px;font-weight:600;padding:3px 8px;display:inline-flex;align-items:center;gap:4px;">
+                                ${isCheckout ? '' : eyeSvg}
                                 ${v.etapa || 'Visualizando Página'}
                             </span>
                         </div>
-                        <div class="visitor-time">Ativo há ${v.tempo_online_segundos || 5}s</div>
+                        <div class="visitor-time">
+                            ${clockSvg}
+                            <span>Ativo há ${v.tempo_online_segundos || 5}s</span>
+                        </div>
                     `;
                     list.appendChild(card);
                 });
