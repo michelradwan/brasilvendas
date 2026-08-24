@@ -3,11 +3,11 @@
 // ==============================================================================
 
 const assert = require('assert');
-const { storage, lock } = require('../api/storage-adapter.js');
-const gateway = require('../api/execution-gateway.js');
-const { DataTrustEngine, purchaseResolver } = require('../api/data-trust-engine.js');
-const rootCause = require('../api/root-cause-engine.js');
-const gamification = require('../api/gamification-engine.js');
+const { storage, lock } = require('../lib/storage-adapter.js');
+const gateway = require('../lib/execution-gateway.js');
+const { DataTrustEngine, purchaseResolver } = require('../lib/data-trust-engine.js');
+const rootCause = require('../lib/root-cause-engine.js');
+const gamification = require('../lib/gamification-engine.js');
 const { ALLOWED_OPERATIONS, ALLOWED_AD_ACCOUNT_ID, SPECIAL_AD_CATEGORIES } = require('../config/meta-constants.js');
 
 console.log('🧪 [MASTER TEST SUITE] Executando 25 Casos Críticos de Teste e Segurança...\n');
@@ -125,7 +125,7 @@ async function runAllTests() {
     console.log('10. Testando fail-closed com token ausente...');
     const originalToken = process.env.META_ACCESS_TOKEN;
     delete process.env.META_ACCESS_TOKEN;
-    const metaApi = require('../api/meta-api-client.js');
+    const metaApi = require('../lib/meta-api-client.js');
     let configError = false;
     try {
         metaApi.getToken();

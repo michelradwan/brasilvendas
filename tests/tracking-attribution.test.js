@@ -4,7 +4,7 @@
 
 const assert = require('assert');
 const trackingGateway = require('../api/tracking-gateway.js');
-const { storage } = require('../api/storage-adapter.js');
+const { storage } = require('../lib/storage-adapter.js');
 
 console.log('🧪 [TRACKING AUDIT SUITE] Iniciando Bateria Completa de Testes de Rastreamento...\n');
 

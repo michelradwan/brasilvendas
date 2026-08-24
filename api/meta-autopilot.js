@@ -4,7 +4,7 @@
 
 const https = require('https');
 const { GRAPH_VERSION, GRAPH_BASE_URL, ALLOWED_AD_ACCOUNT_ID, RATE_LIMIT_ERROR_CODES } = require('../config/meta-constants.js');
-const serverState = require('./meta-state.js');
+const serverState = require('../lib/meta-state.js');
 
 const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
 const CRON_SECRET = process.env.CRON_SECRET || process.env.ADMIN_PASSWORD;

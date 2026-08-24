@@ -5,7 +5,7 @@
 
 const https = require('https');
 const crypto = require('crypto');
-const { storage } = require('./storage-adapter.js');
+const { storage } = require('../lib/storage-adapter.js');
 const { META_GRAPH_VERSION, META_GRAPH_BASE_URL } = require('../config/meta-constants.js');
 
 const PIXEL_ID = process.env.META_PIXEL_ID || '2292987404797869';

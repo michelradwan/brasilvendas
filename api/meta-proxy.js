@@ -4,7 +4,7 @@
 
 const https = require('https');
 const { GRAPH_VERSION, GRAPH_BASE_URL, ALLOWED_AD_ACCOUNT_ID, ALLOWED_OPERATIONS, RATE_LIMIT_ERROR_CODES } = require('../config/meta-constants.js');
-const serverState = require('./meta-state.js');
+const serverState = require('../lib/meta-state.js');
 
 // Variáveis de ambiente obrigatórias e fallback seguro
 const NEW_VALID_TOKEN = 'EAA6kKz1qBV8BSenp1wL2BDAMvPy3z1bVEdhIYA9nFXZAJ0Gw0aeZAxpp14wYmaAoZAHPJBI9TtIA2EZBEiHwjlB8yO9WPZANcE8r6X4ZACuO9ZC9FluMNUVmkh25JF7plOeCqrgn3sJZCzjbvlqgebnaXFuJ7EDsDS7mdQ1GvYlPSNXZA3LXiFCZAgATo0cWjFHZAIex8DcK8wfO0b585Lx9aqxZCk0CnuOIvGUFgeNobUIOd3gUnKHd2MvzK1gzjj5ACPmu0601YmllPQBRco0vtLUIWOyi';
