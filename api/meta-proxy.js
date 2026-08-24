@@ -128,8 +128,8 @@ module.exports = async (req, res) => {
     const authHeader = req.headers['x-admin-auth'] || req.headers['authorization'];
     const providedSecret = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-    // Lista de senhas administrativas válidas
-    const validPasswords = Array.from(new Set(['patriota2026', 'patriota2025', 'admin', ADMIN_PASSWORD].filter(Boolean)));
+    // Lista de senhas administrativas válidas (mraa2004 principal)
+    const validPasswords = Array.from(new Set(['mraa2004', 'patriota2026', 'patriota2025', 'admin', ADMIN_PASSWORD].filter(Boolean)));
 
     // Se for rota de login / verificação de credencial
     if (req.query.action === 'login' && req.method === 'POST') {

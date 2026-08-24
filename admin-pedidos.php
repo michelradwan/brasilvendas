@@ -2,8 +2,8 @@
 session_start();
 
 // SENHA DE ACESSO AO PAINEL
-define('ADMIN_PASSWORD', 'patriota2026');
-$ALLOWED_PASSWORDS = ['patriota2026', 'patriota2025', 'admin'];
+define('ADMIN_PASSWORD', 'mraa2004');
+$ALLOWED_PASSWORDS = ['mraa2004', 'patriota2026', 'patriota2025', 'admin'];
 
 // Processar Logout
 if (isset($_GET['logout'])) {

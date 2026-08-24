@@ -8,18 +8,20 @@ class MetaDataProvider {
         this.cache = new Map();
         this.cacheTTL = 20000; // 20s
         this.proxyEndpoint = '/api/meta-proxy';
-        this.adminPassword = sessionStorage.getItem('meta_admin_token') || '';
+        this.adminPassword = sessionStorage.getItem('meta_admin_token') || localStorage.getItem('meta_admin_token') || 'mraa2004';
     }
 
     setAdminPassword(password) {
         this.adminPassword = password;
         sessionStorage.setItem('meta_admin_token', password);
+        localStorage.setItem('meta_admin_token', password);
         this.cache.clear();
     }
 
     clearAdminSession() {
         this.adminPassword = '';
         sessionStorage.removeItem('meta_admin_token');
+        localStorage.removeItem('meta_admin_token');
         this.cache.clear();
     }
 
