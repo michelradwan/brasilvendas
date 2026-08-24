@@ -3,7 +3,10 @@
 // ==============================================================================
 
 const https = require('https');
-const { GRAPH_VERSION, GRAPH_BASE_URL, ALLOWED_AD_ACCOUNT_ID, RATE_LIMIT_ERROR_CODES } = require('../config/meta-constants.js');
+const metaConstants = require('../config/meta-constants.js');
+const GRAPH_VERSION = metaConstants.GRAPH_VERSION || metaConstants.META_GRAPH_VERSION || 'v21.0';
+const GRAPH_BASE_URL = metaConstants.GRAPH_BASE_URL || metaConstants.META_GRAPH_BASE_URL || 'https://graph.facebook.com/v21.0';
+const { ALLOWED_AD_ACCOUNT_ID, RATE_LIMIT_ERROR_CODES } = metaConstants;
 const serverState = require('../lib/meta-state.js');
 
 const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;

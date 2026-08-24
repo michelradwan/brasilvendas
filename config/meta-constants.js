@@ -2,9 +2,14 @@
 // CENTRALIZED META MARKETING CONSTANTS & GOVERNANCE RULES
 // ==============================================================================
 
+const META_VERSION = process.env.META_GRAPH_VERSION || 'v21.0';
+const BASE_URL = `https://graph.facebook.com/${META_VERSION}`;
+
 module.exports = {
-    META_GRAPH_VERSION: process.env.META_GRAPH_VERSION || 'v21.0',
-    META_GRAPH_BASE_URL: `https://graph.facebook.com/${process.env.META_GRAPH_VERSION || 'v21.0'}`,
+    META_GRAPH_VERSION: META_VERSION,
+    META_GRAPH_BASE_URL: BASE_URL,
+    GRAPH_VERSION: META_VERSION,
+    GRAPH_BASE_URL: BASE_URL,
     ALLOWED_AD_ACCOUNT_ID: process.env.META_AD_ACCOUNT_ID || 'act_846780837970771',
     ALLOWED_BM_ID: '396465144606279',
 
