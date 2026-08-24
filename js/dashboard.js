@@ -88,10 +88,6 @@ class DashboardApp {
 
     setupKeyboardShortcuts() {
         window.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                this.toggleCommandPalette();
-            }
             if (e.key === 'Escape') {
                 this.closeAllModals();
             }
@@ -153,8 +149,6 @@ class DashboardApp {
             this.renderCreativesView();
             this.renderAuditLogs();
             this.renderTopOpportunities();
-            this.renderMissions();
-            this.renderAICoach();
 
             document.getElementById('topbar-last-sync').textContent = new Date().toLocaleTimeString('pt-BR');
             this.showToast('Dados sincronizados e verificados com sucesso.', 'success');
@@ -541,61 +535,6 @@ class DashboardApp {
         `).join('');
     }
 
-    renderMissions() {
-        const container = document.getElementById('missions-container');
-        if (!container) return;
-
-        const missions = [
-            { id: 'M1', title: 'Validar Unit Economics Real', desc: 'Confirmar custos em Configurações para liberar escala autônoma', xp: 100, completed: false },
-            { id: 'M2', title: 'Auditar Eventos no Tracking Health', desc: 'Verificar integridade do Pixel CAPI', xp: 60, completed: true },
-            { id: 'M3', title: 'Revisar Análise do AI Coach', desc: 'Inspecionar as recomendações diárias de performance', xp: 40, completed: false }
-        ];
-
-        container.innerHTML = missions.map(m => `
-            <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <span class="text-base">${m.completed ? '✅' : '⏳'}</span>
-                    <div>
-                        <p class="font-bold text-white text-xs ${m.completed ? 'line-through text-gray-400' : ''}">${escapeHTML(m.title)}</p>
-                        <p class="text-[11px] text-gray-400">${escapeHTML(m.desc)}</p>
-                    </div>
-                </div>
-                <span class="badge badge-winner font-mono">+${m.xp} XP</span>
-            </div>
-        `).join('');
-    }
-
-    renderAICoach() {
-        const headlineEl = document.getElementById('aicoach-headline');
-        const bulletsEl = document.getElementById('aicoach-bullets');
-        if (!headlineEl || !bulletsEl) return;
-
-        let totalSpend = 0, totalPurchases = 0;
-        this.cachedInsights.forEach(ins => {
-            totalSpend += ins.spend;
-            totalPurchases += ins.purchases;
-        });
-
-        const targetCPA = window.guardrailEngine?.config?.targetCPA || 35.00;
-        const avgCpa = totalPurchases > 0 ? (totalSpend / totalPurchases) : 0;
-
-        if (totalPurchases > 0 && avgCpa <= targetCPA * 0.85) {
-            headlineEl.textContent = 'Eficiência de Aquisição em Alta Performance 🚀';
-            bulletsEl.innerHTML = `
-                <li>O CPA médio global está R$ ${avgCpa.toFixed(2)} (abaixo da meta de R$ ${targetCPA.toFixed(2)}).</li>
-                <li>As campanhas vencedoras estão qualificadas para escala controlada de +15%.</li>
-                <li>Mantenha o monitoramento ativo para prevenir fadiga de criativos.</li>
-            `;
-        } else {
-            headlineEl.textContent = 'Operação em Fase de Aprendizado & Calibração';
-            bulletsEl.innerHTML = `
-                <li>Monitore a taxa de cliques (CTR) e passagem para Início de Checkout.</li>
-                <li>Verifique se o checkout está convertendo sem fricção de pagamento.</li>
-                <li>Evite alterações bruscas de orçamento para preservar a entrega do leilão.</li>
-            `;
-        }
-    }
-
     openBudgetModal(campaignId, currentBudgetValue) {
         const modal = document.getElementById('budget-modal');
         if (!modal) return;
@@ -858,6 +797,145 @@ class DashboardApp {
         }
         this.showToast(`Oferta filtrada: ${offerId === 'all' ? 'Todas as Ofertas' : 'Kit Patriota Oficial 2026'}`, 'success');
         this.syncAllData();
+    }
+
+    async loadSIData() {
+        try {
+            const res = await fetch('/api/si-query');
+            const json = await res.json();
+            if (!json.success || !json.data) return;
+
+            const data = json.data;
+            const ov = data.overview || {};
+            
+            // KPIs
+            const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            setTxt('si-kpi-sessions', `${ov.total_sessions || 0}`);
+            setTxt('si-kpi-checkout', `${ov.checkout_count || 0}`);
+            setTxt('si-kpi-pix', `${ov.pix_count || 0}`);
+            setTxt('si-kpi-purchases', `${ov.purchase_count || 0}`);
+            setTxt('si-kpi-rage', `${ov.rage_click_sessions || 0}`);
+            setTxt('si-kpi-scroll', `${ov.avg_scroll || 0}%`);
+            setTxt('si-kpi-health', `${ov.conversion_rate || 0}%`);
+
+            // Bottleneck
+            const b = data.bottleneck || {};
+            setTxt('si-bottleneck-severity', b.severity || 'LOW');
+            const bContainer = document.getElementById('si-bottleneck-content');
+            if (bContainer) {
+                bContainer.innerHTML = `
+                    <p class="font-bold text-[#FF2D2D] text-sm">${escapeHTML(b.name || 'Sem Gargalo Detectado')}</p>
+                    <p class="text-[#A1A1A6] text-xs">${escapeHTML(b.evidence || 'Nenhuma fricção identificada.')}</p>
+                    <div class="pt-2 flex items-center justify-between text-[11px] text-[#6E6E73]">
+                        <span>Taxa de Queda: <b class="text-white">${b.drop_rate || 0}%</b></span>
+                        <span>Impact Score: <b class="text-white">${b.impact_score || 0}/100</b></span>
+                    </div>
+                `;
+            }
+
+            // AI Diagnosis
+            const diag = data.diagnosis || {};
+            setTxt('si-diagnosis-confidence', `Confiança: ${diag.confidence_rating || 'N/A'}`);
+            const diagContainer = document.getElementById('si-diagnosis-content');
+            if (diagContainer) {
+                diagContainer.innerHTML = `
+                    <p class="font-bold text-[#F5F5F7] text-sm">${escapeHTML(diag.headline || '')}</p>
+                    <ul class="list-disc list-inside space-y-1 text-[#A1A1A6]">
+                        ${(diag.bullets || []).map(bullet => `<li>${escapeHTML(bullet)}</li>`).join('')}
+                    </ul>
+                    <div class="p-2.5 rounded-lg bg-[#FF2D2D]/10 border border-[#FF2D2D]/20 mt-2">
+                        <p class="text-[11px] font-bold text-[#FF2D2D]">Ação Recomendada:</p>
+                        <p class="text-xs text-white">${escapeHTML(diag.recommended_action || '')}</p>
+                    </div>
+                `;
+            }
+
+            // Funnel Visual
+            const fnContainer = document.getElementById('si-funnel-container');
+            if (fnContainer && data.funnel && data.funnel.steps) {
+                fnContainer.innerHTML = data.funnel.steps.map(s => `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono">
+                            <span class="text-[#F5F5F7]">${escapeHTML(s.name)}</span>
+                            <span class="text-[#A1A1A6]">${s.count} (${s.pct}%) ${s.drop_off_pct > 0 ? `• Drop: ${s.drop_off_pct}%` : ''}</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-[#101014] overflow-hidden">
+                            <div class="h-full bg-[#FF2D2D]" style="width: ${s.pct}%"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Sessions Table
+            const sContainer = document.getElementById('si-sessions-container');
+            if (sContainer && data.recent_sessions) {
+                if (data.recent_sessions.length === 0) {
+                    sContainer.innerHTML = `<p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada ainda.</p>`;
+                } else {
+                    sContainer.innerHTML = `
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">Sessão / Dispositivo</th>
+                                        <th class="text-left">Origem</th>
+                                        <th class="text-right">Max Scroll</th>
+                                        <th class="text-right">Rage Clicks</th>
+                                        <th class="text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.recent_sessions.map(s => `
+                                        <tr>
+                                            <td>
+                                                <p class="font-mono text-xs font-bold text-[#F5F5F7]">${escapeHTML(s.session_id)}</p>
+                                                <p class="text-[10px] text-[#6E6E73]">${escapeHTML(s.device_type)}</p>
+                                            </td>
+                                            <td class="text-xs text-[#A1A1A6]">${escapeHTML(s.utm_source)} / ${escapeHTML(s.utm_campaign)}</td>
+                                            <td class="text-right font-mono text-xs text-[#F5F5F7]">${s.max_scroll}%</td>
+                                            <td class="text-right font-mono text-xs ${s.rage_clicks > 0 ? 'text-[#FF453A] font-bold' : 'text-[#6E6E73]'}">${s.rage_clicks}</td>
+                                            <td class="text-center">
+                                                <span class="badge ${s.purchased ? 'badge-active' : (s.reached_checkout ? 'badge-paused' : 'badge-error')} text-[9px]">
+                                                    ${s.purchased ? 'CONVERTIDO' : (s.reached_checkout ? 'CHECKOUT' : 'BOUNCE')}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+
+        } catch (err) {
+            console.error('[SI Load Error]', err);
+        }
+    }
+
+    switchView(viewName) {
+        this.currentView = viewName;
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (item.getAttribute('data-nav-target') === viewName) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        document.querySelectorAll('.view-section').forEach(sec => {
+            if (sec.id === `view-${viewName}`) {
+                sec.classList.remove('hidden');
+            } else {
+                sec.classList.add('hidden');
+            }
+        });
+
+        if (viewName === 'site-intelligence') {
+            this.loadSIData();
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     toggleSidebar() {

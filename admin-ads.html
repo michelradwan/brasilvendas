@@ -125,15 +125,6 @@
                 </div>
             </div>
 
-            <!-- Multi-Offer Selector (Preparado para Escala Multi-Oferta) -->
-            <div class="hidden xl:flex items-center space-x-1.5 pl-3 border-l border-white/[0.07]">
-                <span class="text-[10px] uppercase font-bold text-[#6E6E73]">Oferta:</span>
-                <select id="offer-selector" onchange="window.dashboard.changeOffer(this.value)" class="bg-[#101014] border border-white/[0.08] text-[#F5F5F7] text-xs rounded-md px-2 py-1 focus:outline-none focus:border-[#FF2D2D]">
-                    <option value="all">Todas as Ofertas</option>
-                    <option value="kit_patriota" selected>Kit Patriota Oficial 2026</option>
-                    <option value="new_offer">+ Nova Oferta (Multi-Offer)</option>
-                </select>
-            </div>
         </div>
 
         <!-- Central Date Range Selector -->
@@ -150,13 +141,6 @@
             <button onclick="window.dashboard.openTokenModal()" class="btn btn-secondary btn-sm flex items-center gap-1.5" title="Trocar Credencial Meta">
                 <span class="text-[#FF2D2D]">🔑</span>
                 <span class="hidden sm:inline">Trocar Token</span>
-            </button>
-            <button onclick="window.dashboard.runWarRoomAudit()" class="btn btn-danger btn-sm hidden md:inline-flex">
-                🚨 War Room
-            </button>
-            <button onclick="window.dashboard.toggleCommandPalette()" class="btn btn-secondary btn-sm hidden xl:inline-flex">
-                <span class="font-mono text-[10px] text-[#6E6E73]">⌘K</span>
-                <span>Comandos</span>
             </button>
             <button onclick="window.dashboard.syncAllData()" class="btn btn-secondary btn-sm">
                 <span>🔄</span>
@@ -202,17 +186,9 @@
                 <div>
                     <p class="sidebar-group-title">INTELLIGENCE</p>
                     <nav class="space-y-0.5">
-                        <div class="nav-item" data-nav-target="aicoach" title="AI Coach">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span>AI Performance Coach</span>
-                        </div>
-                        <div class="nav-item" data-nav-target="lab" title="Experiment Lab">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                            <span>Experiment Lab</span>
-                        </div>
-                        <div class="nav-item" data-nav-target="warroom" title="War Room">
-                            <svg class="w-4 h-4 text-[#FF453A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            <span class="text-[#FF453A] font-semibold">War Room</span>
+                        <div class="nav-item" data-nav-target="site-intelligence" title="Site Intelligence">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>Site Intelligence</span>
                         </div>
                     </nav>
                 </div>
@@ -223,15 +199,11 @@
                     <nav class="space-y-0.5">
                         <div class="nav-item" data-nav-target="tracking" title="Tracking Health">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            <span>Tracking Glass Box</span>
+                            <span>Tracking Health</span>
                         </div>
                         <div class="nav-item" data-nav-target="autopilot" title="Autopilot">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                            <span>Autopilot & Safety</span>
-                        </div>
-                        <div class="nav-item" data-nav-target="gamification" title="Missões & XP">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                            <span>Governança & XP</span>
+                            <span>Autopilot</span>
                         </div>
                         <div class="nav-item" data-nav-target="audit" title="Audit Trail">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -245,19 +217,15 @@
                 </div>
             </div>
 
-            <!-- Sidebar Operator XP Footer -->
-            <div class="p-3 rounded-xl bg-[#101014] border border-white/[0.05] space-y-2 text-[11px]">
+            <!-- Sidebar Footer -->
+            <div class="p-3 rounded-xl bg-[#101014] border border-white/[0.05] space-y-1.5 text-[11px]">
                 <div class="flex items-center justify-between">
-                    <span class="text-[#6E6E73]">Operador</span>
-                    <span id="topbar-level-name" class="font-bold text-[#F5F5F7]">Level 1: Junior</span>
+                    <span class="text-[#6E6E73]">Emergency Stop</span>
+                    <span id="sidebar-emergency-status" class="text-[#1FC16B] font-semibold">Inativo</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-[#6E6E73]">Disciplina XP</span>
-                    <span id="topbar-xp" class="text-[#FF2D2D] font-mono font-bold">150 XP</span>
-                </div>
-                <div class="pt-2 border-t border-white/[0.05] flex items-center justify-between">
-                    <span class="text-[#6E6E73]">Modo IA</span>
-                    <span id="sidebar-ai-mode" class="text-[#1FC16B] font-semibold">Assistido</span>
+                    <span class="text-[#6E6E73]">Modo Autopilot</span>
+                    <span id="sidebar-ai-mode" class="text-[#A1A1A6] font-semibold">Assistido</span>
                 </div>
             </div>
         </aside>
@@ -307,80 +275,6 @@
                         <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Tracking Health</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]">98%</p>
                         <p class="text-[10px] text-[#6E6E73] font-mono">CAPI v21.0 Online</p>
-                    </div>
-                </div>
-
-                <!-- CAMADA 3: DECISION CENTER (O CORAÇÃO DO SISTEMA) -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                    <!-- Today's Brief (4 colunas) -->
-                    <div class="lg:col-span-4 panel p-5 space-y-3 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">TODAY'S BRIEF</span>
-                                <span class="text-[10px] text-[#6E6E73] font-mono">Atualizado em tempo real</span>
-                            </div>
-                            <p class="text-xs text-[#F5F5F7] leading-relaxed">
-                                O sistema está tecnicamente íntegro e ativo. A infraestrutura de rastreamento híbrido (Pixel + CAPI v21.0) opera com 100% de precisão de sinal.
-                            </p>
-                            <div class="space-y-1.5 pt-1 text-[11.5px]">
-                                <div class="flex items-center gap-2 text-[#1FC16B]">
-                                    <span>✓</span> <span>Sinal CAPI e Webhooks UTMify sincronizados</span>
-                                </div>
-                                <div class="flex items-center gap-2 text-[#A1A1A6]">
-                                    <span>●</span> <span>Frequência média dos criativos em zona segura (&lt; 2.2)</span>
-                                </div>
-                                <div class="flex items-center gap-2 text-[#F5A524]">
-                                    <span>⚠</span> <span>Ponto de atenção: Taxa de conversão no checkout mobile</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pt-3 border-t border-white/[0.05] flex justify-between items-center text-[10.5px]">
-                            <span class="text-[#6E6E73]">Diagnóstico: Estável</span>
-                            <span class="text-[#1FC16B] font-mono font-bold">Confiança 94%</span>
-                        </div>
-                    </div>
-
-                    <!-- Decision Queue / What Should I Do Now? (8 colunas) -->
-                    <div class="lg:col-span-8 panel p-5 space-y-3">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <div class="flex items-center space-x-2">
-                                <span class="w-2 h-2 rounded-full bg-[#FF2D2D]"></span>
-                                <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">DECISION QUEUE (O QUE FAZER AGORA)</span>
-                            </div>
-                            <span class="badge badge-winner text-[9px]">PRIORIDADES ATIVAS</span>
-                        </div>
-                        <div id="what-should-i-do-container" class="space-y-2 text-xs">
-                            <!-- Inserido dinamicamente via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CAMADA 3.1: CAUSE MAP (MAPEAMENTO CAUSAL INOVADOR) -->
-                <div class="panel p-5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">CAUSE MAP — DIAGNÓSTICO CAUSAL DO SISTEMA</span>
-                        <span class="text-[10px] text-[#6E6E73] font-mono">Análise de Causa Raiz</span>
-                    </div>
-                    <div class="cause-map-flow">
-                        <div class="cause-map-node">
-                            <span class="text-[#5DA9FF]">📊 Impressões & CTR</span>
-                            <span class="text-[#1FC16B]">Estáveis (2.4%)</span>
-                        </div>
-                        <span class="cause-map-arrow">➔</span>
-                        <div class="cause-map-node">
-                            <span class="text-[#5DA9FF]">🌐 Landing Page Views</span>
-                            <span class="text-[#1FC16B]">86% Retenção</span>
-                        </div>
-                        <span class="cause-map-arrow">➔</span>
-                        <div class="cause-map-node">
-                            <span class="text-[#F5A524]">🛒 Checkout Iniciado</span>
-                            <span class="text-[#F5A524]">Ativo</span>
-                        </div>
-                        <span class="cause-map-arrow">➔</span>
-                        <div class="cause-map-node border-[#FF2D2D]/40 bg-[#FF2D2D]/10">
-                            <span class="text-[#FF2D2D]">🎯 Conclusão:</span>
-                            <span class="text-[#F5F5F7]">Foco no fechamento do PIX mobile</span>
-                        </div>
                     </div>
                 </div>
 
@@ -435,41 +329,7 @@
                     </div>
                 </div>
 
-                <!-- CAMADA 5: LIVE ACTIVITY / PERFORMANCE STREAM -->
-                <div class="panel p-5 space-y-3">
-                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-[#1FC16B] animate-pulse"></span>
-                            <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">LIVE ACTIVITY STREAM</span>
-                        </div>
-                        <span class="text-[10px] text-[#6E6E73] font-mono">Eventos em Tempo Real</span>
-                    </div>
-                    <div class="space-y-2 text-xs font-mono" id="live-activity-stream">
-                        <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[#1FC16B]">●</span>
-                                <span class="text-[#F5F5F7]">Sincronização com Meta Marketing API concluída</span>
-                            </div>
-                            <span class="text-[10px] text-[#6E6E73]">Agora</span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[#5DA9FF]">●</span>
-                                <span class="text-[#F5F5F7]">Reconciliação CAPI & UTMify validada sem divergências</span>
-                            </div>
-                            <span class="text-[10px] text-[#6E6E73]">1 min atrás</span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[#1FC16B]">●</span>
-                                <span class="text-[#F5F5F7]">Guardrail de Segurança: Teto diário de R$ 500,00 verificado</span>
-                            </div>
-                            <span class="text-[10px] text-[#6E6E73]">2 min atrás</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CAMADA 6: OPORTUNIDADES & RECONCILIAÇÃO -->
+                <!-- CAMADA 5: OPORTUNIDADES & RECONCILIAÇÃO -->
                 <div class="panel p-5 space-y-3">
                     <h3 class="font-bold text-sm text-[#F5F5F7]">Oportunidades de Otimização (Scoring de Confiança & Risco)</h3>
                     <div id="top-opportunities-container" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"></div>
@@ -540,104 +400,119 @@
             </section>
 
             <!-- ===================================================================
-                 SEÇÃO 5: EXPERIMENT LAB
+                 SEÇÃO 5: SITE INTELLIGENCE (FASE 1)
                  =================================================================== -->
-            <section id="view-lab" class="view-section hidden space-y-4">
-                <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Experiment Lab & Hipóteses</h2>
-                    <p class="text-xs text-[#A1A1A6]">Ambiente científico para validação de novas variações e ofertas com significância estatística</p>
+            <section id="view-site-intelligence" class="view-section hidden space-y-5">
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-[#F5F5F7]">Site Intelligence</h2>
+                        <p class="text-xs text-[#A1A1A6]">Análise comportamental do visitante — Funil, Fricção, Gargalos e Diagnóstico de Conversão</p>
+                    </div>
+                    <span class="badge badge-active text-[10px]">OBSERVE ONLY</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="panel p-5 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="badge badge-active text-[10px]">RUNNING</span>
-                            <span class="text-[10px] text-[#6E6E73]">Iniciado há 2 dias</span>
+
+                <!-- Overview Metrics SI -->
+                <div class="snapshot-grid">
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões</p>
+                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-sessions">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Visitas únicas</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Checkout</p>
+                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-checkout">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Iniciaram preenchimento</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">PIX Criado</p>
+                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-pix">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Clicaram em gerar</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums" id="si-kpi-purchases">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Pagamento confirmado</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Rage Clicks</p>
+                        <p class="text-xl font-bold font-mono text-[#FF453A] tabular-nums" id="si-kpi-rage">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Sessões com fricção</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Scroll Médio</p>
+                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-scroll">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Profundidade média</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Conversion Health</p>
+                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-health">—</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Score de conversão</p>
+                    </div>
+                </div>
+
+                <!-- Main Bottleneck + AI Diagnosis -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <!-- Bottleneck Card -->
+                    <div class="lg:col-span-5 panel p-5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Main Bottleneck</span>
+                            <span id="si-bottleneck-severity" class="badge badge-error text-[9px]">—</span>
                         </div>
-                        <h4 class="font-bold text-sm text-[#F5F5F7]">Teste de Headline: Frete Full Express</h4>
-                        <p class="text-xs text-[#A1A1A6]">Hipótese: Destacar envio em 24h na primeira dobra aumenta a taxa de conversão em 15%.</p>
-                        <div class="pt-2 border-t border-white/[0.05] flex justify-between text-xs font-mono">
-                            <span class="text-[#6E6E73]">Amostra: 420 LPV</span>
-                            <span class="text-[#1FC16B] font-bold">+18.4% Win Rate</span>
+                        <div id="si-bottleneck-content" class="space-y-2 text-xs">
+                            <p class="text-[#6E6E73] text-center py-4 italic">Aguardando dados suficientes...</p>
                         </div>
                     </div>
 
-                    <div class="panel p-5 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="badge badge-winner text-[10px]">WIN</span>
-                            <span class="text-[10px] text-[#6E6E73]">Concluído</span>
+                    <!-- AI Diagnosis -->
+                    <div class="lg:col-span-7 panel p-5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-[#FF2D2D]"></span>
+                                <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">AI Diagnosis</span>
+                            </div>
+                            <span id="si-diagnosis-confidence" class="text-[10px] text-[#6E6E73] font-mono">—</span>
                         </div>
-                        <h4 class="font-bold text-sm text-[#F5F5F7]">Botão Verde Esmeralda vs Amarelo Ouro</h4>
-                        <p class="text-xs text-[#A1A1A6]">Hipótese: O botão verde de pagamento gera maior sensação de segurança do que amarelo.</p>
-                        <div class="pt-2 border-t border-white/[0.05] flex justify-between text-xs font-mono">
-                            <span class="text-[#6E6E73]">Confiança: 96%</span>
-                            <span class="text-[#1FC16B] font-bold">Adotado</span>
+                        <div id="si-diagnosis-content" class="space-y-3 text-xs">
+                            <p class="text-[#6E6E73] text-center py-4 italic">Insufficient data — coletando primeiras sessões...</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Funnel Visual -->
+                <div class="panel p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                        <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Funil de Conversão do Site</span>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">Dados reais — sem estimativas</span>
+                    </div>
+                    <div id="si-funnel-container" class="space-y-2">
+                        <p class="text-[#6E6E73] text-center py-4 italic text-xs">Aguardando sessões...</p>
+                    </div>
+                </div>
+
+                <!-- Sessions List -->
+                <div class="panel overflow-hidden">
+                    <div class="flex items-center justify-between p-5 border-b border-white/[0.05]">
+                        <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões Recentes</span>
+                        <div class="flex items-center space-x-2">
+                            <select id="si-session-filter" class="bg-[#101014] border border-white/[0.08] text-[#F5F5F7] text-xs rounded-md px-2 py-1 focus:outline-none focus:border-[#FF2D2D]">
+                                <option value="all">Todas</option>
+                                <option value="converted">Convertidas</option>
+                                <option value="abandoned">Abandonadas</option>
+                                <option value="rage_click">Rage Click</option>
+                                <option value="mobile">Mobile</option>
+                                <option value="desktop">Desktop</option>
+                            </select>
+                            <button onclick="window.dashboard.loadSIData()" class="btn btn-secondary btn-sm">Atualizar</button>
+                        </div>
+                    </div>
+                    <div id="si-sessions-container">
+                        <p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada ainda.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- ===================================================================
-                 SEÇÃO 6: TRACKING GLASS BOX
-                 =================================================================== -->
-            <section id="view-tracking" class="view-section hidden space-y-4">
-                <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Tracking Glass Box & Reconciliação CAPI</h2>
-                    <p class="text-xs text-[#A1A1A6]">Auditoria contínua de integridade de sinal, deduplicação `eventID` e sincronização UTMify</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="panel p-5 space-y-2">
-                        <p class="text-xs text-[#A1A1A6] font-semibold">Meta CAPI v21.0</p>
-                        <p class="text-2xl font-bold font-mono text-[#1FC16B]">ONLINE</p>
-                        <p class="text-[10px] text-[#6E6E73]">Server-Side SHA-256</p>
-                    </div>
-                    <div class="panel p-5 space-y-2">
-                        <p class="text-xs text-[#A1A1A6] font-semibold">UTMify Sync</p>
-                        <p class="text-2xl font-bold font-mono text-[#1FC16B]">ATIVO</p>
-                        <p class="text-[10px] text-[#6E6E73]">Atribuição First/Last Touch</p>
-                    </div>
-                    <div class="panel p-5 space-y-2">
-                        <p class="text-xs text-[#A1A1A6] font-semibold">Deduplicação de Compras</p>
-                        <p class="text-2xl font-bold font-mono text-[#F5F5F7]">100%</p>
-                        <p class="text-[10px] text-[#6E6E73]">ID Único Canônico</p>
-                    </div>
-                    <div class="panel p-5 space-y-2">
-                        <p class="text-xs text-[#A1A1A6] font-semibold">Vendas Órfãs</p>
-                        <p class="text-2xl font-bold font-mono text-[#1FC16B]">0</p>
-                        <p class="text-[10px] text-[#6E6E73]">Zero perda de atribuição</p>
-                    </div>
-                </div>
-            </section>
 
-            <!-- ===================================================================
-                 SEÇÃO 7: AI PERFORMANCE COACH
-                 =================================================================== -->
-            <section id="view-aicoach" class="view-section hidden space-y-4">
-                <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">AI Performance Coach & Diagnóstico</h2>
-                    <p class="text-xs text-[#A1A1A6]">Consultor executivo autônomo baseado em estatística bayesiana e causa raiz</p>
-                </div>
-                <div class="panel p-6 space-y-4">
-                    <div class="flex items-center space-x-3 pb-3 border-b border-white/[0.05]">
-                        <span class="w-8 h-8 rounded-lg bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-sm">🤖</span>
-                        <div>
-                            <h3 id="aicoach-headline" class="font-bold text-sm text-[#F5F5F7]">Carregando diagnóstico de IA...</h3>
-                            <p class="text-xs text-[#A1A1A6]">Relatório analítico em tempo real</p>
-                        </div>
-                    </div>
-                    <div id="aicoach-bullets" class="space-y-2 text-xs"></div>
-                </div>
-            </section>
-
-            <!-- ===================================================================
-                 SEÇÃO 8: GOVERNANÇA & GAMIFICAÇÃO
-                 =================================================================== -->
-            <section id="view-gamification" class="view-section hidden space-y-4">
-                <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Governança & Disciplina Operacional</h2>
-                    <p class="text-xs text-[#A1A1A6]">Progressão de nível focada em rigor técnico, preservação de capital e precisão de dados</p>
-                </div>
-                <div id="missions-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </section>
 
             <!-- ===================================================================
                  SEÇÃO 9: AUTOPILOT & EMERGENCY STOP
@@ -697,21 +572,7 @@
                 </div>
             </section>
 
-            <!-- ===================================================================
-                 SEÇÃO 10: WAR ROOM
-                 =================================================================== -->
-            <section id="view-warroom" class="view-section hidden space-y-4">
-                <div>
-                    <h2 class="text-lg font-bold text-[#FF453A]">War Room — Triage Imediata de Performance</h2>
-                    <p class="text-xs text-[#A1A1A6]">Análise de anomalias, picos de CPA e isolamento de causas raízes</p>
-                </div>
-                <div class="panel p-6 space-y-4">
-                    <button onclick="window.dashboard.runWarRoomAudit()" class="btn btn-danger w-full py-3 text-xs font-bold">
-                        🚨 EXECUTAR AUDITORIA WAR ROOM AGORA
-                    </button>
-                    <div id="war-room-inline-content" class="space-y-3 text-xs"></div>
-                </div>
-            </section>
+            <!-- SEÇÃO 10: (removida) -->
 
             <!-- ===================================================================
                  SEÇÃO 11: AUDITORIA & LINHA DO TEMPO
@@ -759,44 +620,7 @@
 
     <!-- MODAIS, DRAWERS E TOASTS -->
 
-    <!-- Modal Command Palette (⌘K) -->
-    <div id="command-palette-modal" class="modal-overlay hidden">
-        <div class="modal-content max-w-lg p-4 space-y-3">
-            <div class="flex items-center space-x-2 pb-2 border-b border-white/[0.07]">
-                <span>🔍</span>
-                <input type="text" placeholder="Digite um comando (ex: War Room, Sincronizar, Campanhas)..." class="w-full bg-transparent text-xs text-[#F5F5F7] focus:outline-none placeholder-[#6E6E73]">
-                <button onclick="window.dashboard.toggleCommandPalette()" class="text-xs text-[#6E6E73] hover:text-[#F5F5F7]">Esc</button>
-            </div>
-            <div class="space-y-1 text-xs text-[#A1A1A6] max-h-60 overflow-y-auto">
-                <div onclick="window.dashboard.switchView('campaigns'); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/[0.05] cursor-pointer flex items-center justify-between">
-                    <span>📢 Campanhas</span> <span class="text-[10px] text-[#6E6E73]">Navegar</span>
-                </div>
-                <div onclick="window.dashboard.runWarRoomAudit(); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/[0.05] cursor-pointer flex items-center justify-between">
-                    <span>🚨 Abrir War Room</span> <span class="text-[10px] text-[#6E6E73]">Auditoria</span>
-                </div>
-                <div onclick="window.dashboard.syncAllData(); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/[0.05] cursor-pointer flex items-center justify-between">
-                    <span>🔄 Sincronizar Agora</span> <span class="text-[10px] text-[#6E6E73]">Ação</span>
-                </div>
-                <div onclick="window.dashboard.openTokenModal(); window.dashboard.toggleCommandPalette()" class="p-2 rounded-lg hover:bg-white/[0.05] cursor-pointer flex items-center justify-between">
-                    <span>🔑 Atualizar Token Meta</span> <span class="text-[10px] text-[#6E6E73]">Config</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal War Room -->
-    <div id="war-room-modal" class="modal-overlay hidden">
-        <div class="modal-content max-w-2xl p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
-                <div class="flex items-center space-x-2">
-                    <span class="text-xl">🚨</span>
-                    <h3 class="font-bold text-[#F5F5F7] text-base">War Room — Auditoria Imediata de Performance</h3>
-                </div>
-                <button onclick="document.getElementById('war-room-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
-            </div>
-            <div id="war-room-content" class="space-y-3"></div>
-        </div>
-    </div>
+    <!-- Modais removidos: War Room, Command Palette (não eram usados) -->
 
     <!-- Modal Orçamento -->
     <div id="budget-modal" class="modal-overlay hidden">
