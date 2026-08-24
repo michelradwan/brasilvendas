@@ -949,7 +949,7 @@
         } catch(e) {}
     }
 
-    // ── Pedidos ──
+    // ── Pedidos (Real Data Only) ──
     async function carregarPedidos() {
         let combined = [];
 
@@ -958,20 +958,9 @@
             if (resApi.ok) {
                 const dataApi = await resApi.json();
                 if (dataApi && Array.isArray(dataApi.pedidos)) {
-                    combined = combined.concat(dataApi.pedidos);
+                    combined = dataApi.pedidos;
                 }
             }
-        } catch(e) {}
-
-        try {
-            const resPhp = await fetch('admin-pedidos.php?export=json');
-            const dataPhp = await resPhp.json();
-            if (Array.isArray(dataPhp)) combined = combined.concat(dataPhp);
-        } catch(e) {}
-
-        try {
-            const local = JSON.parse(localStorage.getItem('pedidos_brasilvendas') || '[]');
-            if (Array.isArray(local)) combined = combined.concat(local);
         } catch(e) {}
 
         // Deduplicar

@@ -45,8 +45,8 @@ module.exports = async (req, res) => {
             globalPedidosCache = [];
             saveDiskOrders([]);
             
-            // Limpar chave de ações persistentes do storage
-            await storage.set('actions', 'ORDER_CLEAR_FLAG', null);
+            // Zerar persistentemente a coleção de pedidos/ações registradas no storage
+            await storage.clearStore('actions');
             
             // Tentar remover arquivo físico se existir
             try {

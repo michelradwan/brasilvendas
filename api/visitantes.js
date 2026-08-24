@@ -16,9 +16,9 @@ module.exports = async (req, res) => {
 
     const agora = Date.now();
 
-    // Limpar visitantes inativos (mais de 45 segundos sem ping)
+    // Limpar visitantes inativos (mais de 25 segundos sem ping)
     for (const [id, data] of visitantesAtivos.entries()) {
-        if (agora - data.ultimo_ping > 45000) {
+        if (agora - data.ultimo_ping > 25000) {
             visitantesAtivos.delete(id);
         }
     }
@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try {
             const body = req.body || {};
-            const visitId = body.visit_id || req.headers['x-forwarded-for'] || `v_${agora}_${Math.random()}`;
+            const visitId = body.visit_id || req.headers['x-forwarded-for'] || `v_anon_${agora}`;
             
             // Geolocalização nativa da Vercel (Edge Headers)
             const cidade = decodeURIComponent(req.headers['x-vercel-ip-city'] || body.city || 'São Paulo');
@@ -36,11 +36,13 @@ module.exports = async (req, res) => {
             const userAgent = req.headers['user-agent'] || '';
 
             // Detectar dispositivo
-            let dispositivo = '📱 Celular';
-            if (/iphone/i.test(userAgent)) dispositivo = '📱 iPhone';
-            else if (/android/i.test(userAgent)) dispositivo = '📱 Android';
-            else if (/windows|macintosh|linux/i.test(userAgent)) dispositivo = '💻 Computador';
+            let dispositivo = 'Celular';
+            if (/iphone/i.test(userAgent)) dispositivo = 'iPhone';
+            else if (/android/i.test(userAgent)) dispositivo = 'Android';
+            else if (/windows|macintosh|linux/i.test(userAgent)) dispositivo = 'Computador';
+            else if (/ipad|tablet/i.test(userAgent)) dispositivo = 'Tablet';
 
+            const existing = visitantesAtivos.get(visitId);
             visitantesAtivos.set(visitId, {
                 visit_id: visitId,
                 cidade: cidade,
@@ -50,7 +52,7 @@ module.exports = async (req, res) => {
                 etapa: body.etapa || 'Visualizando Página',
                 origem: body.origem || 'Meta Ads',
                 campanha: body.campanha || 'Direto',
-                criado_em: visitantesAtivos.get(visitId)?.criado_em || agora,
+                criado_em: existing?.criado_em || agora,
                 ultimo_ping: agora
             });
 

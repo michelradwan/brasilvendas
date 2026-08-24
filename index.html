@@ -2319,18 +2319,32 @@
             }
         }
 
-        // Monitor de Visitantes em Tempo Real (Heartbeat 10s)
+        // Monitor de Visitantes em Tempo Real (Heartbeat 10s com Deduplicação Durável)
         (function initVisitorHeartbeat() {
+            function getOrCreateVisitorId() {
+                try {
+                    let vid = localStorage.getItem('bv_visitor_id');
+                    if (!vid || vid.length < 10) {
+                        vid = 'v_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36);
+                        localStorage.setItem('bv_visitor_id', vid);
+                    }
+                    return vid;
+                } catch(e) {
+                    return 'v_temp_' + Math.random().toString(36).substring(2, 9);
+                }
+            }
+
+            const visitorId = getOrCreateVisitorId();
+
             function sendPing(etapa = 'Visualizando Página') {
                 try {
                     const attr = JSON.parse(sessionStorage.getItem('brasilvendas_attr') || '{}');
                     const payload = {
-                        visit_id: sessionStorage.getItem('bv_visit_id') || ('v_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7)),
+                        visit_id: visitorId,
                         etapa: etapa,
                         origem: (attr.last_touch && attr.last_touch.utm_source) ? 'Meta Ads' : 'Direto',
                         campanha: (attr.last_touch && attr.last_touch.utm_campaign) ? attr.last_touch.utm_campaign : 'Direto'
                     };
-                    sessionStorage.setItem('bv_visit_id', payload.visit_id);
                     
                     const proxyBase = (window.location.protocol === 'file:') ? 'https://brasilvendas.vercel.app' : '';
                     if (navigator.sendBeacon) {

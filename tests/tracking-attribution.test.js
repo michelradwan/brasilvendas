@@ -139,6 +139,10 @@ async function runTrackingTests() {
     console.log(`   ✅ PASS: Tracking Health calculado com precisão (${healthScore}% - Alerta disparado).`);
     passed++;
 
+    // Limpeza de isolamento: Remover dados sintéticos gerados para os testes
+    await storage.delete('actions', `ORDER_${testTxId}`);
+    await storage.delete('actions', `ORDER_${organicTxId}`);
+
     console.log('\n================================================================');
     console.log(`🎉 TODOS OS ${passed} TESTES DA AUDITORIA DE TRACKING FORAM APROVADOS!`);
     console.log('================================================================\n');
