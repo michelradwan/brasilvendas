@@ -78,7 +78,7 @@ module.exports = async (req, res) => {
         const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress;
         const clientUserAgent = req.headers['user-agent'] || '';
 
-        // Payload estrito exigido pela API da Duttyfy com tracking parameters anexados
+        // Payload estrito exigido pela API da Duttyfy
         const payload = JSON.stringify({
             paymentMethod: 'PIX',
             customer: {
@@ -92,17 +92,7 @@ module.exports = async (req, res) => {
                 price: amountInCents,
                 quantity: quantity
             },
-            amount: amountInCents,
-            metadata: {
-                utm_source: attribution.last_touch.utm_source || attribution.first_touch.utm_source || '',
-                utm_medium: attribution.last_touch.utm_medium || attribution.first_touch.utm_medium || '',
-                utm_campaign: attribution.last_touch.utm_campaign || attribution.first_touch.utm_campaign || '',
-                utm_content: attribution.last_touch.utm_content || attribution.first_touch.utm_content || '',
-                utm_term: attribution.last_touch.utm_term || attribution.first_touch.utm_term || '',
-                src: attribution.last_touch.src || attribution.first_touch.src || '',
-                sck: attribution.last_touch.sck || attribution.first_touch.sck || '',
-                fbclid: attribution.last_touch.fbclid || attribution.first_touch.fbclid || ''
-            }
+            amount: amountInCents
         });
 
         const parsed = new URL(API_URL);

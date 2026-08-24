@@ -62,6 +62,9 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    screens: {
+                        'xs': '400px',
+                    },
                     fontFamily: {
                         'inter': ['Inter', 'sans-serif'],
                         'outfit': ['Outfit', 'sans-serif'],
@@ -223,17 +226,20 @@
                             </div>
 
                             <!-- Preço e Oferta Transparente -->
-                            <div class="bg-brand-card/90 p-3 sm:p-4 rounded-2xl border border-brand-border mb-3.5 sm:mb-4 flex items-center justify-between">
-                                <div>
-                                    <span class="text-[11px] text-gray-400 line-through block">De R$ 159,90</span>
-                                    <div class="flex items-baseline space-x-2">
-                                        <span class="text-3xl sm:text-4xl font-outfit font-black text-white tracking-tight">R$ 89,90</span>
-                                        <span class="text-xs text-brand-green font-bold bg-brand-green/15 px-2 py-0.5 rounded-md">à vista no PIX</span>
+                            <div class="bg-brand-card/90 p-3.5 sm:p-4 rounded-2xl border border-brand-border mb-3.5 sm:mb-4 flex flex-col xs:flex-row xs:items-center justify-between gap-2.5 sm:gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <span class="text-[11px] text-gray-400 line-through block mb-0.5">De R$ 159,90</span>
+                                    <div class="flex items-center flex-wrap gap-2">
+                                        <span class="text-2xl sm:text-3xl lg:text-4xl font-outfit font-black text-white tracking-tight whitespace-nowrap">R$&nbsp;89,90</span>
+                                        <span class="text-[11px] sm:text-xs text-brand-green font-bold bg-brand-green/15 border border-brand-green/20 px-2 py-0.5 rounded-md whitespace-nowrap inline-flex items-center">à vista no PIX</span>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <span class="text-xs font-bold text-brand-accent block">🚚 Frete Grátis</span>
-                                    <span class="text-[11px] text-gray-400 block">Envio em até 24h úteis</span>
+                                <div class="text-left xs:text-right border-t xs:border-t-0 border-white/5 pt-2 xs:pt-0 flex-shrink-0">
+                                    <span class="text-xs font-bold text-brand-accent flex xs:justify-end items-center space-x-1">
+                                        <span>🚚</span>
+                                        <span>Frete Grátis</span>
+                                    </span>
+                                    <span class="text-[11px] text-gray-400 block mt-0.5">Envio em até 24h úteis</span>
                                 </div>
                             </div>
 
