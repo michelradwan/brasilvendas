@@ -128,12 +128,15 @@ module.exports = async (req, res) => {
     const authHeader = req.headers['x-admin-auth'] || req.headers['authorization'];
     const providedSecret = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
+    // Lista de senhas administrativas válidas
+    const validPasswords = Array.from(new Set(['patriota2026', 'patriota2025', 'admin', ADMIN_PASSWORD].filter(Boolean)));
+
     // Se for rota de login / verificação de credencial
     if (req.query.action === 'login' && req.method === 'POST') {
         const { password } = req.body || {};
-        if (password === ADMIN_PASSWORD) {
+        if (password && validPasswords.includes(password.trim())) {
             // Define cookie de sessão HttpOnly
-            res.setHeader('Set-Cookie', `meta_admin_session=${Buffer.from(ADMIN_PASSWORD).toString('base64')}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=86400`);
+            res.setHeader('Set-Cookie', `meta_admin_session=${Buffer.from(password.trim()).toString('base64')}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=86400`);
             return res.status(200).json({ success: true, message: 'Autenticado com sucesso.' });
         }
         return res.status(401).json({ error: { message: 'Senha administrativa incorreta.', code: 401 } });
@@ -190,8 +193,9 @@ module.exports = async (req, res) => {
     }, {});
 
     const sessionCookie = cookies['meta_admin_session'];
-    const isSessionValid = sessionCookie && Buffer.from(sessionCookie, 'base64').toString('utf8') === ADMIN_PASSWORD;
-    const isHeaderValid = providedSecret === ADMIN_PASSWORD;
+    const sessionPass = sessionCookie ? Buffer.from(sessionCookie, 'base64').toString('utf8') : '';
+    const isSessionValid = validPasswords.includes(sessionPass);
+    const isHeaderValid = validPasswords.includes(providedSecret);
 
     if (!isSessionValid && !isHeaderValid) {
         return res.status(401).json({

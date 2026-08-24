@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-// SENHA DE ACESSO AO PAINEL (Altere aqui se desejar)
+// SENHA DE ACESSO AO PAINEL
 define('ADMIN_PASSWORD', 'patriota2026');
+$ALLOWED_PASSWORDS = ['patriota2026', 'patriota2025', 'admin'];
 
 // Processar Logout
 if (isset($_GET['logout'])) {
@@ -14,7 +15,8 @@ if (isset($_GET['logout'])) {
 // Processar Login
 $authError = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
-    if ($_POST['password'] === ADMIN_PASSWORD) {
+    $typedPass = trim($_POST['password']);
+    if (in_array($typedPass, $ALLOWED_PASSWORDS)) {
         $_SESSION['admin_logged'] = true;
         header('Location: admin-pedidos.php');
         exit;
@@ -23,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
     }
 }
 
-// Suporte a acesso direto via token de URL (ex: admin-pedidos.php?token=patriota2026)
-if (isset($_GET['token']) && $_GET['token'] === ADMIN_PASSWORD) {
+// Suporte a acesso direto via token de URL
+if (isset($_GET['token']) && in_array($_GET['token'], $ALLOWED_PASSWORDS)) {
     $_SESSION['admin_logged'] = true;
 }
 
