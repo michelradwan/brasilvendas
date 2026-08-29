@@ -19,6 +19,9 @@ class DashboardApp {
         this.cachedCampaigns = [];
         this.cachedInsights = new Map();
         this.searchQuery = '';
+        this.cachedOrders = [];
+        this.ordersFilter = 'all';
+        this.ordersSearchQuery = '';
     }
 
     async init() {
@@ -149,6 +152,7 @@ class DashboardApp {
             this.renderCreativesView();
             this.renderAuditLogs();
             this.renderTopOpportunities();
+            await this.loadOrdersData(true);
 
             document.getElementById('topbar-last-sync').textContent = new Date().toLocaleTimeString('pt-BR');
             this.showToast('Dados sincronizados e verificados com sucesso.', 'success');
@@ -913,6 +917,335 @@ class DashboardApp {
         }
     }
 
+    async loadOrdersData(silent = false) {
+        if (!silent) this.showToast('Atualizando lista de pedidos...', 'info');
+
+        try {
+            const token = window.metaAdapter.adminPassword || 'mraa2004';
+            const res = await fetch(`/api/pedidos?token=${encodeURIComponent(token)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Array.isArray(data.pedidos)) {
+                    // Deduplica pedidos por transaction_id
+                    const map = new Map();
+                    data.pedidos.forEach(p => {
+                        const key = p.transaction_id || p.id;
+                        if (!map.has(key) || (p.status || '').toUpperCase() === 'PAID' || (p.status || '').toUpperCase() === 'PAGO' || (p.status || '').toUpperCase() === 'APROVADO') {
+                            map.set(key, p);
+                        }
+                    });
+                    this.cachedOrders = Array.from(map.values());
+                } else {
+                    this.cachedOrders = [];
+                }
+            } else {
+                this.cachedOrders = [];
+            }
+
+            this.updateOrdersMetrics();
+            this.renderOrdersTable();
+
+            if (!silent) this.showToast('Pedidos sincronizados com sucesso.', 'success');
+
+            // Checagem em background de status de PIX pendentes
+            this.checkPendingOrdersStatus();
+
+        } catch (err) {
+            console.error('[Orders Load Error]', err);
+            if (!silent) this.showToast('Erro ao carregar pedidos.', 'warning');
+        }
+    }
+
+    async checkPendingOrdersStatus() {
+        const pending = this.cachedOrders.filter(p => {
+            const st = (p.status || 'PENDENTE').toUpperCase();
+            return st !== 'PAID' && st !== 'PAGO' && st !== 'APROVADO' && p.transaction_id;
+        });
+
+        let anyUpdated = false;
+        for (const p of pending.slice(0, 8)) {
+            try {
+                const res = await fetch(`/api/status-pix?id=${encodeURIComponent(p.transaction_id)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (data.status === 'paid' || data.status === 'approved')) {
+                        p.status = 'PAID';
+                        anyUpdated = true;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        if (anyUpdated) {
+            this.updateOrdersMetrics();
+            this.renderOrdersTable();
+        }
+    }
+
+    updateOrdersMetrics() {
+        let totalRevenue = 0;
+        let paidCount = 0;
+        let pendingCount = 0;
+
+        this.cachedOrders.forEach(p => {
+            const st = (p.status || 'PENDENTE').toUpperCase();
+            const isPaid = (st === 'PAID' || st === 'PAGO' || st === 'APROVADO');
+            const amt = parseFloat(p.amount || 89.90);
+            if (isPaid) {
+                totalRevenue += amt;
+                paidCount++;
+            } else {
+                pendingCount++;
+            }
+        });
+
+        const totalOrders = paidCount + pendingCount;
+        const convRate = totalOrders > 0 ? ((paidCount / totalOrders) * 100).toFixed(1) : '0.0';
+
+        // Gasto total de anúncios da Meta
+        let totalSpend = 0;
+        this.cachedCampaigns.forEach(c => {
+            const ins = this.cachedInsights.get(c.id);
+            if (ins) totalSpend += (ins.spend || 0);
+        });
+
+        // Lucro real = Faturamento - Gasto Meta - Custo do Kit (R$ 38 por kit pago) - taxa gateway (3.99%)
+        const productCost = paidCount * 38.00;
+        const gatewayFees = totalRevenue * 0.0399;
+        const netProfit = totalRevenue - totalSpend - productCost - gatewayFees;
+
+        const revEl = document.getElementById('orders-kpi-revenue');
+        if (revEl) revEl.textContent = `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`;
+
+        const paidEl = document.getElementById('orders-kpi-paid-count');
+        if (paidEl) paidEl.textContent = `${paidCount} un`;
+
+        const pendEl = document.getElementById('orders-kpi-pending-count');
+        if (pendEl) pendEl.textContent = `${pendingCount} un`;
+
+        const convEl = document.getElementById('orders-kpi-conv-rate');
+        if (convEl) convEl.textContent = `${convRate}%`;
+
+        const profEl = document.getElementById('orders-kpi-profit');
+        if (profEl) {
+            profEl.textContent = `R$ ${netProfit.toFixed(2).replace('.', ',')}`;
+            profEl.className = netProfit >= 0 ? 'text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]' : 'text-xl sm:text-2xl font-bold font-mono text-[#FF453A]';
+        }
+
+        // Atualiza badge na sidebar
+        const badgeEl = document.getElementById('sidebar-orders-badge');
+        if (badgeEl) {
+            if (paidCount > 0) {
+                badgeEl.textContent = `${paidCount} vendas`;
+                badgeEl.classList.remove('hidden');
+            } else if (totalOrders > 0) {
+                badgeEl.textContent = `${totalOrders}`;
+                badgeEl.classList.remove('hidden');
+            } else {
+                badgeEl.classList.add('hidden');
+            }
+        }
+    }
+
+    setOrdersFilter(filter) {
+        this.ordersFilter = filter;
+        document.querySelectorAll('[data-order-filter]').forEach(btn => {
+            if (btn.getAttribute('data-order-filter') === filter) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        this.renderOrdersTable();
+    }
+
+    searchOrders(query) {
+        this.ordersSearchQuery = (query || '').toLowerCase().trim();
+        this.renderOrdersTable();
+    }
+
+    renderOrdersTable() {
+        const tbody = document.getElementById('orders-table-body');
+        const emptyState = document.getElementById('orders-empty-state');
+        if (!tbody || !emptyState) return;
+
+        let filtered = this.cachedOrders;
+
+        // Filtro de Status
+        if (this.ordersFilter === 'paid') {
+            filtered = filtered.filter(p => {
+                const st = (p.status || 'PENDENTE').toUpperCase();
+                return st === 'PAID' || st === 'PAGO' || st === 'APROVADO';
+            });
+        } else if (this.ordersFilter === 'pending') {
+            filtered = filtered.filter(p => {
+                const st = (p.status || 'PENDENTE').toUpperCase();
+                return st !== 'PAID' && st !== 'PAGO' && st !== 'APROVADO';
+            });
+        }
+
+        // Filtro de Busca
+        if (this.ordersSearchQuery) {
+            const q = this.ordersSearchQuery;
+            filtered = filtered.filter(p => {
+                const name = (p.name || (p.customer && p.customer.name) || '').toLowerCase();
+                const cpf = (p.cpf || (p.customer && (p.customer.document || p.customer.cpf)) || '').replace(/\D/g, '');
+                const phone = (p.phone || (p.customer && p.customer.phone) || '').replace(/\D/g, '');
+                const tx = (p.transaction_id || p.id || '').toLowerCase();
+                return name.includes(q) || cpf.includes(q) || phone.includes(q) || tx.includes(q);
+            });
+        }
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+        tbody.innerHTML = filtered.map(p => {
+            const st = (p.status || 'PENDENTE').toUpperCase();
+            const isPaid = (st === 'PAID' || st === 'PAGO' || st === 'APROVADO');
+            const cust = p.customer || {};
+            const name = p.name || cust.name || 'Cliente Patriota';
+            const cpf = p.cpf || cust.document || cust.cpf || '–';
+            const phone = p.phone || cust.phone || '';
+            const phoneClean = phone.replace(/\D/g, '');
+            const amount = parseFloat(p.amount || 89.90).toFixed(2).replace('.', ',');
+            const dt = p.created_at ? new Date(p.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'Hoje';
+            const txId = p.transaction_id || p.id || '';
+            const pixCode = p.pix_code || p.pixCode || '';
+            const attr = p.attribution || {};
+            const utmCampaign = attr.utm_campaign || (attr.last_touch && attr.last_touch.utm_campaign) || 'Direto / Orgânico';
+            const utmContent = attr.utm_content || (attr.last_touch && attr.last_touch.utm_content) || '';
+            const size = p.size || 'M';
+            const quantity = p.quantity || 1;
+            const shippingLabel = p.shipping_label || (p.shipping_type === 'express' ? 'Express (3 dias)' : 'Frete Grátis');
+
+            return `
+                <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.05]">
+                    <td class="py-3 px-4">
+                        <div class="font-mono text-xs text-[#F5F5F7] font-semibold">${escapeHTML(dt)}</div>
+                        <div class="mt-1">
+                            ${isPaid
+                                ? `<span class="badge badge-active text-[10px]"><span class="status-dot status-dot-active"></span> Pago (PIX)</span>`
+                                : `<span class="badge badge-warning text-[10px]"><span class="status-dot status-dot-paused bg-[#F5A524]"></span> Aguardando PIX</span>`
+                            }
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-xs text-[#F5F5F7]">${escapeHTML(name)}</div>
+                        <div class="font-mono text-[10px] text-[#A1A1A6]">CPF: ${escapeHTML(cpf)}</div>
+                        ${phoneClean ? `
+                            <a href="https://wa.me/55${phoneClean}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[11px] text-[#1FC16B] hover:underline mt-0.5">
+                                <span>📱</span>
+                                <span class="font-mono">${escapeHTML(phone)}</span>
+                            </a>
+                        ` : '<span class="text-[10px] text-[#6E6E73]">Sem telefone</span>'}
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="text-xs text-[#F5F5F7]">${quantity}x Kit Patriota (Tam ${escapeHTML(size)})</div>
+                        <div class="text-[10px] text-[#A1A1A6] font-mono">${escapeHTML(shippingLabel)}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-mono font-bold text-xs ${isPaid ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">
+                            R$ ${escapeHTML(amount)}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[#A1A1A6] max-w-[180px] truncate" title="${escapeHTML(utmCampaign)}">
+                            🎯 ${escapeHTML(utmCampaign)}
+                        </span>
+                        ${utmContent ? `<div class="text-[9px] text-[#6E6E73] font-mono truncate max-w-[180px]">Ad: ${escapeHTML(utmContent)}</div>` : ''}
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="inline-flex items-center justify-end gap-1.5">
+                            ${!isPaid && phoneClean ? `
+                                <button onclick="window.dashboard.sendWhatsAppRecovery('${escapeHTML(txId)}')" class="btn btn-sm bg-[#1FC16B]/15 text-[#1FC16B] border border-[#1FC16B]/30 hover:bg-[#1FC16B] hover:text-white transition-all text-[11px]" title="Recuperar no WhatsApp">
+                                    <span>💬</span>
+                                    <span>Recuperar PIX</span>
+                                </button>
+                            ` : ''}
+                            ${pixCode ? `
+                                <button onclick="window.dashboard.copyPixCode('${escapeHTML(pixCode)}')" class="btn btn-secondary btn-sm text-[11px]" title="Copiar Código PIX">
+                                    <span>📋</span>
+                                </button>
+                            ` : ''}
+                            ${isPaid ? `
+                                <span class="text-[11px] font-semibold text-[#1FC16B] flex items-center gap-1">
+                                    <span>✓</span> Concluído
+                                </span>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    copyPixCode(pixCode) {
+        if (!pixCode) {
+            this.showToast('Código PIX não disponível para este pedido.', 'warning');
+            return;
+        }
+        navigator.clipboard.writeText(pixCode).then(() => {
+            this.showToast('Chave PIX copiada com sucesso para a área de transferência!', 'success');
+        }).catch(() => {
+            prompt('Copie o código PIX abaixo:', pixCode);
+        });
+    }
+
+    sendWhatsAppRecovery(txId) {
+        const order = this.cachedOrders.find(p => (p.transaction_id || p.id) === txId);
+        if (!order) {
+            this.showToast('Pedido não encontrado.', 'error');
+            return;
+        }
+
+        const cust = order.customer || {};
+        const name = (order.name || cust.name || 'Cliente').split(' ')[0];
+        const phone = (order.phone || cust.phone || '').replace(/\D/g, '');
+        const amount = parseFloat(order.amount || 89.90).toFixed(2).replace('.', ',');
+        const pixCode = order.pix_code || order.pixCode || '';
+
+        if (!phone) {
+            this.showToast('Este cliente não possui telefone cadastrado.', 'warning');
+            return;
+        }
+
+        let msg = `Olá, ${name}! Tudo bem?\n\n`;
+        msg += `Vi que você gerou o pedido do seu *Kit Patriota Oficial 2026* no valor de *R$ ${amount}*, mas o PIX ainda não foi compensado pelo sistema.\n\n`;
+        msg += `O seu lote com *Frete Promocional* está reservado. Caso queira garantir o seu envio imediato, segue a sua chave PIX Copia e Cola:\n\n`;
+        if (pixCode) {
+            msg += `\`${pixCode}\`\n\n`;
+        }
+        msg += `Ficou com alguma dúvida ou precisa de ajuda com o pedido? Estou à disposição!`;
+
+        const waUrl = `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+    }
+
+    async clearOrdersHistory() {
+        if (!confirm('⚠️ ATENÇÃO: Deseja realmente zerar todo o histórico de pedidos e testes?\n\nEsta ação limpará o banco de dados de pedidos de teste do painel.')) {
+            return;
+        }
+
+        try {
+            const token = window.metaAdapter.adminPassword || 'mraa2004';
+            const res = await fetch(`/api/pedidos?action=clear&token=${encodeURIComponent(token)}`, { method: 'POST' });
+            if (res.ok) {
+                this.cachedOrders = [];
+                this.updateOrdersMetrics();
+                this.renderOrdersTable();
+                this.showToast('Histórico de pedidos limpo com sucesso.', 'success');
+            } else {
+                this.showToast('Falha ao limpar histórico de pedidos.', 'error');
+            }
+        } catch(err) {
+            this.showToast(`Erro ao limpar: ${err.message}`, 'error');
+        }
+    }
+
     switchView(viewName) {
         this.currentView = viewName;
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -933,6 +1266,8 @@ class DashboardApp {
 
         if (viewName === 'site-intelligence') {
             this.loadSIData();
+        } else if (viewName === 'orders') {
+            this.loadOrdersData();
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
