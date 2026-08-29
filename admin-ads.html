@@ -100,10 +100,13 @@
 
 <body class="bg-[#050506] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2D2D] selection:text-white">
 
+    <!-- BACKDROP DA SIDEBAR (OFF-CANVAS OVERLAY MOBILE) -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="window.dashboard.closeSidebar()"></div>
+
     <!-- CAMADA 1: STATUS STRIP OPERACIONAL (TOPBAR) -->
-    <header class="status-strip sticky top-0 z-40 flex items-center justify-between border-b border-white/[0.07] bg-[#0A0A0C] px-4 py-2">
-        <div class="flex items-center space-x-3 sm:space-x-4 min-w-0">
-            <button onclick="window.dashboard.toggleSidebar()" class="btn-icon md:hidden text-gray-400 hover:text-white" title="Menu">
+    <header class="status-strip sticky top-0 z-40 flex items-center justify-between border-b border-white/[0.07] bg-[#0A0A0C] px-3 sm:px-4 py-2">
+        <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
+            <button onclick="window.dashboard.toggleSidebar()" class="btn-icon md:hidden text-gray-400 hover:text-white" title="Menu Lateral">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
 
@@ -114,9 +117,9 @@
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-center space-x-2">
-                        <span id="topbar-account-name" class="font-bold text-xs sm:text-sm text-[#F5F5F7] truncate max-w-[130px] sm:max-w-[180px]">Brasil Vendas</span>
+                        <span id="topbar-account-name" class="font-bold text-xs sm:text-sm text-[#F5F5F7] truncate max-w-[120px] sm:max-w-[180px]">Brasil Vendas</span>
                         <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#1FC16B] bg-[#1FC16B]/10 px-2 py-0.5 rounded border border-[#1FC16B]/20">
-                            <span class="status-dot status-dot-active"></span> Connected
+                            <span class="status-dot status-dot-active"></span> Conectado
                         </span>
                     </div>
                     <p class="text-[10px] text-[#A1A1A6] font-mono truncate hidden sm:block">
@@ -124,27 +127,43 @@
                     </p>
                 </div>
             </div>
-
         </div>
 
-        <!-- Central Date Range Selector -->
-        <div class="hidden lg:flex items-center space-x-1 bg-[#101014] border border-white/[0.07] p-0.5 rounded-lg text-xs">
-            <button data-date-preset="today" class="segmented-btn active px-3 py-1 text-xs">Hoje</button>
-            <button data-date-preset="yesterday" class="segmented-btn px-3 py-1 text-xs">Ontem</button>
-            <button data-date-preset="last_3d" class="segmented-btn px-3 py-1 text-xs">3 Dias</button>
-            <button data-date-preset="last_7d" class="segmented-btn px-3 py-1 text-xs">7 Dias</button>
-            <button data-date-preset="last_30d" class="segmented-btn px-3 py-1 text-xs">30 Dias</button>
+        <!-- Seletor Global de Período & Comparação -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2">
+            <!-- Segmented Quick Presets (Desktop & Tablet) -->
+            <div class="hidden xl:flex items-center space-x-1 bg-[#101014] border border-white/[0.07] p-0.5 rounded-lg text-xs">
+                <button data-date-preset="today" onclick="window.dashboard.setGlobalPreset('today')" class="segmented-btn active px-2.5 py-1 text-xs">Hoje</button>
+                <button data-date-preset="yesterday" onclick="window.dashboard.setGlobalPreset('yesterday')" class="segmented-btn px-2.5 py-1 text-xs">Ontem</button>
+                <button data-date-preset="last_3d" onclick="window.dashboard.setGlobalPreset('last_3d')" class="segmented-btn px-2.5 py-1 text-xs">3D</button>
+                <button data-date-preset="last_7d" onclick="window.dashboard.setGlobalPreset('last_7d')" class="segmented-btn px-2.5 py-1 text-xs">7D</button>
+                <button data-date-preset="last_14d" onclick="window.dashboard.setGlobalPreset('last_14d')" class="segmented-btn px-2.5 py-1 text-xs">14D</button>
+                <button data-date-preset="last_30d" onclick="window.dashboard.setGlobalPreset('last_30d')" class="segmented-btn px-2.5 py-1 text-xs">30D</button>
+                <button data-date-preset="this_month" onclick="window.dashboard.setGlobalPreset('this_month')" class="segmented-btn px-2.5 py-1 text-xs">Mês</button>
+            </div>
+
+            <!-- Botão de Calendário Personalizado & Status do Período Ativo -->
+            <button onclick="window.dashboard.openCustomDateModal()" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs font-mono" title="Alterar período ou personalizar datas">
+                <span>📅</span>
+                <span id="topbar-period-label" class="font-sans font-semibold text-xs">Hoje</span>
+            </button>
+
+            <!-- Toggle Rápido de Comparação -->
+            <button id="btn-toggle-comparison" onclick="window.dashboard.toggleComparison()" class="btn btn-tertiary btn-sm text-[11px] hidden sm:inline-flex items-center gap-1 border border-white/[0.07]" title="Comparar métricas com o período anterior equivalente">
+                <span>🔄</span>
+                <span>Comparar</span>
+            </button>
         </div>
 
         <!-- Command Bar Actions -->
-        <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+        <div class="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
             <button onclick="window.dashboard.openTokenModal()" class="btn btn-secondary btn-sm flex items-center gap-1.5" title="Trocar Credencial Meta">
                 <span class="text-[#FF2D2D]">🔑</span>
-                <span class="hidden sm:inline">Trocar Token</span>
+                <span class="hidden md:inline">Token</span>
             </button>
-            <button onclick="window.dashboard.syncAllData()" class="btn btn-secondary btn-sm">
+            <button onclick="window.dashboard.syncAllData()" class="btn btn-secondary btn-sm flex items-center gap-1">
                 <span>🔄</span>
-                <span class="hidden sm:inline">Sincronizar</span>
+                <span class="hidden md:inline">Sincronizar</span>
             </button>
             <button onclick="window.dashboard.logout()" class="btn btn-tertiary btn-sm text-[#FF453A] hover:text-[#FF453A]" title="Sair da Conta">
                 <span>🚪</span>
@@ -381,13 +400,29 @@
             </section>
 
             <!-- ===================================================================
-                 SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA)
+                 SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA COM PERIOD OVERRIDE)
                  =================================================================== -->
             <section id="view-creatives" class="view-section hidden space-y-4">
-                <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Galeria e Diagnóstico de Criativos</h2>
-                    <p class="text-xs text-[#A1A1A6]">Análise de fadiga, hook rate, taxa de retenção e Creative Score</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0F0F12] border border-white/[0.07] p-3 sm:p-4 rounded-xl">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-bold text-[#F5F5F7]">Galeria e Diagnóstico de Criativos</h2>
+                            <span id="creatives-override-badge" class="badge badge-paused text-[10px]">Período Global</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Análise de fadiga, hook rate, taxa de retenção e Creative Score</p>
+                    </div>
+
+                    <!-- Controles de Período Local para Criativos -->
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <div class="flex items-center space-x-1 bg-[#15151A] border border-white/[0.05] p-1 rounded-lg">
+                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'global')" data-sec-preset="global" class="segmented-btn active px-2.5 py-1 text-xs">Global</button>
+                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_7d')" data-sec-preset="last_7d" class="segmented-btn px-2.5 py-1 text-xs">7D</button>
+                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_30d')" data-sec-preset="last_30d" class="segmented-btn px-2.5 py-1 text-xs">30D (Recomendado)</button>
+                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_90d')" data-sec-preset="last_90d" class="segmented-btn px-2.5 py-1 text-xs">90D</button>
+                        </div>
+                    </div>
                 </div>
+
                 <div id="creatives-grid-container" class="creatives-grid"></div>
             </section>
 
@@ -724,7 +759,62 @@
 
     <!-- MODAIS, DRAWERS E TOASTS -->
 
-    <!-- Modais removidos: War Room, Command Palette (não eram usados) -->
+    <!-- Modal Seleção de Período Personalizado & Comparação -->
+    <div id="custom-date-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-6 space-y-5">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📅</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Selecionar Período de Análise</h3>
+                </div>
+                <button onclick="window.dashboard.closeCustomDateModal()" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+
+            <!-- Presets Rápidos no Modal -->
+            <div>
+                <label class="block text-[10.5px] text-[#A1A1A6] uppercase font-bold mb-2">Atalhos Rápidos</label>
+                <div class="grid grid-cols-3 gap-1.5 text-xs">
+                    <button type="button" onclick="window.dashboard.selectModalPreset('today')" class="btn btn-secondary btn-sm text-[11px]">Hoje</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('yesterday')" class="btn btn-secondary btn-sm text-[11px]">Ontem</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_3d')" class="btn btn-secondary btn-sm text-[11px]">3 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_7d')" class="btn btn-secondary btn-sm text-[11px]">7 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_14d')" class="btn btn-secondary btn-sm text-[11px]">14 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_30d')" class="btn btn-secondary btn-sm text-[11px]">30 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_90d')" class="btn btn-secondary btn-sm text-[11px]">90 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('this_month')" class="btn btn-secondary btn-sm text-[11px]">Este Mês</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_month')" class="btn btn-secondary btn-sm text-[11px]">Mês Passado</button>
+                </div>
+            </div>
+
+            <!-- Intervalo Manual Customizado -->
+            <form onsubmit="window.dashboard.applyCustomDateRange(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Data Inicial</label>
+                        <input type="date" id="modal-date-since" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] font-mono focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Data Final</label>
+                        <input type="date" id="modal-date-until" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] font-mono focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Comparação de Período -->
+                <div class="flex items-center justify-between p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                    <div>
+                        <p class="font-bold text-xs text-[#F5F5F7]">Comparar com período anterior</p>
+                        <p class="text-[10px] text-[#A1A1A6]">Exibe variações (+12%, -8%) comparando com o período anterior equivalente</p>
+                    </div>
+                    <input type="checkbox" id="modal-compare-checkbox" class="w-4 h-4 accent-[#FF2D2D] rounded">
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/[0.05]">
+                    <button type="button" onclick="window.dashboard.closeCustomDateModal()" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" class="btn btn-primary text-xs">Aplicar e Recalcular ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal Orçamento -->
     <div id="budget-modal" class="modal-overlay hidden">
@@ -785,15 +875,16 @@
     <!-- Toast Notifications Container -->
     <div id="toast-container"></div>
 
-    <!-- SCRIPTS DA APLICAÇÃO -->
-    <script src="js/meta-adapter.js?v=5.0"></script>
-    <script src="js/analytics.js?v=5.0"></script>
-    <script src="js/guardrails.js?v=5.0"></script>
-    <script src="js/decisions.js?v=5.0"></script>
-    <script src="js/execution.js?v=5.0"></script>
-    <script src="js/audit.js?v=5.0"></script>
-    <script src="js/autopilot.js?v=5.0"></script>
-    <script src="js/dashboard.js?v=5.0"></script>
+    <!-- SCRIPTS DA APLICAÇÃO (ORDEM RIGOROSA) -->
+    <script src="js/period-store.js?v=6.0"></script>
+    <script src="js/meta-adapter.js?v=6.0"></script>
+    <script src="js/analytics.js?v=6.0"></script>
+    <script src="js/guardrails.js?v=6.0"></script>
+    <script src="js/decisions.js?v=6.0"></script>
+    <script src="js/execution.js?v=6.0"></script>
+    <script src="js/audit.js?v=6.0"></script>
+    <script src="js/autopilot.js?v=6.0"></script>
+    <script src="js/dashboard.js?v=6.0"></script>
 </body>
 
 </html>

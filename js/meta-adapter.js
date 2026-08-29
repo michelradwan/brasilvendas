@@ -138,12 +138,24 @@ class MetaDataProvider {
         });
     }
 
-    // Buscar Insights
-    async getInsights(objectId, datePreset = 'today') {
-        return this.request(`${objectId}/insights`, 'GET', {
-            fields: 'spend,impressions,clicks,cpc,cpm,ctr,frequency,actions,action_values',
-            date_preset: datePreset
-        });
+    // Buscar Insights (Suporta Presets e Intervalos Customizados)
+    async getInsights(objectId, periodParam = 'today') {
+        const params = {
+            fields: 'spend,impressions,clicks,cpc,cpm,ctr,frequency,actions,action_values'
+        };
+
+        if (typeof periodParam === 'object' && periodParam !== null && periodParam.since && periodParam.until) {
+            params.time_range = JSON.stringify({
+                since: periodParam.since,
+                until: periodParam.until
+            });
+        } else if (typeof periodParam === 'string' && periodParam.startsWith('{')) {
+            params.time_range = periodParam;
+        } else {
+            params.date_preset = periodParam || 'today';
+        }
+
+        return this.request(`${objectId}/insights`, 'GET', params);
     }
 
     // Mutação de Status

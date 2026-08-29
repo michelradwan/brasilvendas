@@ -169,7 +169,18 @@ module.exports = async (req, res) => {
                 allMap.set(p.transaction_id, flattened);
             });
 
-            const mergedList = Array.from(allMap.values());
+            let mergedList = Array.from(allMap.values());
+
+            // Filtro por período temporal (se especificado na query)
+            if (req.query.start_date && req.query.end_date) {
+                const startTs = new Date(`${req.query.start_date}T00:00:00.000Z`).getTime();
+                const endTs = new Date(`${req.query.end_date}T23:59:59.999Z`).getTime();
+                mergedList = mergedList.filter(p => {
+                    if (!p.created_at) return true;
+                    const pTs = new Date(p.created_at).getTime();
+                    return pTs >= startTs && pTs <= endTs;
+                });
+            }
 
             return res.status(200).json({
                 success: true,
