@@ -28,12 +28,29 @@ class DashboardApp {
         this.isTopMoreMenuOpen = false;
         this.isSyncing = false;
         this.currentAbortController = null;
+
+        // Metrics & Columns Master System State
+        this.activeColumns = window.metricsRegistry ? window.metricsRegistry.getActiveColumns('campaign') : [
+            'status_toggle', 'name', 'radwan_status', 'daily_budget', 'spend', 'purchases', 'cpa', 'revenue', 'roas', 'profit', 'link_ctr', 'link_cpc', 'cpm', 'frequency', 'initiate_checkout', 'conversion_rate', 'actions'
+        ];
+        this.sortColumn = 'spend';
+        this.sortDirection = 'desc';
+        this.isTableCompact = false;
+        this.drawerSelectedColumns = [];
+        this.drawerCategoryFilter = 'all';
+        this.drawerSearchQuery = '';
     }
 
     async init() {
         this.bindEvents();
         this.setupKeyboardShortcuts();
         this.setupPeriodStoreListener();
+
+        // Inicializa colunas e badges do Metric Registry
+        this.updateActiveColumnsBadge();
+        const activePreset = window.metricsRegistry ? window.metricsRegistry.repository.getActivePresetId() : 'PADRAO_GESTOR';
+        const presetSelect = document.getElementById('select-metric-preset');
+        if (presetSelect) presetSelect.value = activePreset === 'CUSTOM' ? 'PADRAO_GESTOR' : activePreset;
 
         // Listener para fechar popover da topbar ao clicar fora
         document.addEventListener('click', (e) => {
@@ -514,7 +531,12 @@ class DashboardApp {
         `).join('');
     }
 
-    // ─── CONSOLE OPERACIONAL DE CAMPANHAS (META ADS) ──────────────────────────
+    // ─── CONSOLE OPERACIONAL DE CAMPANHAS COM METRICS & COLUMNS MASTER ───────
+
+    updateActiveColumnsBadge() {
+        const badge = document.getElementById('active-columns-badge');
+        if (badge) badge.textContent = this.activeColumns.length;
+    }
 
     setCampaignFilter(filter) {
         this.campaignFilter = filter;
@@ -527,6 +549,39 @@ class DashboardApp {
 
     filterCampaignsList(query) {
         this.campaignSearchQuery = (query || '').toLowerCase().trim();
+        this.renderCampaignsTable();
+    }
+
+    changeMetricPreset(presetId) {
+        if (!window.metricsRegistry) return;
+        const preset = window.metricsRegistry.getPreset(presetId);
+        if (preset) {
+            this.activeColumns = [...preset.columns];
+            window.metricsRegistry.repository.setActivePresetId(presetId);
+            this.updateActiveColumnsBadge();
+            this.renderCampaignsTable();
+            this.showToast(`Visualização alterada para: ${preset.name}`, 'info');
+        }
+    }
+
+    toggleTableDensity() {
+        this.isTableCompact = !this.isTableCompact;
+        const table = document.getElementById('campaigns-table');
+        if (table) {
+            if (this.isTableCompact) table.classList.add('table-compact');
+            else table.classList.remove('table-compact');
+        }
+        this.showToast(`Densidade da tabela: ${this.isTableCompact ? 'Compacta' : 'Confortável'}`, 'info');
+    }
+
+    handleSort(metricId) {
+        if (metricId === 'actions' || metricId === 'status_toggle') return;
+        if (this.sortColumn === metricId) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortColumn = metricId;
+            this.sortDirection = 'desc';
+        }
         this.renderCampaignsTable();
     }
 
@@ -579,7 +634,7 @@ class DashboardApp {
     }
 
     getFilteredCampaigns() {
-        return this.cachedCampaigns.filter(camp => {
+        let list = this.cachedCampaigns.filter(camp => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
             
             // Filtro de busca textual
@@ -599,12 +654,75 @@ class DashboardApp {
 
             return true;
         });
+
+        // Ordenação dinâmica
+        if (this.sortColumn && window.metricsRegistry) {
+            const metricDef = window.metricsRegistry.getMetric(this.sortColumn);
+            if (metricDef) {
+                list.sort((a, b) => {
+                    const insA = this.cachedInsights.get(a.id);
+                    const insB = this.cachedInsights.get(b.id);
+                    let valA = metricDef.calculate(insA, a, this.cachedOrders);
+                    let valB = metricDef.calculate(insB, b, this.cachedOrders);
+
+                    if (valA === null || valA === undefined) valA = -999999;
+                    if (valB === null || valB === undefined) valB = -999999;
+
+                    if (typeof valA === 'string') {
+                        return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    }
+                    return this.sortDirection === 'asc' ? (valA - valB) : (valB - valA);
+                });
+            }
+        }
+
+        return list;
+    }
+
+    renderCampaignsTableHead() {
+        const thead = document.getElementById('campaigns-table-head');
+        if (!thead || !window.metricsRegistry) return;
+
+        let html = '<tr>';
+        
+        // Checkbox geral
+        html += `
+            <th class="sticky-col-check text-center" style="width: 36px;">
+                <input type="checkbox" id="select-all-campaigns" onchange="window.dashboard.toggleSelectAllCampaigns(this.checked)" class="custom-checkbox" title="Selecionar todas as campanhas visíveis">
+            </th>
+        `;
+
+        this.activeColumns.forEach(metricId => {
+            const metric = window.metricsRegistry.getMetric(metricId);
+            if (!metric) return;
+
+            let stickyClass = '';
+            if (metricId === 'status_toggle') stickyClass = 'sticky-col-status';
+            else if (metricId === 'name') stickyClass = 'sticky-col-name';
+
+            const isSorted = this.sortColumn === metricId;
+            const sortClass = metric.sortable ? `sortable-th ${isSorted ? (this.sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : ''}` : '';
+            const sortIcon = metric.sortable ? `<span class="sort-icon">${isSorted ? (this.sortDirection === 'asc' ? '▲' : '▼') : '↕'}</span>` : '';
+            const alignClass = metric.align === 'right' ? 'text-right' : (metric.align === 'center' ? 'text-center' : 'text-left');
+
+            html += `
+                <th class="${stickyClass} ${sortClass} ${alignClass}" onclick="${metric.sortable ? `window.dashboard.handleSort('${metricId}')` : ''}" title="${escapeHTML(metric.tooltip || metric.label)}" style="min-width: ${metric.minWidth}px;">
+                    <span>${escapeHTML(metric.shortLabel || metric.label)}</span>
+                    ${sortIcon}
+                </th>
+            `;
+        });
+
+        html += '</tr>';
+        thead.innerHTML = html;
     }
 
     renderCampaignsTable() {
+        this.renderCampaignsTableHead();
+
         const tbody = document.getElementById('campaigns-table-body');
         const mobileContainer = document.getElementById('campaigns-mobile-cards');
-        if (!tbody) return;
+        if (!tbody || !window.metricsRegistry) return;
 
         const filtered = this.getFilteredCampaigns();
 
@@ -613,9 +731,9 @@ class DashboardApp {
         this.cachedCampaigns.forEach(c => {
             const ins = this.cachedInsights.get(c.id);
             if (ins) {
-                totalSpend += ins.spend;
-                totalPurchases += ins.purchases;
-                totalRevenue += ins.revenue;
+                totalSpend += (ins.spend || 0);
+                totalPurchases += (ins.purchases || 0);
+                totalRevenue += (ins.revenue || 0);
             }
         });
 
@@ -631,80 +749,70 @@ class DashboardApp {
         if (badgeEl) badgeEl.textContent = `${filtered.length} de ${this.cachedCampaigns.length} campanhas`;
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-[#6E6E73] italic text-xs">Nenhuma campanha encontrada para os filtros selecionados.</td></tr>`;
+            const colSpan = this.activeColumns.length + 1;
+            tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-8 text-center text-[#6E6E73] italic text-xs">Nenhuma campanha encontrada para os filtros selecionados.</td></tr>`;
             if (mobileContainer) mobileContainer.innerHTML = `<p class="text-xs text-[#6E6E73] text-center py-6">Nenhuma campanha encontrada.</p>`;
             return;
         }
 
-        // Tabela Desktop
+        // Tabela Desktop Dinâmica
         tbody.innerHTML = filtered.map(camp => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
-            const isActive = camp.status === 'ACTIVE';
             const isSelected = this.selectedCampaigns.has(camp.id);
-            const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : (camp.lifetime_budget ? parseFloat(camp.lifetime_budget) / 100 : 0);
-            const isCBO = !!camp.daily_budget || !!camp.lifetime_budget;
-            const evalResult = window.decisionEngine ? window.decisionEngine.evaluateCreative(ins, 35.00) : { classification: 'NORMAL', score: 70 };
-
             const safeName = escapeHTML(camp.name);
             const safeId = escapeHTML(camp.id);
 
-            let stateBadge = 'badge-active';
-            let stateLabel = 'Saudável';
-            if (evalResult.classification === 'WINNER') {
-                stateBadge = 'badge-winner';
-                stateLabel = 'Pronta p/ Escalar';
-            } else if (evalResult.classification === 'FATIGUE') {
-                stateBadge = 'badge-error';
-                stateLabel = 'Requer Atenção';
-            } else if (evalResult.classification === 'WATCH') {
-                stateBadge = 'badge-warning';
-                stateLabel = 'Observando';
-            }
+            let rowHtml = `<tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] ${isSelected ? 'bg-[#FF2D2D]/[0.03]' : ''}">`;
 
-            return `
-                <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] ${isSelected ? 'bg-[#FF2D2D]/[0.03]' : ''}">
-                    <td class="p-3 text-center">
-                        <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox" aria-label="Selecionar ${safeName}">
-                    </td>
-                    <td class="p-3">
+            // Checkbox da linha (sticky)
+            rowHtml += `
+                <td class="sticky-col-check p-3 text-center">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox" aria-label="Selecionar ${safeName}">
+                </td>
+            `;
+
+            this.activeColumns.forEach(metricId => {
+                const metric = window.metricsRegistry.getMetric(metricId);
+                if (!metric) return;
+
+                let stickyClass = '';
+                if (metricId === 'status_toggle') stickyClass = 'sticky-col-status';
+                else if (metricId === 'name') stickyClass = 'sticky-col-name';
+
+                const alignClass = metric.align === 'right' ? 'text-right tabular-nums' : (metric.align === 'center' ? 'text-center' : 'text-left');
+                const rawVal = metric.calculate(ins, camp, this.cachedOrders);
+
+                let cellContent = '';
+
+                if (metricId === 'status_toggle') {
+                    const isActive = camp.status === 'ACTIVE';
+                    cellContent = `
                         <label class="toggle-switch" title="Pausar ou reativar campanha">
                             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}')">
                             <span class="toggle-slider"></span>
                         </label>
-                    </td>
-                    <td class="p-3 max-w-[240px]">
-                        <div class="font-semibold text-[#F5F5F7] truncate" title="${safeName}">${safeName}</div>
+                    `;
+                } else if (metricId === 'name') {
+                    const isCBO = !!(camp.daily_budget || camp.lifetime_budget);
+                    cellContent = `
+                        <div class="font-semibold text-[#F5F5F7] truncate max-w-[240px]" title="${safeName}">${safeName}</div>
                         <div class="flex items-center gap-1.5 text-[10px] text-[#6E6E73] font-mono">
                             <span>ID: ${safeId}</span>
                             <span>•</span>
                             <span class="${isCBO ? 'text-[#5DA9FF]' : 'text-[#A1A1A6]'}">${isCBO ? 'CBO' : 'ABO'}</span>
                         </div>
-                    </td>
-                    <td class="p-3">
-                        <span class="badge ${stateBadge} text-[9.5px]">${stateLabel}</span>
-                    </td>
-                    <td class="p-3 tabular-nums text-right">
-                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="hover:underline text-[#F5F5F7] font-semibold flex items-center justify-end gap-1 ml-auto" title="Clique para editar orçamento">
+                    `;
+                } else if (metricId === 'daily_budget') {
+                    const budgetVal = rawVal || 0;
+                    const isCBO = !!(camp.daily_budget || camp.lifetime_budget);
+                    cellContent = `
+                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center justify-end gap-1 ml-auto" title="Clique para editar orçamento">
                             <span>R$ ${budgetVal.toFixed(2).replace('.', ',')}</span>
                             <span class="text-[10px] text-[#6E6E73]">✏️</span>
                         </button>
-                    </td>
-                    <td class="p-3 tabular-nums text-right font-medium text-[#A1A1A6]">
-                        ${window.analyticsEngine.formatMoney(ins.spend)}
-                    </td>
-                    <td class="p-3 tabular-nums text-right font-bold text-[#F5F5F7]">
-                        ${ins.purchases}
-                    </td>
-                    <td class="p-3 tabular-nums text-right font-medium text-[#A1A1A6]">
-                        ${ins.cpa !== null ? window.analyticsEngine.formatMoney(ins.cpa) : '–'}
-                    </td>
-                    <td class="p-3 tabular-nums text-right font-medium text-[#A1A1A6]">
-                        ${window.analyticsEngine.formatMoney(ins.revenue)}
-                    </td>
-                    <td class="p-3 tabular-nums text-right font-bold ${ins.roas && ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">
-                        ${ins.roas !== null ? `${ins.roas.toFixed(2)}x` : '–'}
-                    </td>
-                    <td class="p-3 text-center">
+                    `;
+                } else if (metricId === 'actions') {
+                    cellContent = `
                         <div class="inline-flex items-center gap-1 justify-center">
                             <button onclick="window.dashboard.openRadwanAnalysisModal('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Diagnóstico Radwan">
                                 🧠
@@ -716,9 +824,16 @@ class DashboardApp {
                                 ➔
                             </button>
                         </div>
-                    </td>
-                </tr>
-            `;
+                    `;
+                } else {
+                    cellContent = window.metricsRegistry.formatValue(metricId, rawVal);
+                }
+
+                rowHtml += `<td class="${stickyClass} ${alignClass} p-3">${cellContent}</td>`;
+            });
+
+            rowHtml += '</tr>';
+            return rowHtml;
         }).join('');
 
         // Cards Mobile (< 640px)
@@ -750,10 +865,6 @@ class DashboardApp {
 
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Orçamento</span>
-                                <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">R$ ${budgetVal.toFixed(2).replace('.', ',')}</p>
-                            </div>
-                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
                                 <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Investido</span>
                                 <p class="tabular-nums font-bold text-[#A1A1A6] text-sm">${window.analyticsEngine.formatMoney(ins.spend)}</p>
                             </div>
@@ -762,10 +873,20 @@ class DashboardApp {
                                 <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">${ins.purchases} <span class="text-xs font-normal text-[#6E6E73]">(${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : '–'})</span></p>
                             </div>
                             <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">ROAS</span>
+                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">ROAS Meta</span>
                                 <p class="tabular-nums font-bold ${ins.roas && ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'} text-sm">${ins.roas ? `${ins.roas.toFixed(2)}x` : '–'}</p>
                             </div>
+                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Orçamento</span>
+                                <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">R$ ${budgetVal.toFixed(2).replace('.', ',')}</p>
+                            </div>
                         </div>
+
+                        <!-- Botão Expandir Todas as Métricas Ativas -->
+                        <button onclick="window.dashboard.openMobileMetricDetails('${safeId}')" class="w-full py-1.5 px-3 rounded-lg bg-[#15151A] hover:bg-[#1C1C24] border border-white/[0.06] text-xs font-semibold text-[#5DA9FF] flex items-center justify-between transition-colors">
+                            <span>Ver todas as ${this.activeColumns.length} métricas</span>
+                            <span>➔</span>
+                        </button>
 
                         <div class="flex items-center justify-between gap-2 pt-1">
                             <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="btn btn-secondary btn-sm flex-1 text-[11px]">
@@ -782,6 +903,296 @@ class DashboardApp {
                 `;
             }).join('');
         }
+    }
+
+    // ─── CONTROLADOR DO COLUMN MANAGER DRAWER ─────────────────────────────────
+
+    openColumnManager() {
+        const drawer = document.getElementById('column-manager-drawer');
+        if (!drawer || !window.metricsRegistry) return;
+
+        this.drawerSelectedColumns = [...this.activeColumns];
+        this.renderMetricsCatalog();
+        this.renderSelectedColumnsList();
+        this.renderSavedViewsList();
+
+        const countEl = document.getElementById('column-manager-selected-count');
+        if (countEl) countEl.textContent = `${this.drawerSelectedColumns.length} selecionadas`;
+
+        drawer.classList.add('open');
+    }
+
+    closeColumnManager() {
+        const drawer = document.getElementById('column-manager-drawer');
+        if (drawer) drawer.classList.remove('open');
+    }
+
+    filterMetricsCatalog(query) {
+        this.drawerSearchQuery = (query || '').toLowerCase().trim();
+        this.renderMetricsCatalog();
+    }
+
+    filterMetricCategory(category) {
+        this.drawerCategoryFilter = category;
+        document.querySelectorAll('[data-cat-filter]').forEach(btn => {
+            if (btn.getAttribute('data-cat-filter') === category) {
+                btn.className = 'px-2 py-1 rounded bg-[#15151A] text-[#F5F5F7] border border-white/[0.08] font-semibold';
+            } else {
+                btn.className = 'px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]';
+            }
+        });
+        this.renderMetricsCatalog();
+    }
+
+    renderMetricsCatalog() {
+        const container = document.getElementById('metrics-catalog-list');
+        if (!container || !window.metricsRegistry) return;
+
+        let allMetrics = window.metricsRegistry.getAllMetrics();
+
+        // Filtro por Categoria
+        if (this.drawerCategoryFilter !== 'all') {
+            allMetrics = allMetrics.filter(m => m.category === this.drawerCategoryFilter);
+        }
+
+        // Filtro por Busca
+        if (this.drawerSearchQuery) {
+            allMetrics = allMetrics.filter(m => 
+                (m.label || '').toLowerCase().includes(this.drawerSearchQuery) ||
+                (m.shortLabel || '').toLowerCase().includes(this.drawerSearchQuery) ||
+                (m.id || '').toLowerCase().includes(this.drawerSearchQuery) ||
+                (m.description || '').toLowerCase().includes(this.drawerSearchQuery)
+            );
+        }
+
+        if (allMetrics.length === 0) {
+            container.innerHTML = `<p class="text-xs text-[#6E6E73] italic py-6 text-center">Nenhuma métrica encontrada para "${escapeHTML(this.drawerSearchQuery)}".</p>`;
+            return;
+        }
+
+        container.innerHTML = allMetrics.map(m => {
+            const isSelected = this.drawerSelectedColumns.includes(m.id);
+            let sourceBadge = '';
+            if (m.source === 'META_RAW' || m.source === 'META_ACTION') sourceBadge = '<span class="source-tag source-tag-meta">Meta</span>';
+            else if (m.source === 'BACKEND_ORDER') sourceBadge = '<span class="source-tag source-tag-real">Real</span>';
+            else if (m.source === 'RADWAN') sourceBadge = '<span class="source-tag source-tag-radwan">Radwan</span>';
+            else if (m.source === 'ECONOMICS' || m.source === 'DERIVED') sourceBadge = '<span class="source-tag source-tag-derived">Fórmula</span>';
+
+            return `
+                <div onclick="window.dashboard.toggleMetricInDrawer('${m.id}')" class="metric-picker-item ${isSelected ? 'selected' : ''}">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} class="custom-checkbox mt-0.5 pointer-events-none">
+                    <div class="flex-1 min-w-0 space-y-0.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-bold text-xs text-[#F5F5F7] truncate">${escapeHTML(m.label)}</span>
+                            ${sourceBadge}
+                        </div>
+                        <p class="text-[10.5px] text-[#A1A1A6] line-clamp-1">${escapeHTML(m.beginnerDescription || m.tooltip || '')}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderSelectedColumnsList() {
+        const container = document.getElementById('selected-columns-order-list');
+        const countEl = document.getElementById('column-manager-selected-count');
+        if (countEl) countEl.textContent = `${this.drawerSelectedColumns.length} selecionadas`;
+        if (!container || !window.metricsRegistry) return;
+
+        if (this.drawerSelectedColumns.length === 0) {
+            container.innerHTML = `<p class="text-xs text-[#6E6E73] italic py-4 text-center">Nenhuma coluna selecionada.</p>`;
+            return;
+        }
+
+        container.innerHTML = this.drawerSelectedColumns.map((metricId, index) => {
+            const metric = window.metricsRegistry.getMetric(metricId);
+            if (!metric) return '';
+
+            const isFirst = index === 0;
+            const isLast = index === this.drawerSelectedColumns.length - 1;
+            const isEssential = metricId === 'name';
+
+            return `
+                <div class="order-list-item">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-4 h-4 rounded bg-white/[0.05] text-[#A1A1A6] text-[10px] font-mono flex items-center justify-center">${index + 1}</span>
+                        <span class="font-semibold text-xs text-[#F5F5F7] truncate">${escapeHTML(metric.label)}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="event.stopPropagation(); window.dashboard.moveColumnOrder(${index}, -1)" ${isFirst ? 'disabled' : ''} class="btn-icon text-xs text-gray-400 hover:text-white disabled:opacity-20" title="Mover para cima">▲</button>
+                        <button onclick="event.stopPropagation(); window.dashboard.moveColumnOrder(${index}, 1)" ${isLast ? 'disabled' : ''} class="btn-icon text-xs text-gray-400 hover:text-white disabled:opacity-20" title="Mover para baixo">▼</button>
+                        ${!isEssential ? `
+                            <button onclick="event.stopPropagation(); window.dashboard.removeColumnFromDrawer('${metricId}')" class="btn-icon text-xs text-[#FF453A] hover:text-white ml-1" title="Remover coluna">✕</button>
+                        ` : '<span class="w-5"></span>'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderSavedViewsList() {
+        const container = document.getElementById('saved-views-container');
+        if (!container || !window.metricsRegistry) return;
+
+        const views = window.metricsRegistry.repository.getSavedViews();
+        if (views.length === 0) {
+            container.innerHTML = `<p class="text-[10px] text-[#6E6E73] italic">Nenhuma visão personalizada salva.</p>`;
+            return;
+        }
+
+        container.innerHTML = views.map(v => `
+            <div class="flex items-center justify-between py-1 text-xs">
+                <button onclick="window.dashboard.loadCustomView('${v.id}')" class="text-[#5DA9FF] hover:underline font-medium truncate max-w-[140px]" title="Carregar ${escapeHTML(v.name)}">
+                    ${escapeHTML(v.name)} <span class="text-[9.5px] text-[#6E6E73]">(${v.columns.length})</span>
+                </button>
+                <button onclick="window.dashboard.deleteCustomView('${v.id}')" class="text-[10px] text-[#FF453A] hover:underline">Excluir</button>
+            </div>
+        `).join('');
+    }
+
+    toggleMetricInDrawer(metricId) {
+        const index = this.drawerSelectedColumns.indexOf(metricId);
+        if (index >= 0) {
+            if (metricId === 'name') {
+                this.showToast('A coluna Nome da Campanha é obrigatória.', 'warning');
+                return;
+            }
+            this.drawerSelectedColumns.splice(index, 1);
+        } else {
+            this.drawerSelectedColumns.push(metricId);
+        }
+        this.renderMetricsCatalog();
+        this.renderSelectedColumnsList();
+    }
+
+    moveColumnOrder(index, direction) {
+        const targetIndex = index + direction;
+        if (targetIndex < 0 || targetIndex >= this.drawerSelectedColumns.length) return;
+        const temp = this.drawerSelectedColumns[index];
+        this.drawerSelectedColumns[index] = this.drawerSelectedColumns[targetIndex];
+        this.drawerSelectedColumns[targetIndex] = temp;
+        this.renderSelectedColumnsList();
+    }
+
+    removeColumnFromDrawer(metricId) {
+        if (metricId === 'name') {
+            this.showToast('A coluna Nome da Campanha é obrigatória.', 'warning');
+            return;
+        }
+        this.drawerSelectedColumns = this.drawerSelectedColumns.filter(id => id !== metricId);
+        this.renderMetricsCatalog();
+        this.renderSelectedColumnsList();
+    }
+
+    applyPresetInDrawer(presetId) {
+        if (!window.metricsRegistry) return;
+        const preset = window.metricsRegistry.getPreset(presetId);
+        if (preset) {
+            this.drawerSelectedColumns = [...preset.columns];
+            document.querySelectorAll('[data-drawer-preset]').forEach(btn => {
+                if (btn.getAttribute('data-drawer-preset') === presetId) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            this.renderMetricsCatalog();
+            this.renderSelectedColumnsList();
+        }
+    }
+
+    restoreDefaultColumns() {
+        if (!window.metricsRegistry) return;
+        this.drawerSelectedColumns = [...window.metricsRegistry.presets.PADRAO_GESTOR.columns];
+        this.renderMetricsCatalog();
+        this.renderSelectedColumnsList();
+        this.showToast('Preset restaurado para Padrão do Gestor.', 'info');
+    }
+
+    applySelectedColumns() {
+        if (this.drawerSelectedColumns.length === 0) {
+            this.drawerSelectedColumns = [...window.metricsRegistry.presets.PADRAO_GESTOR.columns];
+        }
+        this.activeColumns = [...this.drawerSelectedColumns];
+        if (window.metricsRegistry) {
+            window.metricsRegistry.setActiveColumns(this.activeColumns, 'campaign');
+        }
+        this.updateActiveColumnsBadge();
+        this.closeColumnManager();
+        this.renderCampaignsTable();
+        this.showToast(`Tabela atualizada com ${this.activeColumns.length} colunas selecionadas!`, 'success');
+    }
+
+    saveCurrentCustomView() {
+        const input = document.getElementById('save-view-name-input');
+        const name = input ? input.value.trim() : '';
+        if (!name) {
+            this.showToast('Informe um nome para a visão personalizada.', 'warning');
+            return;
+        }
+        if (window.metricsRegistry) {
+            window.metricsRegistry.repository.saveView(name, this.drawerSelectedColumns, 'campaign');
+            if (input) input.value = '';
+            this.renderSavedViewsList();
+            this.showToast(`Visão "${name}" salva com sucesso!`, 'success');
+        }
+    }
+
+    loadCustomView(viewId) {
+        if (!window.metricsRegistry) return;
+        const views = window.metricsRegistry.repository.getSavedViews();
+        const view = views.find(v => v.id === viewId);
+        if (view) {
+            this.drawerSelectedColumns = [...view.columns];
+            this.renderMetricsCatalog();
+            this.renderSelectedColumnsList();
+            this.showToast(`Visão "${view.name}" carregada no editor.`, 'info');
+        }
+    }
+
+    deleteCustomView(viewId) {
+        if (!confirm('Deseja realmente excluir esta visão salva?')) return;
+        if (window.metricsRegistry) {
+            window.metricsRegistry.repository.deleteView(viewId);
+            this.renderSavedViewsList();
+            this.showToast('Visão excluída.', 'info');
+        }
+    }
+
+    openMobileMetricDetails(campId) {
+        const modal = document.getElementById('mobile-metric-details-modal');
+        const grid = document.getElementById('mobile-modal-metrics-grid');
+        const nameEl = document.getElementById('mobile-modal-camp-name');
+        const idEl = document.getElementById('mobile-modal-camp-id');
+        if (!modal || !grid || !window.metricsRegistry) return;
+
+        const camp = this.cachedCampaigns.find(c => c.id === campId);
+        const ins = this.cachedInsights.get(campId) || window.analyticsEngine.parseInsights(null);
+
+        if (nameEl) nameEl.textContent = camp ? camp.name : 'Campanha';
+        if (idEl) idEl.textContent = `ID: ${campId}`;
+
+        grid.innerHTML = this.activeColumns.map(metricId => {
+            const metric = window.metricsRegistry.getMetric(metricId);
+            if (!metric || metricId === 'actions' || metricId === 'status_toggle') return '';
+
+            const rawVal = metric.calculate(ins, camp, this.cachedOrders);
+            const formatted = window.metricsRegistry.formatValue(metricId, rawVal);
+
+            let sourceTag = '';
+            if (m => m.source === 'META_RAW') sourceTag = 'Meta';
+
+            return `
+                <div class="flex items-center justify-between py-2">
+                    <div>
+                        <p class="font-semibold text-xs text-[#F5F5F7]">${escapeHTML(metric.label)}</p>
+                        <p class="text-[10px] text-[#6E6E73]">${escapeHTML(metric.shortLabel || '')}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold text-xs">${formatted}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        modal.classList.remove('hidden');
     }
 
     // ─── OPERAÇÕES DE MUTAÇÃO EM CAMPANHAS (WRITE-READ-VERIFY) ────────────────

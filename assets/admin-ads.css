@@ -955,3 +955,156 @@ input:checked + .toggle-slider:before {
         max-width: 1720px;
     }
 }
+
+/* ==============================================================================
+   METRICS & COLUMNS MASTER SYSTEM (DRAWER, STICKY & BADGES)
+   ============================================================================== */
+
+/* Drawer de Colunas */
+.drawer-wide {
+    width: min(840px, 96vw) !important;
+}
+
+/* Colunas Sticky da Tabela Dinâmica */
+.sticky-col-check {
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background: #0E0E12;
+}
+
+.sticky-col-status {
+    position: sticky;
+    left: 36px;
+    z-index: 20;
+    background: #0E0E12;
+}
+
+.sticky-col-name {
+    position: sticky;
+    left: 86px;
+    z-index: 20;
+    background: #0E0E12;
+    box-shadow: 4px 0 12px -2px rgba(0, 0, 0, 0.7);
+}
+
+tbody tr:hover .sticky-col-check,
+tbody tr:hover .sticky-col-status,
+tbody tr:hover .sticky-col-name {
+    background: #15151A !important;
+}
+
+/* Tabela Compacta */
+.table-compact th {
+    padding: 0.5rem 0.65rem !important;
+    font-size: 9.5px !important;
+}
+
+.table-compact td {
+    padding: 0.55rem 0.65rem !important;
+    font-size: 11.5px !important;
+}
+
+/* Cabeçalhos Ordenáveis */
+.sortable-th {
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--transition-fast);
+}
+
+.sortable-th:hover {
+    color: #F5F5F7 !important;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.sort-icon {
+    display: inline-block;
+    margin-left: 3px;
+    font-size: 9px;
+    opacity: 0.4;
+    transition: opacity var(--transition-fast);
+}
+
+.sortable-th.sorted-asc .sort-icon,
+.sortable-th.sorted-desc .sort-icon {
+    opacity: 1;
+    color: #FF2D2D;
+}
+
+/* Source Tags (Origem dos Dados) */
+.source-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.source-tag-meta {
+    background: rgba(93, 169, 255, 0.12);
+    color: #5DA9FF;
+    border: 1px solid rgba(93, 169, 255, 0.25);
+}
+
+.source-tag-real {
+    background: rgba(31, 193, 107, 0.12);
+    color: #1FC16B;
+    border: 1px solid rgba(31, 193, 107, 0.25);
+}
+
+.source-tag-radwan {
+    background: rgba(255, 45, 45, 0.12);
+    color: #FF2D2D;
+    border: 1px solid rgba(255, 45, 45, 0.25);
+}
+
+.source-tag-derived {
+    background: rgba(255, 255, 255, 0.06);
+    color: #A1A1A6;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Cartões do Seletor de Métricas */
+.metric-picker-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #111115;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.metric-picker-item:hover {
+    background: #16161C;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.metric-picker-item.selected {
+    background: rgba(255, 45, 45, 0.04);
+    border-color: rgba(255, 45, 45, 0.3);
+}
+
+/* Itens da Lista Reordenável de Colunas */
+.order-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 6px;
+    background: #111115;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 11.5px;
+    transition: all var(--transition-fast);
+}
+
+.order-list-item:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: #15151A;
+}
+

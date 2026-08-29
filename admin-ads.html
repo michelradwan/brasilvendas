@@ -426,47 +426,70 @@
                     </div>
                 </div>
 
-                <!-- Barra de Filtros, Busca e Seleção em Lote -->
-                <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
-                    <!-- Filter Chips -->
-                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-                        <button onclick="window.dashboard.setCampaignFilter('all')" data-camp-filter="all" class="filter-chip active">Todas</button>
-                        <button onclick="window.dashboard.setCampaignFilter('active')" data-camp-filter="active" class="filter-chip">Ativas</button>
-                        <button onclick="window.dashboard.setCampaignFilter('paused')" data-camp-filter="paused" class="filter-chip">Pausadas</button>
-                        <button onclick="window.dashboard.setCampaignFilter('sales')" data-camp-filter="sales" class="filter-chip">Com Vendas</button>
-                        <button onclick="window.dashboard.setCampaignFilter('profitable')" data-camp-filter="profitable" class="filter-chip">Lucrativas</button>
-                        <button onclick="window.dashboard.setCampaignFilter('scaling')" data-camp-filter="scaling" class="filter-chip">Prontas p/ Escalar</button>
-                        <button onclick="window.dashboard.setCampaignFilter('attention')" data-camp-filter="attention" class="filter-chip">Requer Atenção</button>
+                <!-- Barra de Controle: Filtros, Presets de Colunas e Busca -->
+                <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
+                    <!-- Linha Superior: Status & Presets Rápidos -->
+                    <div class="flex flex-wrap items-center justify-between gap-2.5">
+                        <!-- Filter Chips -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                            <button onclick="window.dashboard.setCampaignFilter('all')" data-camp-filter="all" class="filter-chip active">Todas</button>
+                            <button onclick="window.dashboard.setCampaignFilter('active')" data-camp-filter="active" class="filter-chip">Ativas</button>
+                            <button onclick="window.dashboard.setCampaignFilter('paused')" data-camp-filter="paused" class="filter-chip">Pausadas</button>
+                            <button onclick="window.dashboard.setCampaignFilter('sales')" data-camp-filter="sales" class="filter-chip">Com Vendas</button>
+                            <button onclick="window.dashboard.setCampaignFilter('profitable')" data-camp-filter="profitable" class="filter-chip">Lucrativas</button>
+                            <button onclick="window.dashboard.setCampaignFilter('scaling')" data-camp-filter="scaling" class="filter-chip">Prontas p/ Escalar</button>
+                            <button onclick="window.dashboard.setCampaignFilter('attention')" data-camp-filter="attention" class="filter-chip">Requer Atenção</button>
+                        </div>
+
+                        <!-- Controles de Métricas & Colunas -->
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <!-- Dropdown de Presets Nativos -->
+                            <div class="flex items-center gap-1 bg-[#15151A] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs">
+                                <span class="text-[11px] text-[#6E6E73]">Visão:</span>
+                                <select id="select-metric-preset" onchange="window.dashboard.changeMetricPreset(this.value)" class="bg-transparent text-xs text-[#F5F5F7] font-semibold focus:outline-none cursor-pointer">
+                                    <option value="PADRAO_GESTOR">⭐ Padrão do Gestor</option>
+                                    <option value="ESSENCIAL">⚡ Essencial</option>
+                                    <option value="TRAFEGO">🔗 Tráfego & Cliques</option>
+                                    <option value="CONVERSAO">🛒 Conversão & Vendas</option>
+                                    <option value="FINANCEIRO">💰 Financeiro & Retorno</option>
+                                    <option value="FUNIL">📊 Funil Completo</option>
+                                    <option value="VIDEO">🎬 Vídeo & Retenção</option>
+                                    <option value="CRIATIVOS">🎨 Criativos & Anúncios</option>
+                                    <option value="RADWAN">⌘ Inteligência Radwan</option>
+                                    <option value="COMPLETO">🌐 Visão Completa</option>
+                                </select>
+                            </div>
+
+                            <!-- Botão Abrir Personalizador de Colunas -->
+                            <button id="btn-columns-picker" onclick="window.dashboard.openColumnManager()" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs" title="Personalizar métricas e colunas da tabela">
+                                <span>📊</span>
+                                <span>Colunas</span>
+                                <span id="active-columns-badge" class="badge badge-active text-[9.5px] px-1.5 py-0.2">17</span>
+                            </button>
+
+                            <!-- Alternador de Densidade (Confortável / Compacta) -->
+                            <button id="btn-toggle-density" onclick="window.dashboard.toggleTableDensity()" class="btn btn-tertiary btn-sm text-[11px] border border-white/[0.07]" title="Alternar densidade da tabela">
+                                <span id="density-icon">📐</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Search Input -->
-                    <div class="relative min-w-[200px] sm:min-w-[260px]">
+                    <!-- Linha Inferior: Busca Rápida -->
+                    <div class="relative w-full">
                         <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
                         <input type="text" id="global-search-input" oninput="window.dashboard.filterCampaignsList(this.value)" placeholder="Buscar por nome ou ID..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
                     </div>
                 </div>
 
-                <!-- Tabela Desktop -->
-                <div class="data-table-container hidden sm:block">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 36px;" class="text-center">
-                                    <input type="checkbox" id="select-all-campaigns" onchange="window.dashboard.toggleSelectAllCampaigns(this.checked)" class="custom-checkbox" title="Selecionar todas">
-                                </th>
-                                <th class="text-left" style="width: 50px;">STATUS</th>
-                                <th class="text-left">CAMPANHA</th>
-                                <th class="text-left">ESTADO RADWAN</th>
-                                <th class="text-right">ORÇAMENTO</th>
-                                <th class="text-right">GASTO</th>
-                                <th class="text-right">VENDAS</th>
-                                <th class="text-right">CPA</th>
-                                <th class="text-right">RECEITA</th>
-                                <th class="text-right">ROAS</th>
-                                <th class="text-center" style="width: 140px;">AÇÕES</th>
-                            </tr>
+                <!-- Tabela Desktop com Scroll Horizontal Seguro e Colunas Sticky -->
+                <div class="data-table-container hidden sm:block overflow-x-auto">
+                    <table id="campaigns-table" class="data-table">
+                        <thead id="campaigns-table-head">
+                            <!-- Cabeçalho dinâmico gerado pelo MetricsEngine -->
                         </thead>
-                        <tbody id="campaigns-table-body" class="divide-y divide-white/[0.05]"></tbody>
+                        <tbody id="campaigns-table-body" class="divide-y divide-white/[0.05]">
+                            <!-- Linhas dinâmicas geradas pelo MetricsEngine -->
+                        </tbody>
                     </table>
                 </div>
 
@@ -1099,6 +1122,127 @@
         </div>
     </div>
 
+    <!-- Column Manager Slide-Over Drawer (Customizador Mestre de Métricas) -->
+    <div id="column-manager-drawer" class="drawer drawer-wide flex flex-col">
+        <!-- Header -->
+        <div class="p-4 sm:p-5 border-b border-white/[0.07] flex items-center justify-between bg-[#0A0A0C]">
+            <div class="flex items-center space-x-2.5">
+                <span class="text-xl">📊</span>
+                <div>
+                    <h3 class="font-bold text-[#F5F5F7] text-sm sm:text-base">Personalizar Colunas & Métricas</h3>
+                    <p class="text-[11px] text-[#A1A1A6]">Selecione e organize as métricas que você deseja visualizar na tabela operacional</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span id="column-manager-selected-count" class="badge badge-active text-[10px]">17 selecionadas</span>
+                <button onclick="window.dashboard.closeColumnManager()" class="btn-icon text-gray-400 hover:text-white" title="Fechar">✕</button>
+            </div>
+        </div>
+
+        <!-- Presets Toolbar -->
+        <div class="p-3 bg-[#0E0E12] border-b border-white/[0.05] flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            <span class="text-[10px] text-[#6E6E73] uppercase font-bold mr-1 flex-shrink-0">Presets:</span>
+            <button onclick="window.dashboard.applyPresetInDrawer('PADRAO_GESTOR')" data-drawer-preset="PADRAO_GESTOR" class="filter-chip active text-[11px]">⭐ Padrão do Gestor</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('ESSENCIAL')" data-drawer-preset="ESSENCIAL" class="filter-chip text-[11px]">⚡ Essencial</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('TRAFEGO')" data-drawer-preset="TRAFEGO" class="filter-chip text-[11px]">🔗 Tráfego</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('CONVERSAO')" data-drawer-preset="CONVERSAO" class="filter-chip text-[11px]">🛒 Conversão</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('FINANCEIRO')" data-drawer-preset="FINANCEIRO" class="filter-chip text-[11px]">💰 Financeiro</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('FUNIL')" data-drawer-preset="FUNIL" class="filter-chip text-[11px]">📊 Funil</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('VIDEO')" data-drawer-preset="VIDEO" class="filter-chip text-[11px]">🎬 Vídeo</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('CRIATIVOS')" data-drawer-preset="CRIATIVOS" class="filter-chip text-[11px]">🎨 Criativos</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('RADWAN')" data-drawer-preset="RADWAN" class="filter-chip text-[11px]">⌘ Radwan</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('COMPLETO')" data-drawer-preset="COMPLETO" class="filter-chip text-[11px]">🌐 Completo</button>
+        </div>
+
+        <!-- Main Body: Split Grid -->
+        <div class="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+            <!-- Coluna Esquerda: Catálogo de Métricas (7 cols) -->
+            <div class="md:col-span-7 p-4 overflow-y-auto space-y-3.5 flex flex-col max-h-[50vh] md:max-h-none">
+                <!-- Search Box -->
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                    <input type="text" id="column-search-input" oninput="window.dashboard.filterMetricsCatalog(this.value)" placeholder="Buscar por nome ou sigla (ROAS, CPA, CTR, Compra, Vídeo)..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-2 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+                    <button onclick="window.dashboard.filterMetricCategory('all')" data-cat-filter="all" class="px-2 py-1 rounded bg-[#15151A] text-[#F5F5F7] border border-white/[0.08] font-semibold">Todas</button>
+                    <button onclick="window.dashboard.filterMetricCategory('principais')" data-cat-filter="principais" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Principais</button>
+                    <button onclick="window.dashboard.filterMetricCategory('entrega')" data-cat-filter="entrega" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Entrega</button>
+                    <button onclick="window.dashboard.filterMetricCategory('trafego')" data-cat-filter="trafego" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Tráfego</button>
+                    <button onclick="window.dashboard.filterMetricCategory('conversao')" data-cat-filter="conversao" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Conversão</button>
+                    <button onclick="window.dashboard.filterMetricCategory('financeiro')" data-cat-filter="financeiro" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Financeiro</button>
+                    <button onclick="window.dashboard.filterMetricCategory('funil')" data-cat-filter="funil" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Funil</button>
+                    <button onclick="window.dashboard.filterMetricCategory('video')" data-cat-filter="video" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Vídeo</button>
+                    <button onclick="window.dashboard.filterMetricCategory('radwan')" data-cat-filter="radwan" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Radwan</button>
+                </div>
+
+                <!-- Metrics List Container -->
+                <div id="metrics-catalog-list" class="space-y-2 overflow-y-auto flex-1 pr-1">
+                    <!-- Gerado dinamicamente pelo MetricsEngine -->
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Colunas Selecionadas e Ordem (5 cols) -->
+            <div class="md:col-span-5 p-4 bg-[#0A0A0C] overflow-y-auto flex flex-col justify-between space-y-3">
+                <div class="space-y-2 flex-1 overflow-hidden flex flex-col">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
+                        <span class="text-xs font-bold text-[#F5F5F7]">Ordem na Tabela</span>
+                        <span class="text-[10px] text-[#6E6E73]">Arraste ou use ▲ ▼</span>
+                    </div>
+
+                    <div id="selected-columns-order-list" class="space-y-1.5 overflow-y-auto flex-1 pr-1 max-h-[40vh] md:max-h-none">
+                        <!-- Gerado dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Saved Views Box -->
+                <div class="p-2.5 rounded-lg bg-[#111115] border border-white/[0.05] space-y-2">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-semibold text-[#A1A1A6]">Salvar Esta Visão</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <input type="text" id="save-view-name-input" placeholder="Nome da visão (ex: Minha Análise)..." class="flex-1 bg-[#16161C] border border-white/[0.08] rounded px-2 py-1 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                        <button onclick="window.dashboard.saveCurrentCustomView()" class="btn btn-secondary btn-sm text-[10.5px]">Salvar</button>
+                    </div>
+                    <div id="saved-views-container" class="space-y-1 pt-1 border-t border-white/[0.04]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-3 sm:p-4 border-t border-white/[0.07] bg-[#0A0A0C] flex items-center justify-between gap-2">
+            <button onclick="window.dashboard.restoreDefaultColumns()" class="btn btn-tertiary text-xs text-[#A1A1A6] hover:text-white" title="Restaurar o Padrão do Gestor">
+                Restaurar Padrão do Gestor
+            </button>
+            <div class="flex items-center space-x-2">
+                <button onclick="window.dashboard.closeColumnManager()" class="btn btn-secondary text-xs">Cancelar</button>
+                <button onclick="window.dashboard.applySelectedColumns()" class="btn btn-primary text-xs">Aplicar e Atualizar Tabela ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes de Todas as Métricas (Mobile) -->
+    <div id="mobile-metric-details-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-5 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="min-w-0">
+                    <h3 id="mobile-modal-camp-name" class="font-bold text-[#F5F5F7] text-sm truncate">Campanha</h3>
+                    <p id="mobile-modal-camp-id" class="text-[10px] text-[#6E6E73] font-mono">ID: --</p>
+                </div>
+                <button onclick="document.getElementById('mobile-metric-details-modal').classList.add('hidden')" class="btn-icon text-gray-400 hover:text-white">✕</button>
+            </div>
+            
+            <div id="mobile-modal-metrics-grid" class="overflow-y-auto space-y-2 flex-1 pr-1 text-xs divide-y divide-white/[0.04]">
+                <!-- Lista de todas as métricas ativas preenchida dinamicamente -->
+            </div>
+
+            <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
+                <button onclick="document.getElementById('mobile-metric-details-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Campaign Slide-Over Drawer -->
     <div id="campaign-drawer" class="drawer">
         <div class="p-5 border-b border-white/[0.07] flex items-center justify-between">
@@ -1113,6 +1257,7 @@
 
     <!-- SCRIPTS DA APLICAÇÃO (ORDEM RIGOROSA) -->
     <script src="js/period-store.js?v=6.0"></script>
+    <script src="js/metrics-registry.js?v=6.0"></script>
     <script src="js/meta-adapter.js?v=6.0"></script>
     <script src="js/analytics.js?v=6.0"></script>
     <script src="js/guardrails.js?v=6.0"></script>
