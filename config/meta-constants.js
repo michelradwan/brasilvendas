@@ -44,6 +44,7 @@ module.exports = {
         'STATUS_UPDATE': { method: 'POST', pathRegex: /^[0-9]+$/ },
         'BUDGET_UPDATE': { method: 'POST', pathRegex: /^[0-9]+$/ },
         'RENAME_UPDATE': { method: 'POST', pathRegex: /^[0-9]+$/ },
+        'CAMPAIGN_COPY': { method: 'POST', pathRegex: /^[0-9]+\/copies$/ },
         'OBJECT_READ': { method: 'GET', pathRegex: /^[0-9]+$/ }
     },
 

@@ -23,6 +23,9 @@ class DashboardApp {
         this.ordersFilter = 'all';
         this.ordersSearchQuery = '';
         this.campaignSearchQuery = '';
+        this.campaignFilter = 'all';
+        this.selectedCampaigns = new Set();
+        this.isTopMoreMenuOpen = false;
         this.isSyncing = false;
         this.currentAbortController = null;
     }
@@ -32,6 +35,13 @@ class DashboardApp {
         this.setupKeyboardShortcuts();
         this.setupPeriodStoreListener();
 
+        // Listener para fechar popover da topbar ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#topbar-more-menu') && !e.target.closest('button[title="Mais Opções"]')) {
+                this.closeTopMoreMenu();
+            }
+        });
+
         // Verifica autenticação
         if (!window.metaAdapter.isAuthenticated()) {
             this.showLoginModal();
@@ -40,6 +50,20 @@ class DashboardApp {
 
         document.getElementById('login-screen-modal')?.classList.add('hidden');
         await this.syncAllData();
+    }
+
+    toggleTopMoreMenu() {
+        const menu = document.getElementById('topbar-more-menu');
+        if (!menu) return;
+        this.isTopMoreMenuOpen = !this.isTopMoreMenuOpen;
+        if (this.isTopMoreMenuOpen) menu.classList.add('open');
+        else menu.classList.remove('open');
+    }
+
+    closeTopMoreMenu() {
+        const menu = document.getElementById('topbar-more-menu');
+        if (menu) menu.classList.remove('open');
+        this.isTopMoreMenuOpen = false;
     }
 
     // ─── LISENTERS & COMUNICAÇÃO CENTRAL ──────────────────────────────────────
@@ -485,75 +509,205 @@ class DashboardApp {
         `).join('');
     }
 
-    // ─── TABELA DE CAMPANHAS COM DRILLDOWN ────────────────────────────────────
+    // ─── CONSOLE OPERACIONAL DE CAMPANHAS (META ADS) ──────────────────────────
+
+    setCampaignFilter(filter) {
+        this.campaignFilter = filter;
+        document.querySelectorAll('[data-camp-filter]').forEach(btn => {
+            if (btn.getAttribute('data-camp-filter') === filter) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        this.renderCampaignsTable();
+    }
+
+    filterCampaignsList(query) {
+        this.campaignSearchQuery = (query || '').toLowerCase().trim();
+        this.renderCampaignsTable();
+    }
+
+    toggleSelectAllCampaigns(checked) {
+        const visible = this.getFilteredCampaigns();
+        if (checked) {
+            visible.forEach(c => this.selectedCampaigns.add(c.id));
+        } else {
+            visible.forEach(c => this.selectedCampaigns.delete(c.id));
+        }
+        this.updateBulkBarUI();
+        this.renderCampaignsTable();
+    }
+
+    toggleSelectCampaign(campId) {
+        if (this.selectedCampaigns.has(campId)) {
+            this.selectedCampaigns.delete(campId);
+        } else {
+            this.selectedCampaigns.add(campId);
+        }
+        this.updateBulkBarUI();
+        this.renderCampaignsTable();
+    }
+
+    clearBulkSelection() {
+        this.selectedCampaigns.clear();
+        this.updateBulkBarUI();
+        this.renderCampaignsTable();
+    }
+
+    updateBulkBarUI() {
+        const bar = document.getElementById('bulk-actions-bar');
+        const countEl = document.getElementById('bulk-selected-count');
+        const selectAllCheckbox = document.getElementById('select-all-campaigns');
+        
+        if (countEl) countEl.textContent = this.selectedCampaigns.size;
+        
+        if (bar) {
+            if (this.selectedCampaigns.size > 0) {
+                bar.classList.add('active');
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+
+        const visible = this.getFilteredCampaigns();
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = visible.length > 0 && visible.every(c => this.selectedCampaigns.has(c.id));
+        }
+    }
+
+    getFilteredCampaigns() {
+        return this.cachedCampaigns.filter(camp => {
+            const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
+            
+            // Filtro de busca textual
+            if (this.campaignSearchQuery) {
+                const matchName = (camp.name || '').toLowerCase().includes(this.campaignSearchQuery);
+                const matchId = (camp.id || '').includes(this.campaignSearchQuery);
+                if (!matchName && !matchId) return false;
+            }
+
+            // Filtro de status e performance
+            if (this.campaignFilter === 'active') return camp.status === 'ACTIVE';
+            if (this.campaignFilter === 'paused') return camp.status === 'PAUSED';
+            if (this.campaignFilter === 'sales') return ins.purchases > 0;
+            if (this.campaignFilter === 'profitable') return (ins.roas && ins.roas >= 2.2);
+            if (this.campaignFilter === 'scaling') return (ins.roas && ins.roas >= 2.5 && ins.purchases >= 2);
+            if (this.campaignFilter === 'attention') return (ins.spend > 40 && ins.purchases === 0);
+
+            return true;
+        });
+    }
 
     renderCampaignsTable() {
         const tbody = document.getElementById('campaigns-table-body');
         const mobileContainer = document.getElementById('campaigns-mobile-cards');
         if (!tbody) return;
 
-        let filtered = this.cachedCampaigns;
-        if (this.campaignSearchQuery) {
-            filtered = filtered.filter(c => (c.name || '').toLowerCase().includes(this.campaignSearchQuery));
-        }
+        const filtered = this.getFilteredCampaigns();
+
+        // Atualiza KPIs resumo no topo do console
+        let totalSpend = 0, totalPurchases = 0, totalRevenue = 0;
+        this.cachedCampaigns.forEach(c => {
+            const ins = this.cachedInsights.get(c.id);
+            if (ins) {
+                totalSpend += ins.spend;
+                totalPurchases += ins.purchases;
+                totalRevenue += ins.revenue;
+            }
+        });
+
+        const avgRoas = totalSpend > 0 ? (totalRevenue / totalSpend) : 0;
+        const spendEl = document.getElementById('camp-summary-spend');
+        if (spendEl) spendEl.textContent = window.analyticsEngine.formatMoney(totalSpend);
+        const purchEl = document.getElementById('camp-summary-purchases');
+        if (purchEl) purchEl.textContent = `${totalPurchases} un`;
+        const roasEl = document.getElementById('camp-summary-roas');
+        if (roasEl) roasEl.textContent = totalSpend > 0 ? `${avgRoas.toFixed(2)}x` : '0,00x';
+
+        const badgeEl = document.getElementById('campaigns-count-badge');
+        if (badgeEl) badgeEl.textContent = `${filtered.length} de ${this.cachedCampaigns.length} campanhas`;
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-[#6E6E73] italic">Nenhuma campanha localizada.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-[#6E6E73] italic text-xs">Nenhuma campanha encontrada para os filtros selecionados.</td></tr>`;
             if (mobileContainer) mobileContainer.innerHTML = `<p class="text-xs text-[#6E6E73] text-center py-6">Nenhuma campanha encontrada.</p>`;
             return;
         }
 
+        // Tabela Desktop
         tbody.innerHTML = filtered.map(camp => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
-            const isChecked = camp.status === 'ACTIVE';
-            const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : 0;
+            const isActive = camp.status === 'ACTIVE';
+            const isSelected = this.selectedCampaigns.has(camp.id);
+            const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : (camp.lifetime_budget ? parseFloat(camp.lifetime_budget) / 100 : 0);
+            const isCBO = !!camp.daily_budget || !!camp.lifetime_budget;
             const evalResult = window.decisionEngine ? window.decisionEngine.evaluateCreative(ins, 35.00) : { classification: 'NORMAL', score: 70 };
 
             const safeName = escapeHTML(camp.name);
             const safeId = escapeHTML(camp.id);
 
             let stateBadge = 'badge-active';
-            if (evalResult.classification === 'WINNER') stateBadge = 'badge-winner';
-            else if (evalResult.classification === 'FATIGUE') stateBadge = 'badge-error';
-            else if (evalResult.classification === 'WATCH') stateBadge = 'badge-warning';
+            let stateLabel = 'Saudável';
+            if (evalResult.classification === 'WINNER') {
+                stateBadge = 'badge-winner';
+                stateLabel = 'Pronta p/ Escalar';
+            } else if (evalResult.classification === 'FATIGUE') {
+                stateBadge = 'badge-error';
+                stateLabel = 'Requer Atenção';
+            } else if (evalResult.classification === 'WATCH') {
+                stateBadge = 'badge-warning';
+                stateLabel = 'Observando';
+            }
 
             return `
-                <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04]">
-                    <td class="p-3">
-                        <span class="status-dot ${isChecked ? 'status-dot-active' : 'status-dot-paused'}"></span>
-                    </td>
-                    <td class="p-3 font-semibold text-[#F5F5F7] max-w-[200px] truncate" title="${safeName}">
-                        ${safeName}
+                <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] ${isSelected ? 'bg-[#FF2D2D]/[0.03]' : ''}">
+                    <td class="p-3 text-center">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox" aria-label="Selecionar ${safeName}">
                     </td>
                     <td class="p-3">
-                        <span class="badge ${stateBadge} text-[10px]">
-                            ${escapeHTML(evalResult.classification)} (${evalResult.score || 70})
-                        </span>
+                        <label class="toggle-switch" title="Pausar ou reativar campanha">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}')">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </td>
-                    <td class="p-3 tabular-nums text-right font-mono text-[#F5F5F7]">
-                        R$ ${budgetVal.toFixed(2).replace('.', ',')}
+                    <td class="p-3 max-w-[240px]">
+                        <div class="font-semibold text-[#F5F5F7] truncate" title="${safeName}">${safeName}</div>
+                        <div class="flex items-center gap-1.5 text-[10px] text-[#6E6E73] font-mono">
+                            <span>ID: ${safeId}</span>
+                            <span>•</span>
+                            <span class="${isCBO ? 'text-[#5DA9FF]' : 'text-[#A1A1A6]'}">${isCBO ? 'CBO' : 'ABO'}</span>
+                        </div>
                     </td>
-                    <td class="p-3 tabular-nums text-right font-mono text-[#A1A1A6]">
+                    <td class="p-3">
+                        <span class="badge ${stateBadge} text-[9.5px]">${stateLabel}</span>
+                    </td>
+                    <td class="p-3 tabular-nums text-right">
+                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="hover:underline text-[#F5F5F7] font-semibold flex items-center justify-end gap-1 ml-auto" title="Clique para editar orçamento">
+                            <span>R$ ${budgetVal.toFixed(2).replace('.', ',')}</span>
+                            <span class="text-[10px] text-[#6E6E73]">✏️</span>
+                        </button>
+                    </td>
+                    <td class="p-3 tabular-nums text-right font-medium text-[#A1A1A6]">
                         ${window.analyticsEngine.formatMoney(ins.spend)}
                     </td>
-                    <td class="p-3 tabular-nums text-right font-mono font-bold text-[#F5F5F7]">
+                    <td class="p-3 tabular-nums text-right font-bold text-[#F5F5F7]">
                         ${ins.purchases}
                     </td>
-                    <td class="p-3 tabular-nums text-right font-mono text-[#A1A1A6]">
+                    <td class="p-3 tabular-nums text-right font-medium text-[#A1A1A6]">
                         ${ins.cpa !== null ? window.analyticsEngine.formatMoney(ins.cpa) : '–'}
                     </td>
-                    <td class="p-3 tabular-nums text-right font-mono text-[#A1A1A6]">
+                    <td class="p-3 tabular-nums text-right font-medium text-[#A1A1A6]">
                         ${window.analyticsEngine.formatMoney(ins.revenue)}
                     </td>
-                    <td class="p-3 tabular-nums text-right font-mono font-bold ${ins.roas && ins.roas >= 2.0 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">
+                    <td class="p-3 tabular-nums text-right font-bold ${ins.roas && ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">
                         ${ins.roas !== null ? `${ins.roas.toFixed(2)}x` : '–'}
                     </td>
                     <td class="p-3 text-center">
-                        <div class="inline-flex items-center gap-1">
-                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal})" class="btn btn-secondary btn-sm text-[11px]" title="Ajustar Orçamento">
-                                💰
+                        <div class="inline-flex items-center gap-1 justify-center">
+                            <button onclick="window.dashboard.openRadwanAnalysisModal('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Diagnóstico Radwan">
+                                🧠
                             </button>
-                            <button onclick="window.dashboard.openCampaignDrawer('${safeId}')" class="btn btn-secondary btn-sm text-[11px]" title="Ver Detalhes">
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Duplicar Campanha">
+                                📋
+                            </button>
+                            <button onclick="window.dashboard.openCampaignDrawer('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Ver Detalhes">
                                 ➔
                             </button>
                         </div>
@@ -561,6 +715,345 @@ class DashboardApp {
                 </tr>
             `;
         }).join('');
+
+        // Cards Mobile (< 640px)
+        if (mobileContainer) {
+            mobileContainer.innerHTML = filtered.map(camp => {
+                const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
+                const isActive = camp.status === 'ACTIVE';
+                const isSelected = this.selectedCampaigns.has(camp.id);
+                const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : (camp.lifetime_budget ? parseFloat(camp.lifetime_budget) / 100 : 0);
+                const isCBO = !!camp.daily_budget || !!camp.lifetime_budget;
+                const safeName = escapeHTML(camp.name);
+                const safeId = escapeHTML(camp.id);
+
+                return `
+                    <div class="campaign-mobile-card space-y-3 ${isSelected ? 'border-[#FF2D2D]/50 bg-[#FF2D2D]/[0.02]' : ''}">
+                        <div class="flex items-start justify-between gap-2 border-b border-white/[0.05] pb-2.5">
+                            <div class="flex items-start gap-2.5 min-w-0">
+                                <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox mt-0.5" aria-label="Selecionar ${safeName}">
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
+                                    <p class="text-[10px] text-[#6E6E73] font-mono">ID: ${safeId} • ${isCBO ? 'CBO' : 'ABO'}</p>
+                                </div>
+                            </div>
+                            <label class="toggle-switch flex-shrink-0">
+                                <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Orçamento</span>
+                                <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">R$ ${budgetVal.toFixed(2).replace('.', ',')}</p>
+                            </div>
+                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Investido</span>
+                                <p class="tabular-nums font-bold text-[#A1A1A6] text-sm">${window.analyticsEngine.formatMoney(ins.spend)}</p>
+                            </div>
+                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Vendas / CPA</span>
+                                <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">${ins.purchases} <span class="text-xs font-normal text-[#6E6E73]">(${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : '–'})</span></p>
+                            </div>
+                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">ROAS</span>
+                                <p class="tabular-nums font-bold ${ins.roas && ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'} text-sm">${ins.roas ? `${ins.roas.toFixed(2)}x` : '–'}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2 pt-1">
+                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="btn btn-secondary btn-sm flex-1 text-[11px]">
+                                💰 Orçamento
+                            </button>
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm flex-1 text-[11px]">
+                                📋 Duplicar
+                            </button>
+                            <button onclick="window.dashboard.openRadwanAnalysisModal('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2.5">
+                                🧠
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // ─── OPERAÇÕES DE MUTAÇÃO EM CAMPANHAS (WRITE-READ-VERIFY) ────────────────
+
+    async toggleCampaignStatus(campId, currentStatus) {
+        const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+        const actionLabel = newStatus === 'ACTIVE' ? 'reativar' : 'pausar';
+
+        if (!confirm(`Deseja realmente ${actionLabel} a campanha ${campId}?`)) {
+            this.renderCampaignsTable();
+            return;
+        }
+
+        try {
+            this.showToast(`Enviando solicitação para ${actionLabel} campanha...`, 'info');
+
+            // 1. WRITE
+            await window.metaAdapter.updateStatus(campId, newStatus);
+
+            // 2. READ & VERIFY
+            const verifyRes = await window.metaAdapter.request(campId, 'GET', { fields: 'id,status' }, null, false);
+            if (verifyRes?.status !== newStatus) {
+                throw new Error(`A Meta não confirmou o novo status ${newStatus}.`);
+            }
+
+            // 3. AUDIT TRAIL LOG
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'STATUS_ALTERADO',
+                    objectId: campId,
+                    before: currentStatus,
+                    after: newStatus,
+                    reason: `Alteração operacional de status (${actionLabel}).`,
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
+            this.showToast(`Campanha ${newStatus === 'ACTIVE' ? 'reativada' : 'pausada'} e verificada com sucesso!`, 'success');
+            await this.syncAllData(true);
+
+        } catch (err) {
+            console.error('[Status Mutation Error]', err);
+            this.showToast(`Falha ao alterar status: ${err.message || 'Erro na Meta'}`, 'error');
+            this.renderCampaignsTable();
+        }
+    }
+
+    openBudgetModal(campId, currentBudget, campName = '', isCBO = true) {
+        const modal = document.getElementById('budget-modal');
+        if (!modal) return;
+        
+        document.getElementById('budget-modal-camp-id').value = campId;
+        document.getElementById('budget-modal-current').textContent = `R$ ${currentBudget.toFixed(2).replace('.', ',')}`;
+        document.getElementById('budget-modal-input').value = currentBudget.toFixed(2);
+        
+        const structEl = document.getElementById('budget-structure-type');
+        if (structEl) {
+            structEl.textContent = isCBO ? 'Nível da Campanha (CBO/Advantage+)' : 'Nível dos Conjuntos (ABO)';
+            structEl.className = isCBO ? 'text-[10.5px] text-[#5DA9FF]' : 'text-[10.5px] text-[#F5A524]';
+        }
+
+        this.updateBudgetDiffPreview();
+        modal.classList.remove('hidden');
+    }
+
+    applyBudgetQuickPct(pct) {
+        const currentText = document.getElementById('budget-modal-current').textContent;
+        const current = parseFloat(currentText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        const next = Math.max(1, current * (1 + pct / 100));
+        document.getElementById('budget-modal-input').value = next.toFixed(2);
+        this.updateBudgetDiffPreview();
+    }
+
+    updateBudgetDiffPreview() {
+        const currentText = document.getElementById('budget-modal-current')?.textContent || '0';
+        const current = parseFloat(currentText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        const newVal = parseFloat(document.getElementById('budget-modal-input')?.value) || 0;
+        const diffLabel = document.getElementById('budget-diff-label');
+        if (!diffLabel) return;
+
+        if (current === 0) {
+            diffLabel.textContent = `R$ ${newVal.toFixed(2).replace('.', ',')}`;
+            return;
+        }
+
+        const diffR$ = newVal - current;
+        const diffPct = ((diffR$) / current) * 100;
+        const sign = diffPct > 0 ? '+' : '';
+        diffLabel.textContent = `${sign}R$ ${diffR$.toFixed(2).replace('.', ',')} (${sign}${diffPct.toFixed(1)}%)`;
+        diffLabel.className = diffPct > 0 ? 'font-bold text-[#1FC16B]' : (diffPct < 0 ? 'font-bold text-[#FF453A]' : 'font-bold text-[#F5F5F7]');
+    }
+
+    openDuplicateModal(campId, campName) {
+        const modal = document.getElementById('duplicate-modal');
+        if (!modal) return;
+        document.getElementById('duplicate-camp-id').value = campId;
+        document.getElementById('duplicate-camp-origin').textContent = `${campName} (ID: ${campId})`;
+        modal.classList.remove('hidden');
+    }
+
+    async submitDuplicateModal(event) {
+        event.preventDefault();
+        const campId = document.getElementById('duplicate-camp-id').value;
+        const copies = parseInt(document.getElementById('duplicate-copies-count').value, 10) || 1;
+        const status = document.getElementById('duplicate-initial-status').value;
+        const suffix = document.getElementById('duplicate-suffix-input').value.trim() || ' - Cópia';
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+            this.showToast(`Iniciando duplicação de ${copies} cópia(s) na Meta...`, 'info');
+
+            // Chamada com suporte nativo a /copies
+            const res = await window.metaAdapter.request(`${campId}/copies`, 'POST', {}, {
+                status_option: status,
+                rename_options: { rename_suffix: suffix }
+            }, true);
+
+            // AUDIT TRAIL LOG
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'DUPLICACAO_CAMPANHA',
+                    objectId: campId,
+                    before: `Original: ${campId}`,
+                    after: `${copies} cópia(s) criadas com status ${status}`,
+                    reason: 'Duplicação assistida de campanha.',
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
+            document.getElementById('duplicate-modal').classList.add('hidden');
+            this.showToast(`${copies} cópia(s) duplicada(s) com sucesso na Meta!`, 'success');
+            await this.syncAllData(true);
+
+        } catch (err) {
+            console.error('[Duplicate Error]', err);
+            this.showToast(`Falha na duplicação: ${err.message || 'Recurso restrito pela conta'}`, 'error');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+
+    openRadwanAnalysisModal(campId) {
+        const modal = document.getElementById('radwan-analysis-modal');
+        const body = document.getElementById('radwan-analysis-body');
+        if (!modal || !body) return;
+
+        const camp = this.cachedCampaigns.find(c => c.id === campId);
+        const ins = this.cachedInsights.get(campId) || window.analyticsEngine.parseInsights(null);
+        
+        let advice = 'Manter em observação com o orçamento atual.';
+        let tag = 'badge-active';
+        let actionSuggestion = 'Nenhuma intervenção necessária no momento.';
+
+        if (ins.roas && ins.roas >= 2.5 && ins.purchases >= 2) {
+            advice = 'Campanha com alto retorno e custo de aquisição controlado. Recomenda-se aumento gradual de 15% no orçamento.';
+            tag = 'badge-winner';
+            actionSuggestion = 'Aumentar orçamento em +15%';
+        } else if (ins.spend > 40 && ins.purchases === 0) {
+            advice = 'Consumo sem conversão registrada no período. Recomenda-se pausar temporariamente para estancar o custo ou testar novo criativo.';
+            tag = 'badge-error';
+            actionSuggestion = 'Pausar campanha para proteger caixa';
+        }
+
+        body.innerHTML = `
+            <div class="p-3 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-[#F5F5F7] text-sm">${escapeHTML(camp ? camp.name : campId)}</span>
+                    <span class="badge ${tag} text-[10px]">${escapeHTML(advice.split('.')[0])}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-xs pt-1">
+                    <div>
+                        <span class="text-[#6E6E73] block text-[10px]">Investido</span>
+                        <b class="text-[#F5F5F7]">${window.analyticsEngine.formatMoney(ins.spend)}</b>
+                    </div>
+                    <div>
+                        <span class="text-[#6E6E73] block text-[10px]">Vendas</span>
+                        <b class="text-[#1FC16B]">${ins.purchases} un</b>
+                    </div>
+                    <div>
+                        <span class="text-[#6E6E73] block text-[10px]">ROAS</span>
+                        <b class="${ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${ins.roas ? `${ins.roas.toFixed(2)}x` : '–'}</b>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.04] space-y-1.5">
+                <p class="font-bold text-[#F5F5F7]">Leitura do Radwan:</p>
+                <p class="text-[#A1A1A6] leading-relaxed">${escapeHTML(advice)}</p>
+                <p class="text-[11px] text-[#5DA9FF] font-semibold pt-1">Sugestão: ${escapeHTML(actionSuggestion)}</p>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
+    async bulkAction(actionType) {
+        if (this.selectedCampaigns.size === 0) return;
+        const count = this.selectedCampaigns.size;
+        const ids = Array.from(this.selectedCampaigns);
+
+        if (actionType === 'pause' || actionType === 'resume') {
+            const newStatus = actionType === 'pause' ? 'PAUSED' : 'ACTIVE';
+            const actionText = actionType === 'pause' ? 'pausar' : 'reativar';
+
+            if (!confirm(`Deseja realmente ${actionText} as ${count} campanhas selecionadas?`)) return;
+
+            let succeeded = 0;
+            let failed = 0;
+
+            this.showToast(`Executando alteração em ${count} campanhas...`, 'info');
+
+            for (const id of ids) {
+                try {
+                    await window.metaAdapter.updateStatus(id, newStatus);
+                    succeeded++;
+                } catch (e) {
+                    failed++;
+                }
+            }
+
+            // AUDIT
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: `LOTE_${actionType.toUpperCase()}`,
+                    objectId: `${count}_CAMPANHAS`,
+                    before: 'Misto',
+                    after: newStatus,
+                    reason: `Ação em massa (${succeeded} sucessos, ${failed} falhas).`,
+                    verification: failed === 0 ? 'CONFIRMADO_PELA_META' : 'PARCIAL'
+                });
+            }
+
+            this.showToast(`Operação concluída: ${succeeded} alteradas, ${failed} falhas.`, succeeded > 0 ? 'success' : 'error');
+            this.clearBulkSelection();
+            await this.syncAllData(true);
+        } else if (actionType === 'radwan') {
+            this.showToast(`Radwan analisando ${count} campanhas em conjunto...`, 'info');
+            this.openRadwanAnalysisModal(ids[0]);
+        }
+    }
+
+    openBulkBudgetModal() {
+        const pctStr = prompt(`Informe a porcentagem de ajuste de orçamento para as ${this.selectedCampaigns.size} campanhas (Ex: +10 ou -15):`);
+        if (!pctStr) return;
+        const pct = parseFloat(pctStr);
+        if (isNaN(pct)) {
+            alert('Porcentagem inválida.');
+            return;
+        }
+
+        const ids = Array.from(this.selectedCampaigns);
+        this.showToast(`Aplicando ajuste de ${pct > 0 ? '+' : ''}${pct}% em ${ids.length} campanhas...`, 'info');
+
+        let updated = 0;
+        ids.forEach(async id => {
+            const camp = this.cachedCampaigns.find(c => c.id === id);
+            if (camp && camp.daily_budget) {
+                const current = parseFloat(camp.daily_budget) / 100;
+                const next = Math.max(1, Math.round(current * (1 + pct / 100)));
+                try {
+                    await window.metaAdapter.updateBudget(id, 'daily_budget', next * 100);
+                    updated++;
+                } catch(e){}
+            }
+        });
+
+        this.showToast(`Ajuste de orçamento enviado para as campanhas.`, 'success');
+        this.clearBulkSelection();
+        setTimeout(() => this.syncAllData(true), 1500);
+    }
+
+    openBulkDuplicateModal() {
+        const firstId = Array.from(this.selectedCampaigns)[0];
+        const camp = this.cachedCampaigns.find(c => c.id === firstId);
+        this.openDuplicateModal(firstId, camp ? camp.name : firstId);
     }
 
     // ─── GALERIA DE CRIATIVOS COM PERIOD OVERRIDE (30D RECOMENDADO) ───────────
