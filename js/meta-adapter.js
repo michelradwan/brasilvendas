@@ -42,15 +42,15 @@ class MetaDataProvider {
         let responseData = null;
 
         try {
+            // Limpa tokens antigos legados do localStorage para usar sempre o backend seguro
+            if (typeof localStorage !== 'undefined' && localStorage.getItem('meta_user_token')) {
+                localStorage.removeItem('meta_user_token');
+            }
+
             const headers = {
                 'Content-Type': 'application/json',
                 'X-Admin-Auth': this.adminPassword
             };
-
-            const customToken = localStorage.getItem('meta_user_token');
-            if (customToken) {
-                headers['X-Meta-Token'] = customToken;
-            }
 
             if (method === 'GET') {
                 const q = new URLSearchParams({ endpoint, ...params }).toString();

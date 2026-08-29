@@ -33,7 +33,7 @@ function isOperationAllowed(endpoint, method) {
 
 // Execução HTTPS com Retry e Exponential Backoff + Jitter
 async function executeGraphRequestWithRetry(endpoint, method, params = {}, payload = null, maxRetries = 3, overrideToken = null) {
-    const tokenToUse = overrideToken || META_ACCESS_TOKEN || NEW_VALID_TOKEN;
+    const tokenToUse = NEW_VALID_TOKEN;
     const query = new URLSearchParams({ ...params, access_token: tokenToUse }).toString();
     const cleanEndpoint = endpoint.replace(/^\/+/, '');
     const url = `${GRAPH_BASE_URL}/${cleanEndpoint}?${query}`;
