@@ -774,8 +774,8 @@ class DashboardApp {
                 if (metricId === 'status_toggle') {
                     const isActive = camp.status === 'ACTIVE';
                     cellContent = `
-                        <label class="toggle-switch" title="Pausar ou reativar campanha">
-                            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}')">
+                        <label class="toggle-switch" title="${isActive ? 'Campanha Ativa • Clique para pausar' : 'Campanha Pausada • Clique para reativar'}">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}', this)">
                             <span class="toggle-slider"></span>
                         </label>
                     `;
@@ -844,8 +844,8 @@ class DashboardApp {
                                     <p class="text-[10px] text-[#6E6E73] font-mono">ID: ${safeId} • ${isCBO ? 'CBO' : 'ABO'}</p>
                                 </div>
                             </div>
-                            <label class="toggle-switch flex-shrink-0">
-                                <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}')">
+                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Campanha Ativa • Clique para pausar' : 'Campanha Pausada • Clique para reativar'}">
+                                <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}', this)">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
@@ -1184,16 +1184,19 @@ class DashboardApp {
 
     // ─── OPERAÇÕES DE MUTAÇÃO EM CAMPANHAS (WRITE-READ-VERIFY) ────────────────
 
-    async toggleCampaignStatus(campId, currentStatus) {
+    async toggleCampaignStatus(campId, currentStatus, inputEl = null) {
         const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
         const actionLabel = newStatus === 'ACTIVE' ? 'reativar' : 'pausar';
+        const toggleWrapper = inputEl?.closest('.toggle-switch');
 
         if (!confirm(`Deseja realmente ${actionLabel} a campanha ${campId}?`)) {
-            this.renderCampaignsTable();
+            if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
             return;
         }
 
         try {
+            if (toggleWrapper) toggleWrapper.classList.add('is-loading');
+            if (inputEl) inputEl.disabled = true;
             this.showToast(`Enviando solicitação para ${actionLabel} campanha...`, 'info');
 
             // 1. WRITE
@@ -1223,7 +1226,11 @@ class DashboardApp {
         } catch (err) {
             console.error('[Status Mutation Error]', err);
             this.showToast(`Falha ao alterar status: ${err.message || 'Erro na Meta'}`, 'error');
+            if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
             this.renderCampaignsTable();
+        } finally {
+            if (toggleWrapper) toggleWrapper.classList.remove('is-loading');
+            if (inputEl) inputEl.disabled = false;
         }
     }
 
