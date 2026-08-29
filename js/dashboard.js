@@ -114,6 +114,19 @@ class DashboardApp {
                 this.renderCampaignsTable();
             });
         }
+
+        // Backdrop click listener
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (backdrop) {
+            backdrop.addEventListener('click', () => this.closeSidebar());
+        }
+
+        // Listener de redimensionamento para restaurar layout desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                this.closeSidebar();
+            }
+        });
     }
 
     setupKeyboardShortcuts() {
@@ -179,6 +192,7 @@ class DashboardApp {
         const backdrop = document.getElementById('sidebar-backdrop');
         if (sidebar) sidebar.classList.add('mobile-open');
         if (backdrop) backdrop.classList.add('active');
+        document.body.classList.add('sidebar-open');
     }
 
     closeSidebar() {
@@ -186,6 +200,7 @@ class DashboardApp {
         const backdrop = document.getElementById('sidebar-backdrop');
         if (sidebar) sidebar.classList.remove('mobile-open');
         if (backdrop) backdrop.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
     }
 
     closeAllModals() {

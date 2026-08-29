@@ -177,65 +177,78 @@
 
         <!-- SIDEBAR DE NAVEGAÇÃO REFINADÍSSIMA -->
         <aside id="main-sidebar" class="sidebar p-3 space-y-4">
-            <div class="space-y-3">
-                <!-- Grupo PERFORMANCE -->
+            <!-- Mobile Header da Sidebar com botão de fechar -->
+            <div class="flex items-center justify-between pb-2 border-b border-white/[0.05] lg:hidden">
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 rounded-md bg-[#FF2D2D]/10 border border-[#FF2D2D]/30 text-[#FF2D2D] flex items-center justify-center font-black text-xs font-mono">
+                        ⌘
+                    </div>
+                    <span class="font-bold text-xs text-[#F5F5F7]">RADWAN ADS</span>
+                </div>
+                <button onclick="window.dashboard.closeSidebar()" class="btn-icon text-gray-400 hover:text-white" title="Fechar Menu">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Grupo DESEMPENHO -->
                 <div>
-                    <p class="sidebar-group-title">PERFORMANCE</p>
-                    <nav class="space-y-0.5">
-                        <div class="nav-item active" data-nav-target="overview" title="Visão Geral">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <span>Overview</span>
+                    <p class="sidebar-group-title">DESEMPENHO</p>
+                    <nav class="space-y-1">
+                        <div class="nav-item active" data-nav-target="overview" title="Visão Geral da Operação">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span class="truncate">Visão Geral</span>
                         </div>
-                        <div class="nav-item" data-nav-target="campaigns" title="Campanhas">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
-                            <span>Campanhas</span>
+                        <div class="nav-item" data-nav-target="campaigns" title="Gestão de Campanhas Meta">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                            <span class="truncate">Campanhas</span>
                         </div>
-                        <div class="nav-item" data-nav-target="creatives" title="Criativos">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span>Criativos</span>
+                        <div class="nav-item" data-nav-target="creatives" title="Galeria e Diagnóstico de Criativos">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="truncate">Criativos</span>
                         </div>
-                        <div class="nav-item" data-nav-target="funnel" title="Funil">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            <span>Funil de Conversão</span>
+                        <div class="nav-item" data-nav-target="funnel" title="Funil Operacional de Conversão">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            <span class="truncate">Funil de Conversão</span>
                         </div>
-                        <div class="nav-item" data-nav-target="orders" title="Pedidos & Vendas">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                            <span>Pedidos & Vendas</span>
+                        <div class="nav-item" data-nav-target="orders" title="Pedidos, Vendas e Recuperação PIX">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <span class="truncate">Pedidos & Vendas</span>
                             <span id="sidebar-orders-badge" class="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1FC16B]/15 text-[#1FC16B] font-bold border border-[#1FC16B]/30 hidden">0</span>
                         </div>
                     </nav>
                 </div>
 
-                <!-- Grupo INTELLIGENCE -->
+                <!-- Grupo INTELIGÊNCIA -->
                 <div>
-                    <p class="sidebar-group-title">INTELLIGENCE</p>
-                    <nav class="space-y-0.5">
-                        <div class="nav-item" data-nav-target="site-intelligence" title="Site Intelligence">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            <span>Site Intelligence</span>
+                    <p class="sidebar-group-title">INTELIGÊNCIA</p>
+                    <nav class="space-y-1">
+                        <div class="nav-item" data-nav-target="site-intelligence" title="Comportamento e Fricção de Usuários">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span class="truncate">Site Intelligence</span>
                         </div>
                     </nav>
                 </div>
 
-                <!-- Grupo OPERATIONS -->
+                <!-- Grupo OPERAÇÕES & SISTEMA -->
                 <div>
-                    <p class="sidebar-group-title">OPERATIONS</p>
-                    <nav class="space-y-0.5">
-                        <div class="nav-item" data-nav-target="tracking" title="Tracking Health">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            <span>Tracking Health</span>
+                    <p class="sidebar-group-title">OPERAÇÕES & SISTEMA</p>
+                    <nav class="space-y-1">
+                        <div class="nav-item" data-nav-target="tracking" title="Saúde dos Pixels e Meta CAPI">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            <span class="truncate">Saúde do Rastreamento</span>
                         </div>
-                        <div class="nav-item" data-nav-target="autopilot" title="Autopilot">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                            <span>Autopilot</span>
+                        <div class="nav-item" data-nav-target="autopilot" title="Regras e Otimização Autônoma">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            <span class="truncate">Modo Automático</span>
                         </div>
-                        <div class="nav-item" data-nav-target="audit" title="Audit Trail">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Audit Trail</span>
+                        <div class="nav-item" data-nav-target="audit" title="Registro de Alterações e Decisões">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="truncate">Histórico de Ações</span>
                         </div>
-                        <div class="nav-item" data-nav-target="settings" title="Configurações">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span>Configurações</span>
+                        <div class="nav-item" data-nav-target="settings" title="Configurações e Parâmetros">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span class="truncate">Configurações</span>
                         </div>
                     </nav>
                 </div>
@@ -244,11 +257,11 @@
             <!-- Sidebar Footer -->
             <div class="p-3 rounded-xl bg-[#101014] border border-white/[0.05] space-y-1.5 text-[11px]">
                 <div class="flex items-center justify-between">
-                    <span class="text-[#6E6E73]">Emergency Stop</span>
-                    <span id="sidebar-emergency-status" class="text-[#1FC16B] font-semibold">Inativo</span>
+                    <span class="text-[#6E6E73]">Parada de Segurança</span>
+                    <span id="sidebar-emergency-status" class="text-[#1FC16B] font-semibold">Inativa</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-[#6E6E73]">Modo Autopilot</span>
+                    <span class="text-[#6E6E73]">Modo do RADWAN</span>
                     <span id="sidebar-ai-mode" class="text-[#A1A1A6] font-semibold">Assistido</span>
                 </div>
             </div>
@@ -259,11 +272,11 @@
             <div class="workspace-content space-y-7">
 
             <!-- ===================================================================
-                 SEÇÃO 1: OVERVIEW — O VERDADEIRO COMMAND CENTER
+                 SEÇÃO 1: VISÃO GERAL — DECISÃO E OPERAÇÃO LIMPA
                  =================================================================== -->
             <section id="view-overview" class="view-section space-y-6">
 
-                <!-- CAMADA 2: BUSINESS SNAPSHOT (BLOCO UNIFICADO COESO) -->
+                <!-- CAMADA 1: SNAPSHOT FINANCEIRO EXECUTIVO (5 PERGUNTAS DE NEGÓCIO) -->
                 <div class="snapshot-grid">
                     <div class="snapshot-cell space-y-1">
                         <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Investimento</p>
@@ -273,89 +286,82 @@
                     <div class="snapshot-cell space-y-1">
                         <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Faturamento</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-revenue">R$ 0,00</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Vendas atribuídas</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Vendas pagas atribuídas</p>
                     </div>
                     <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Lucro Líquido</p>
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Lucro Líquido Real</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]" id="kpi-profit">R$ 0,00</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Margem estimada</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Pós-CMV e pós-anúncios</p>
                     </div>
                     <div class="snapshot-cell space-y-1">
                         <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">ROAS Geral</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#FF2D2D]" id="kpi-roas">0.00x</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Break-even: 2.20x</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Ponto de Equilíbrio: 2.20x</p>
                     </div>
                     <div class="snapshot-cell space-y-1">
                         <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">CPA Médio</p>
                         <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-cpa">R$ 0,00</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Alvo: R$ 35,00</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Meta Alvo: R$ 35,00</p>
                     </div>
                     <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
-                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="kpi-purchases">0 un</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Deduplicadas</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Tracking Health</p>
-                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]">98%</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">CAPI v21.0 Online</p>
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Vendas Confirmadas</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]" id="kpi-purchases">0 un</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">PIX compensados</p>
                     </div>
                 </div>
 
-                <!-- CAMADA 4: SYSTEM HEALTH vs BUSINESS PERFORMANCE (DOIS SCORES SEPARADOS) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- System Health Score -->
-                    <div class="panel p-5 space-y-4">
+                <!-- CAMADA 2: RECOMENDAÇÕES DO RADWAN ADS & SAÚDE OPERACIONAL -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <!-- O que o RADWAN ADS recomenda fazer agora? -->
+                    <div class="lg:col-span-2 panel space-y-4">
                         <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">SYSTEM HEALTH SCORE</span>
-                            <span class="badge badge-active">98/100 EXCELENTE</span>
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-xs font-mono">⌘</span>
+                                <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">O que o RADWAN ADS recomenda agora?</h3>
+                            </div>
+                            <span class="badge badge-winner text-[9.5px]">Inteligência Ativa</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
-                                <span class="text-[10px] text-[#6E6E73] uppercase">Tracking & CAPI</span>
-                                <p class="font-bold text-[#1FC16B] font-mono text-sm">100% Íntegro</p>
-                            </div>
-                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
-                                <span class="text-[10px] text-[#6E6E73] uppercase">Meta Graph API</span>
-                                <p class="font-bold text-[#1FC16B] font-mono text-sm">v21.0 Online</p>
-                            </div>
-                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
-                                <span class="text-[10px] text-[#6E6E73] uppercase">Guardrails & Locks</span>
-                                <p class="font-bold text-[#1FC16B] font-mono text-sm">Ativos (12h)</p>
-                            </div>
-                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
-                                <span class="text-[10px] text-[#6E6E73] uppercase">Autopilot Safety</span>
-                                <p class="font-bold text-[#1FC16B] font-mono text-sm">Fail-Closed OK</p>
-                            </div>
-                        </div>
+                        <div id="what-should-i-do-container" class="space-y-2.5"></div>
                     </div>
 
-                    <!-- Business Performance Score -->
-                    <div class="panel p-5 space-y-4">
+                    <!-- Diagnóstico Operacional Rápido -->
+                    <div class="panel space-y-4">
                         <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">BUSINESS PERFORMANCE SCORE</span>
-                            <span id="account-health-badge" class="badge badge-active">SAUDÁVEL</span>
+                            <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">Saúde da Operação</h3>
+                            <span class="badge badge-active text-[9.5px]">Normal</span>
                         </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span id="account-health-number" class="text-3xl font-bold font-mono text-[#F5F5F7]">82/100</span>
-                            <span class="text-xs text-[#A1A1A6]">Eficiência de Tráfego & Conversão</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
-                                <span class="text-[10px] text-[#6E6E73] uppercase">CTR Geral</span>
-                                <p class="font-bold text-[#F5F5F7] font-mono text-sm" id="kpi-ctr">0.00%</p>
+                        <div class="space-y-3 text-xs">
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">CTR de Tráfego</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Atratividade dos anúncios</p>
+                                </div>
+                                <span class="font-mono font-bold text-[#1FC16B] text-sm" id="kpi-ctr">17.69%</span>
                             </div>
-                            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
-                                <span class="text-[10px] text-[#6E6E73] uppercase">CPC Médio</span>
-                                <p class="font-bold text-[#F5F5F7] font-mono text-sm" id="kpi-cpc">R$ 0,00</p>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Custo por Clique (CPC)</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Custo de visita</p>
+                                </div>
+                                <span class="font-mono font-bold text-[#F5F5F7] text-sm" id="kpi-cpc">R$ 0,35</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Status do Saldo</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Limite de veiculação</p>
+                                </div>
+                                <span class="badge badge-warning text-[9.5px]">Recarga Pendente</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CAMADA 5: OPORTUNIDADES & RECONCILIAÇÃO -->
-                <div class="panel p-5 space-y-3">
-                    <h3 class="font-bold text-sm text-[#F5F5F7]">Oportunidades de Otimização (Scoring de Confiança & Risco)</h3>
+                <!-- CAMADA 3: OPORTUNIDADES OPERACIONAIS IDENTIFICADAS -->
+                <div class="panel space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                        <h3 class="font-bold text-xs sm:text-sm text-[#F5F5F7]">Oportunidades de Otimização & Escala</h3>
+                        <span class="text-[10px] text-[#A1A1A6] font-mono">Confiança & Risco Calculados</span>
+                    </div>
                     <div id="top-opportunities-container" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"></div>
                 </div>
             </section>
@@ -555,101 +561,144 @@
 
 
             <!-- ===================================================================
-                 SEÇÃO 9: AUTOPILOT & EMERGENCY STOP
+                 SEÇÃO 9: MODO AUTOMÁTICO & REGRAS AUTÔNOMAS
                  =================================================================== -->
             <section id="view-autopilot" class="view-section hidden space-y-5">
                 <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Autopilot & Gestão Autônoma</h2>
-                    <p class="text-xs text-[#A1A1A6]">Execução de regras com guardrails, verificação pós-escrita e Emergency Stop</p>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Modo Automático & Regras do RADWAN</h2>
+                    <p class="text-xs text-[#A1A1A6]">Otimização guiada por inteligência com limites de segurança e parada de emergência</p>
                 </div>
 
                 <!-- Segmented Control de Modos -->
-                <div class="panel p-5 space-y-3">
-                    <label class="block text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Modo de Autonomia do Autopilot</label>
+                <div class="panel space-y-3">
+                    <label class="block text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Nível de Autonomia Permitido</label>
                     <div class="flex flex-wrap gap-2">
-                        <button class="segmented-btn active px-4 py-2 text-xs">🛡️ SAFE (Apenas Diagnóstico)</button>
-                        <button class="segmented-btn px-4 py-2 text-xs">👻 SHADOW (Registra Ações sem Executar)</button>
-                        <button class="segmented-btn px-4 py-2 text-xs">🤝 ASSISTED (Requer Confirmação Humana)</button>
-                        <button class="segmented-btn px-4 py-2 text-xs">⚡ SEMI-AUTO (Executa Ajustes Leves)</button>
-                        <button class="segmented-btn px-4 py-2 text-xs text-[#FF453A] border border-[#FF453A]/30">🚨 FULL AUTOPILOT</button>
+                        <button class="segmented-btn active px-3.5 py-2 text-xs">🛡️ Somente Analisar (Modo Seguro)</button>
+                        <button class="segmented-btn px-3.5 py-2 text-xs">👻 Registrar Ações (Modo Sombra)</button>
+                        <button class="segmented-btn px-3.5 py-2 text-xs">🤝 Pedir Minha Aprovação (Assistido)</button>
+                        <button class="segmented-btn px-3.5 py-2 text-xs">⚡ Ajustes Leves Permitidos</button>
                     </div>
                 </div>
 
-                <!-- Readiness Checklist -->
-                <div class="panel p-5 space-y-3">
-                    <h3 class="font-bold text-sm text-[#F5F5F7]">Autopilot Readiness (94/100)</h3>
+                <!-- Lista de Verificação de Segurança -->
+                <div class="panel space-y-3">
+                    <h3 class="font-bold text-sm text-[#F5F5F7]">Prontidão e Blindagem da Conta (98/100)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
                         <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Tracking Reconciled</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
+                            <span>Rastreamento Reconciliado</span> <span class="text-[#1FC16B] font-bold">✓ 100%</span>
                         </div>
                         <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Unit Economics Real</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
+                            <span>Economia Unitária Real</span> <span class="text-[#1FC16B] font-bold">✓ Ativo</span>
                         </div>
                         <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Data Confidence Score</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
+                            <span>Confiança dos Dados</span> <span class="text-[#1FC16B] font-bold">✓ Alta</span>
                         </div>
                         <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Guardrails & Cooldown</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
+                            <span>Limites e Cooldown</span> <span class="text-[#1FC16B] font-bold">✓ 12h Ativo</span>
                         </div>
                         <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>24h Shadow Mode</span> <span class="text-[#1FC16B] font-bold">✓ OK</span>
+                            <span>Verificação Pós-Escrita</span> <span class="text-[#1FC16B] font-bold">✓ Ativo</span>
                         </div>
                         <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Canary Test</span> <span class="text-[#F5A524] font-bold">Pendente</span>
+                            <span>Parada de Segurança</span> <span class="text-[#1FC16B] font-bold">✓ Pronta</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Emergency Stop Dedicado -->
-                <div class="p-5 rounded-xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex items-center justify-between">
+                <!-- Parada de Segurança Dedicada -->
+                <div class="p-5 rounded-xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h4 class="font-bold text-sm text-white">Emergency Stop (Kill Switch)</h4>
-                        <p class="text-xs text-gray-300">Pausa imediatamente qualquer escrita ou alteração do Autopilot em produção</p>
+                        <h4 class="font-bold text-sm text-white">Parada de Segurança da Conta (Kill Switch)</h4>
+                        <p class="text-xs text-gray-300">Pausa imediatamente qualquer escrita, ajuste de orçamento ou automação em produção</p>
                     </div>
-                    <button onclick="window.dashboard.triggerEmergencyStop()" class="btn btn-danger font-bold text-xs px-4 py-2">
-                        🛑 ATIVAR EMERGENCY STOP
+                    <button onclick="window.dashboard.triggerEmergencyStop()" class="btn btn-danger font-bold text-xs px-4 py-2 flex-shrink-0">
+                        🛑 ATIVAR PARADA DE SEGURANÇA
                     </button>
                 </div>
             </section>
 
-            <!-- SEÇÃO 10: (removida) -->
-
             <!-- ===================================================================
-                 SEÇÃO 11: AUDITORIA & LINHA DO TEMPO
+                 SEÇÃO 11: HISTÓRICO DE AÇÕES & AUDITORIA
                  =================================================================== -->
             <section id="view-audit" class="view-section hidden space-y-4">
                 <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Audit Trail & Linha do Tempo Imutável</h2>
-                    <p class="text-xs text-[#A1A1A6]">Registro cronológico de todas as decisões, alterações de orçamento e chamadas via Gateway</p>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Histórico de Ações & Registro de Decisões</h2>
+                    <p class="text-xs text-[#A1A1A6]">Registro cronológico de todas as decisões tomadas, alterações de orçamento e eventos da conta</p>
                 </div>
                 <div id="audit-timeline-container" class="space-y-3"></div>
             </section>
 
             <!-- ===================================================================
-                 SEÇÃO 12: CONFIGURAÇÕES & CREDENCIAIS
+                 SEÇÃO 12: CONFIGURAÇÕES & DIAGNÓSTICO
                  =================================================================== -->
-            <section id="view-settings" class="view-section hidden space-y-4">
-                <div class="panel p-6 rounded-2xl space-y-4 max-w-xl">
-                    <h3 class="font-bold text-[#F5F5F7] text-sm">Parâmetros, Unit Economics & Guardrails</h3>
-                    <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">CPA Alvo de Segurança (R$)</label>
-                            <input type="number" id="setting-target-cpa" value="35.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">Teto Máximo Diário da Conta (R$)</label>
-                            <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+            <section id="view-settings" class="view-section hidden space-y-5">
+                <div>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Configurações & Parâmetros da Operação</h2>
+                    <p class="text-xs text-[#A1A1A6]">Gerencie metas de CPA, tetos de investimento e veja o diagnóstico de infraestrutura</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Parâmetros de Venda -->
+                    <div class="panel space-y-4">
+                        <h3 class="font-bold text-[#F5F5F7] text-sm">Metas de Conversão & Orçamento</h3>
+                        <div class="space-y-3 text-xs">
                             <div>
-                                <p class="font-bold text-[#F5F5F7]">Validar Unit Economics Real</p>
-                                <p class="text-[10px] text-[#A1A1A6]">Permite escala autônoma baseada em margem de contribuição</p>
+                                <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">CPA Alvo de Segurança (R$)</label>
+                                <input type="number" id="setting-target-cpa" value="35.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
                             </div>
-                            <input type="checkbox" id="setting-unit-verified" class="w-4 h-4 accent-[#FF2D2D] rounded">
+                            <div>
+                                <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">Teto Máximo Diário da Conta (R$)</label>
+                                <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Validar Economia Unitária Real</p>
+                                    <p class="text-[10px] text-[#A1A1A6]">Calcula margem líquida real considerando custo do produto e taxas</p>
+                                </div>
+                                <input type="checkbox" id="setting-unit-verified" checked class="w-4 h-4 accent-[#FF2D2D] rounded">
+                            </div>
+                            <button onclick="window.dashboard.saveSettings()" class="btn btn-primary w-full py-2.5 text-xs font-semibold">
+                                Salvar Parâmetros
+                            </button>
                         </div>
-                        <button onclick="window.dashboard.saveSettings()" class="btn btn-primary w-full py-2.5 text-xs font-semibold">
-                            Salvar Parâmetros
-                        </button>
+                    </div>
+
+                    <!-- Diagnóstico Técnico do Sistema -->
+                    <div class="panel space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
+                            <h3 class="font-bold text-[#F5F5F7] text-sm">Diagnóstico Técnico & Conexão</h3>
+                            <span class="badge badge-active text-[10px]">Operacional</span>
+                        </div>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Meta Marketing API</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Graph API v21.0</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">Conectada</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Rastreamento Meta CAPI</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Eventos de Servidor & Deduplicação</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">100% Íntegro</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Token de Acesso</p>
+                                    <p class="text-[10px] text-[#6E6E73]">System User Permanente</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">Válido</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Bloqueio de Segurança (Fail-Closed)</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Proteção contra alterações incorretas</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">Ativo</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

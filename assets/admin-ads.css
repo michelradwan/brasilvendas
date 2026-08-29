@@ -227,12 +227,17 @@ body {
     display: none;
 }
 
+body.sidebar-open {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
 .nav-item {
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    height: 40px;
-    padding: 0 0.9rem;
+    height: 44px;
+    padding: 0 1rem;
     border-radius: var(--radius-md);
     color: var(--text-secondary);
     font-size: 13.5px;
@@ -241,11 +246,17 @@ body {
     position: relative;
     transition: color var(--transition-fast), background-color var(--transition-fast);
     white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .nav-item:hover {
     color: var(--text-primary);
     background: var(--surface-elevated);
+}
+
+.nav-item:active {
+    background: var(--surface-hover);
 }
 
 .nav-item.active {
