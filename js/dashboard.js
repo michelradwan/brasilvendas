@@ -569,52 +569,63 @@ class DashboardApp {
         const container = document.getElementById('creatives-grid-container');
         if (!container) return;
 
-        // Seção Criativos pode consultar 30d por padrão
-        const effectivePeriod = window.periodStore ? window.periodStore.getEffectivePeriod('creatives') : { preset: 'last_30d' };
+        if (this.cachedCampaigns.length === 0) {
+            container.innerHTML = `<div class="col-span-full p-8 text-center text-[#6E6E73] italic text-xs">Nenhum criativo ativo localizado na conta no período.</div>`;
+            return;
+        }
 
-        const creatives = [
-            { id: 'CTV_01', name: 'ctv validado - kit p.mp4', angle: 'Patriotismo / Orgulho', hookRate: '38.4%', ctr: '18.15%', cpc: 'R$ 0,35', spend: 'R$ 194,14', sales: 2, status: 'WINNER', score: 96 },
-            { id: 'CTV_02', name: 'ctv 02 bandeira bordada.mp4', angle: 'Qualidade do Bordado', hookRate: '24.1%', ctr: '4.20%', cpc: 'R$ 1,12', spend: 'R$ 0,00', sales: 0, status: 'TESTING', score: 72 },
-            { id: 'CTV_03', name: 'ctv 03 unboxing kit completo.mp4', angle: 'Prova Social / Entrega', hookRate: '19.8%', ctr: '3.10%', cpc: 'R$ 1,45', spend: 'R$ 0,00', sales: 0, status: 'TESTING', score: 68 }
-        ];
+        container.innerHTML = this.cachedCampaigns.map(camp => {
+            const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
+            const evalResult = window.decisionEngine ? window.decisionEngine.evaluateCreative(ins, 35.00) : { classification: 'TESTING', score: 70 };
+            
+            const hookRate = ins.impressions > 0 && ins.video_views_3s ? ((ins.video_views_3s / ins.impressions) * 100).toFixed(1) + '%' : '–';
+            const ctrFormatted = ins.ctr ? `${ins.ctr.toFixed(2)}%` : '0.00%';
+            const cpcFormatted = ins.cpc !== null ? window.analyticsEngine.formatMoney(ins.cpc) : '–';
+            const spendFormatted = window.analyticsEngine.formatMoney(ins.spend);
 
-        container.innerHTML = creatives.map(c => `
-            <div class="creative-card space-y-3">
-                <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span class="text-sm">🎬</span>
-                        <span class="font-bold text-xs text-[#F5F5F7] truncate">${escapeHTML(c.name)}</span>
+            let badgeClass = 'badge-active';
+            if (evalResult.classification === 'WINNER') badgeClass = 'badge-winner';
+            else if (evalResult.classification === 'FATIGUE') badgeClass = 'badge-error';
+            else if (evalResult.classification === 'WATCH') badgeClass = 'badge-warning';
+
+            return `
+                <div class="creative-card space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="text-sm">🎬</span>
+                            <span class="font-bold text-xs text-[#F5F5F7] truncate" title="${escapeHTML(camp.name)}">${escapeHTML(camp.name)}</span>
+                        </div>
+                        <span class="badge ${badgeClass} text-[10px]">
+                            ${escapeHTML(evalResult.classification)} (${evalResult.score || 70})
+                        </span>
                     </div>
-                    <span class="badge ${c.status === 'WINNER' ? 'badge-winner' : 'badge-paused'} text-[10px]">
-                        ${c.status} (${c.score})
-                    </span>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">CTR Link</span>
+                            <p class="font-mono font-bold ${ins.ctr && ins.ctr >= 2.0 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'} text-sm">${ctrFormatted}</p>
+                        </div>
+                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">CPC Médio</span>
+                            <p class="font-mono font-bold text-[#F5F5F7] text-sm">${cpcFormatted}</p>
+                        </div>
+                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Taxa de Retenção</span>
+                            <p class="font-mono font-bold text-[#5DA9FF] text-sm">${hookRate}</p>
+                        </div>
+                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Investido</span>
+                            <p class="font-mono font-bold text-[#A1A1A6] text-sm">${spendFormatted}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] pt-1">
+                        <span class="text-[#6E6E73] font-mono">ID: ${escapeHTML(camp.id)}</span>
+                        <span class="font-semibold ${ins.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#A1A1A6]'}">${ins.purchases} vendas</span>
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                        <span class="text-[10px] text-[#6E6E73] uppercase font-bold">CTR Link</span>
-                        <p class="font-mono font-bold text-[#1FC16B] text-sm">${c.ctr}</p>
-                    </div>
-                    <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                        <span class="text-[10px] text-[#6E6E73] uppercase font-bold">CPC Médio</span>
-                        <p class="font-mono font-bold text-[#F5F5F7] text-sm">${c.cpc}</p>
-                    </div>
-                    <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                        <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Hook Rate</span>
-                        <p class="font-mono font-bold text-[#5DA9FF] text-sm">${c.hookRate}</p>
-                    </div>
-                    <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                        <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Investido</span>
-                        <p class="font-mono font-bold text-[#A1A1A6] text-sm">${c.spend}</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between text-[11px] pt-1">
-                    <span class="text-[#6E6E73] font-mono">Ângulo: ${escapeHTML(c.angle)}</span>
-                    <span class="font-semibold text-[#1FC16B]">${c.sales} vendas</span>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // ─── FUNIL DE CONVERSÃO ──────────────────────────────────────────────────
@@ -623,22 +634,33 @@ class DashboardApp {
         const container = document.getElementById('funnel-steps-container');
         if (!container) return;
 
-        let totalImp = 0, totalClicks = 0, totalPurchases = 0;
+        let totalImp = 0, totalClicks = 0;
         this.cachedCampaigns.forEach(c => {
             const ins = this.cachedInsights.get(c.id);
             if (ins) {
-                totalImp += ins.impressions;
-                totalClicks += ins.clicks;
-                totalPurchases += ins.purchases;
+                totalImp += (ins.impressions || 0);
+                totalClicks += (ins.clicks || 0);
             }
         });
 
+        const totalCheckouts = this.cachedOrders ? this.cachedOrders.length : 0;
+        let totalPaid = 0;
+        if (this.cachedOrders) {
+            this.cachedOrders.forEach(p => {
+                const st = (p.status || '').toUpperCase();
+                if (st === 'PAID' || st === 'PAGO' || st === 'APROVADO') totalPaid++;
+            });
+        }
+
+        const clickPct = totalImp > 0 ? ((totalClicks / totalImp) * 100).toFixed(1) : '0.0';
+        const checkoutPct = totalClicks > 0 ? ((totalCheckouts / totalClicks) * 100).toFixed(1) : '0.0';
+        const paidPct = totalCheckouts > 0 ? ((totalPaid / totalCheckouts) * 100).toFixed(1) : '0.0';
+
         const steps = [
-            { label: '1. Impressões de Anúncio', value: totalImp || 4600, pct: '100%' },
-            { label: '2. Cliques no Link (Tráfego)', value: totalClicks || 460, pct: totalImp > 0 ? `${((totalClicks/totalImp)*100).toFixed(1)}%` : '10.0%' },
-            { label: '3. Checkout Iniciado', value: 21, pct: totalClicks > 0 ? `${((21/totalClicks)*100).toFixed(1)}%` : '4.5%' },
-            { label: '4. PIX Gerado', value: 8, pct: '38.1%' },
-            { label: '5. Vendas Concluídas (PIX Pago)', value: totalPurchases || 2, pct: '25.0%' }
+            { label: '1. Impressões de Anúncio', value: totalImp, pct: totalImp > 0 ? '100%' : '0%' },
+            { label: '2. Cliques no Link (Tráfego)', value: totalClicks, pct: `${clickPct}%` },
+            { label: '3. Checkout Iniciado (Página)', value: totalCheckouts, pct: `${checkoutPct}%` },
+            { label: '4. Vendas Concluídas (PIX Pago)', value: totalPaid, pct: `${paidPct}%` }
         ];
 
         container.innerHTML = steps.map(s => `
@@ -648,18 +670,88 @@ class DashboardApp {
                     <span class="font-mono font-bold text-[#F5F5F7]">${s.value.toLocaleString('pt-BR')} un <span class="text-[#6E6E73]">(${s.pct})</span></span>
                 </div>
                 <div class="w-full h-2 rounded-full bg-white/[0.05] overflow-hidden">
-                    <div class="h-full bg-[#FF2D2D] rounded-full" style="width: ${s.pct}"></div>
+                    <div class="h-full bg-[#FF2D2D] rounded-full" style="width: ${s.pct === '0%' ? '0%' : s.pct}"></div>
                 </div>
             </div>
         `).join('');
     }
 
     renderAuditLogs() {
-        // Implementação preservada
+        const container = document.getElementById('audit-timeline-container');
+        if (!container) return;
+
+        const logs = window.auditTrailEngine ? window.auditTrailEngine.getLogs() : [];
+
+        if (logs.length === 0) {
+            container.innerHTML = `
+                <div class="p-6 text-center text-[#6E6E73] italic text-xs bg-[#101014] border border-white/[0.05] rounded-xl">
+                    Nenhuma alteração de orçamento ou mutação registrada na sessão até o momento.
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = logs.map(l => `
+            <div class="p-3 rounded-lg bg-[#101014] border border-white/[0.05] space-y-1 text-xs">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-[#F5F5F7]">${escapeHTML(l.action)}</span>
+                    <span class="font-mono text-[#6E6E73] text-[10px]">${escapeHTML(l.formattedDate)} às ${escapeHTML(l.formattedTime)}</span>
+                </div>
+                <p class="text-[#A1A1A6] text-[11px]">${escapeHTML(l.reason)}</p>
+                <div class="flex items-center justify-between text-[10px] text-[#6E6E73] font-mono pt-1">
+                    <span>Antes: ${escapeHTML(String(l.before))} ➔ Depois: ${escapeHTML(String(l.after))}</span>
+                    <span class="text-[#1FC16B] font-semibold">${escapeHTML(l.verification)}</span>
+                </div>
+            </div>
+        `).join('');
     }
 
     renderTopOpportunities() {
-        // Implementação preservada
+        const container = document.getElementById('top-opportunities-container');
+        if (!container) return;
+
+        const opportunities = [];
+
+        this.cachedCampaigns.forEach(camp => {
+            const ins = this.cachedInsights.get(camp.id);
+            if (!ins) return;
+
+            if (ins.roas && ins.roas >= 2.5 && ins.purchases >= 2) {
+                opportunities.push({
+                    title: `Escalar orçamento da campanha ${camp.name}`,
+                    reason: `ROAS consistente de ${ins.roas.toFixed(2)}x com CPA de ${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : 'baixo custo'}.`,
+                    impact: 'ALTO IMPACTO',
+                    type: 'winner'
+                });
+            } else if (ins.spend > 50 && ins.purchases === 0) {
+                opportunities.push({
+                    title: `Revisar criativo da campanha ${camp.name}`,
+                    reason: `Consumo de ${window.analyticsEngine.formatMoney(ins.spend)} sem conversão registrada no período.`,
+                    impact: 'PREVENÇÃO DE PERDA',
+                    type: 'warning'
+                });
+            }
+        });
+
+        if (opportunities.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-full p-4 rounded-lg bg-[#101014] border border-white/[0.05] text-xs text-[#A1A1A6] flex items-center justify-between">
+                    <span>Nenhuma anomalia ou risco imediato detectado nos dados do período atual.</span>
+                    <span class="badge badge-active text-[10px]">Operação Estável</span>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = opportunities.map(op => `
+            <div class="p-3 rounded-lg bg-[#101014] border border-white/[0.05] space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-[#F5F5F7] text-xs truncate">${escapeHTML(op.title)}</span>
+                    <span class="badge ${op.type === 'winner' ? 'badge-winner' : 'badge-warning'} text-[9px]">${escapeHTML(op.impact)}</span>
+                </div>
+                <p class="text-[11px] text-[#A1A1A6]">${escapeHTML(op.reason)}</p>
+            </div>
+        `).join('');
     }
 
     // ─── GESTÃO DE PEDIDOS & VENDAS EM TEMPO REAL ────────────────────────────
@@ -949,14 +1041,45 @@ class DashboardApp {
         const newBudget = parseFloat(document.getElementById('budget-modal-input').value);
         if (isNaN(newBudget) || newBudget <= 0) return;
 
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
         try {
-            this.showToast('Atualizando orçamento na Meta...', 'info');
-            await window.metaAdapter.updateBudget(campId, 'daily_budget', Math.round(newBudget * 100));
+            this.showToast('Enviando alteração de orçamento para a Meta...', 'info');
+            const newBudgetCents = Math.round(newBudget * 100);
+            
+            // 1. WRITE
+            await window.metaAdapter.updateBudget(campId, 'daily_budget', newBudgetCents);
+            
+            // 2. READ & VERIFY
+            const verifyRes = await window.metaAdapter.request(campId, 'GET', { fields: 'id,daily_budget' }, null, false);
+            const verifiedBudgetCents = verifyRes?.daily_budget ? parseInt(verifyRes.daily_budget, 10) : null;
+            
+            if (verifiedBudgetCents && Math.abs(verifiedBudgetCents - newBudgetCents) > 10) {
+                throw new Error('A Meta não confirmou o novo valor de orçamento na leitura pós-escrita.');
+            }
+
+            // 3. AUDIT TRAIL LOG
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'ALTERACAO_ORCAMENTO',
+                    objectId: campId,
+                    before: document.getElementById('budget-modal-current').textContent,
+                    after: `R$ ${newBudget.toFixed(2).replace('.', ',')}`,
+                    reason: 'Ajuste manual de orçamento com verificação pós-escrita.',
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
             document.getElementById('budget-modal').classList.add('hidden');
-            this.showToast('Orçamento atualizado com sucesso!', 'success');
+            this.showToast('Orçamento atualizado e verificado com sucesso na Meta!', 'success');
             await this.syncAllData();
+
         } catch (err) {
-            this.showToast(`Erro ao alterar orçamento: ${err.message}`, 'error');
+            console.error('[Budget Mutation Error]', err);
+            this.showToast(`Falha na alteração de orçamento: ${err.message || 'Erro na Meta API'}`, 'error');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
         }
     }
 

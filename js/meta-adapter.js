@@ -112,7 +112,7 @@ class MetaDataProvider {
             if (res && res.data) {
                 all = all.concat(res.data);
                 if (res.paging && res.paging.cursors && res.paging.cursors.after && res.data.length === limit) {
-                    params.after = res.data.paging.cursors.after;
+                    params.after = res.paging.cursors.after;
                 } else {
                     break;
                 }

@@ -35,7 +35,7 @@ class AnalyticsEngine {
     }
 
     formatMoney(amount, currency = 'BRL') {
-        if (amount === null || amount === undefined || isNaN(amount)) return 'NO DATA';
+        if (amount === null || amount === undefined || isNaN(amount)) return '–';
         const num = parseFloat(amount) || 0;
         return num.toLocaleString('pt-BR', {
             style: 'currency',
@@ -46,7 +46,7 @@ class AnalyticsEngine {
     }
 
     formatPercent(val) {
-        if (val === null || val === undefined || isNaN(val)) return 'NO DATA';
+        if (val === null || val === undefined || isNaN(val)) return '–';
         const num = parseFloat(val) || 0;
         return `${num >= 0 ? '+' : ''}${num.toFixed(1)}%`;
     }
