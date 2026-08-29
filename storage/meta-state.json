@@ -148,6 +148,56 @@
         "success": true,
         "budget": 5750
       }
+    },
+    "ORDER_TEST_TX_1788034703201": {
+      "result": {
+        "transaction_id": "TEST_TX_1788034703201",
+        "status": "PAID",
+        "amount": 89.9,
+        "amount_in_cents": 8990,
+        "currency": "BRL",
+        "customer": {
+          "name": "João Patriota da Silva",
+          "email": "joao.teste@gmail.com",
+          "phone": "11987654321",
+          "document": "12345678909"
+        },
+        "address": {
+          "cep": "01310100",
+          "street": "Av Paulista",
+          "city": "São Paulo",
+          "state": "SP"
+        },
+        "items": [
+          {
+            "title": "Kit Patriota Oficial 2026",
+            "quantity": 1,
+            "price": 89.9
+          }
+        ],
+        "attribution": {
+          "utm_source": "facebook",
+          "utm_medium": null,
+          "utm_campaign": "CAMP 01 - TESTE KIT P - CBO",
+          "utm_content": "CTV 01 - KIT 01",
+          "utm_term": null,
+          "campaign_id": "120250828452640751",
+          "adset_id": null,
+          "ad_id": "120250828452660751",
+          "src": null,
+          "sck": null,
+          "xcod": null,
+          "fbclid": null,
+          "fbp": "fb.1.1787532193.123456",
+          "fbc": "fb.1.1787532193.AbCdEf123",
+          "client_ip": "189.100.20.10",
+          "client_user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)"
+        },
+        "created_at": "2026-08-29T20:18:23.202Z",
+        "paid_at": "2026-08-29T20:18:23.206Z",
+        "meta_capi_sent": true,
+        "utmify_sale_sent": true
+      }
     }
   },
   "cooldowns": {
