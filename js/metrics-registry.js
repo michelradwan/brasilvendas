@@ -266,7 +266,7 @@
             tooltip: 'Número de pessoas únicas que visualizaram os anúncios pelo menos uma vez',
             beginnerDescription: 'Pessoas diferentes que viram o anúncio.',
             requiresFields: ['reach'],
-            calculate: (ins) => ins?.reach || 0
+            calculate: (ins) => ins?.reach !== undefined && ins?.reach !== null ? ins.reach : null
         },
 
         'frequency': {
@@ -274,7 +274,7 @@
             label: 'Frequência',
             shortLabel: 'Freq.',
             category: 'entrega',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'impressions,reach',
             format: 'decimal_2',
             align: 'right',
@@ -285,6 +285,7 @@
             beginnerDescription: 'Quantas vezes a mesma pessoa viu seu anúncio em média.',
             requiresFields: ['impressions', 'reach'],
             calculate: (ins) => {
+                if (ins?.frequency !== undefined && ins?.frequency !== null) return ins.frequency;
                 if (!ins || !ins.reach || ins.reach <= 0) return null;
                 return ins.impressions / ins.reach;
             }
@@ -295,7 +296,7 @@
             label: 'Custo por Mil (CPM)',
             shortLabel: 'CPM',
             category: 'entrega',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'spend,impressions',
             format: 'currency',
             align: 'right',
@@ -306,6 +307,7 @@
             beginnerDescription: 'Quanto custa para 1.000 pessoas verem seu anúncio.',
             requiresFields: ['spend', 'impressions'],
             calculate: (ins) => {
+                if (ins?.cpm !== undefined && ins?.cpm !== null) return ins.cpm;
                 if (!ins || !ins.impressions || ins.impressions <= 0) return null;
                 return (ins.spend / ins.impressions) * 1000;
             }
@@ -327,7 +329,7 @@
             tooltip: 'Cliques específicos no link de destino direcionando para o site',
             beginnerDescription: 'Pessoas que clicaram no link para abrir sua loja.',
             requiresFields: ['inline_link_clicks', 'clicks'],
-            calculate: (ins) => ins?.link_clicks || ins?.clicks || 0
+            calculate: (ins) => ins?.link_clicks !== undefined && ins?.link_clicks !== null ? ins.link_clicks : (ins?.clicks || 0)
         },
 
         'link_ctr': {
@@ -335,7 +337,7 @@
             label: 'CTR do Link',
             shortLabel: 'CTR Link',
             category: 'trafego',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'inline_link_clicks,impressions',
             format: 'percentage',
             align: 'right',
@@ -346,8 +348,9 @@
             beginnerDescription: 'Porcentagem de pessoas que clicaram no link após verem o anúncio.',
             requiresFields: ['inline_link_clicks', 'impressions'],
             calculate: (ins) => {
+                if (ins?.link_ctr !== undefined && ins?.link_ctr !== null) return ins.link_ctr;
+                const clicks = ins?.link_clicks !== undefined && ins?.link_clicks !== null ? ins.link_clicks : (ins?.clicks || 0);
                 if (!ins || !ins.impressions || ins.impressions <= 0) return null;
-                const clicks = ins.link_clicks || ins.clicks || 0;
                 return (clicks / ins.impressions) * 100;
             }
         },
@@ -357,7 +360,7 @@
             label: 'CPC do Link',
             shortLabel: 'CPC Link',
             category: 'trafego',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'spend,inline_link_clicks',
             format: 'currency',
             align: 'right',
@@ -368,7 +371,8 @@
             beginnerDescription: 'Quanto você pagou por cada visita ao seu link.',
             requiresFields: ['spend', 'inline_link_clicks'],
             calculate: (ins) => {
-                const clicks = ins?.link_clicks || ins?.clicks || 0;
+                if (ins?.link_cpc !== undefined && ins?.link_cpc !== null) return ins.link_cpc;
+                const clicks = ins?.link_clicks !== undefined && ins?.link_clicks !== null ? ins.link_clicks : (ins?.clicks || 0);
                 if (!ins || clicks <= 0) return null;
                 return ins.spend / clicks;
             }
@@ -389,7 +393,7 @@
             tooltip: 'Usuários que clicaram e aguardaram o carregamento completo da página de destino',
             beginnerDescription: 'Pessoas que realmente abriram sua página até carregar.',
             requiresFields: ['actions'],
-            calculate: (ins) => ins?.landing_page_views || ins?.clicks || 0
+            calculate: (ins) => ins?.landing_page_views !== undefined && ins?.landing_page_views !== null ? ins.landing_page_views : null
         },
 
         'cost_per_lpv': {
@@ -397,7 +401,7 @@
             label: 'Custo por Visita à Página',
             shortLabel: 'Custo/Visita',
             category: 'trafego',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'spend,actions',
             format: 'currency',
             align: 'right',
@@ -408,8 +412,8 @@
             beginnerDescription: 'Custo para levar uma pessoa real até sua página.',
             requiresFields: ['spend', 'actions'],
             calculate: (ins) => {
-                const lpv = ins?.landing_page_views || ins?.clicks || 0;
-                if (!ins || lpv <= 0) return null;
+                const lpv = ins?.landing_page_views;
+                if (!ins || lpv === null || lpv === undefined || lpv <= 0) return null;
                 return ins.spend / lpv;
             }
         },
@@ -430,7 +434,7 @@
             tooltip: 'Quantidade de pessoas que iniciaram o fluxo de pagamento/checkout',
             beginnerDescription: 'Quantos clientes chegaram na tela de pagamento.',
             requiresFields: ['actions'],
-            calculate: (ins) => ins?.initiate_checkout || Math.round((ins?.purchases || 0) * 1.5)
+            calculate: (ins) => ins?.initiate_checkout !== undefined && ins?.initiate_checkout !== null ? ins.initiate_checkout : null
         },
 
         'cost_per_initiate_checkout': {
@@ -438,7 +442,7 @@
             label: 'Custo por Checkout Iniciado',
             shortLabel: 'Custo/Checkout',
             category: 'conversao',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'spend,actions',
             format: 'currency',
             align: 'right',
@@ -449,8 +453,8 @@
             beginnerDescription: 'Quanto custou para colocar um cliente no checkout.',
             requiresFields: ['spend', 'actions'],
             calculate: (ins) => {
-                const ic = ins?.initiate_checkout || Math.round((ins?.purchases || 0) * 1.5);
-                if (!ins || ic <= 0) return null;
+                const ic = ins?.initiate_checkout;
+                if (!ins || ic === null || ic === undefined || ic <= 0) return null;
                 return ins.spend / ic;
             }
         },
@@ -470,7 +474,7 @@
             tooltip: 'Número de adições de produtos ao carrinho de compras',
             beginnerDescription: 'Pessoas que colocaram produtos no carrinho.',
             requiresFields: ['actions'],
-            calculate: (ins) => ins?.add_to_cart || (ins?.purchases || 0) * 2
+            calculate: (ins) => ins?.add_to_cart !== undefined && ins?.add_to_cart !== null ? ins.add_to_cart : null
         },
 
         'conversion_rate': {
@@ -478,7 +482,7 @@
             label: 'Taxa de Conversão (CVR)',
             shortLabel: 'Taxa Conv.',
             category: 'conversao',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'actions,clicks',
             format: 'percentage',
             align: 'right',
@@ -489,7 +493,7 @@
             beginnerDescription: 'A cada 100 cliques, quantos viraram compradores.',
             requiresFields: ['actions', 'clicks'],
             calculate: (ins) => {
-                const clicks = ins?.link_clicks || ins?.clicks || 0;
+                const clicks = ins?.link_clicks !== undefined && ins?.link_clicks !== null ? ins.link_clicks : (ins?.clicks || 0);
                 if (!ins || clicks <= 0 || !ins.purchases) return null;
                 return (ins.purchases / clicks) * 100;
             }
@@ -500,7 +504,7 @@
             label: 'Conversão Checkout ➔ Compra',
             shortLabel: 'Conv. Checkout',
             category: 'funil',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'actions',
             format: 'percentage',
             align: 'right',
@@ -511,8 +515,8 @@
             beginnerDescription: 'De quem entrou no checkout, quantos realmente pagaram.',
             requiresFields: ['actions'],
             calculate: (ins) => {
-                const ic = ins?.initiate_checkout || Math.round((ins?.purchases || 0) * 1.5);
-                if (!ins || ic <= 0 || !ins.purchases) return null;
+                const ic = ins?.initiate_checkout;
+                if (!ins || ic === null || ic === undefined || ic <= 0 || !ins.purchases) return null;
                 return Math.min(100, (ins.purchases / ic) * 100);
             }
         },
@@ -533,7 +537,7 @@
             tooltip: 'Reproduções do vídeo com pelo menos 3 segundos de exibição contínua',
             beginnerDescription: 'Pessoas que assistiram pelo menos 3 segundos do seu vídeo.',
             requiresFields: ['video_30_sec_watched_actions', 'impressions'],
-            calculate: (ins) => ins?.video_views_3s || Math.round((ins?.impressions || 0) * 0.45)
+            calculate: (ins) => ins?.video_views_3s !== undefined && ins?.video_views_3s !== null ? ins.video_views_3s : null
         },
 
         'hook_rate': {
@@ -541,20 +545,19 @@
             label: 'Retenção Inicial (Hook Rate)',
             shortLabel: 'Hook Rate',
             category: 'video',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'video_30_sec_watched_actions,impressions',
             format: 'percentage',
             align: 'right',
             minWidth: 95,
             sortable: true,
             higherIsBetter: true,
-            tooltip: 'Taxa de captura do gancho inicial ((Reproduções 3s / Impressões) * 100)',
+            tooltip: 'Taxa de captura do gancho inicial ((Reproduções 3s / Impressões) * 100) — RADWAN DERIVED',
             beginnerDescription: 'Poder do gancho inicial para prender a atenção no feed.',
             requiresFields: ['video_30_sec_watched_actions', 'impressions'],
             calculate: (ins) => {
-                if (!ins || !ins.impressions || ins.impressions <= 0) return null;
-                const v3s = ins.video_views_3s || Math.round(ins.impressions * 0.45);
-                return (v3s / ins.impressions) * 100;
+                if (!ins || !ins.impressions || ins.impressions <= 0 || ins.video_views_3s === null || ins.video_views_3s === undefined) return null;
+                return (ins.video_views_3s / ins.impressions) * 100;
             }
         },
 
@@ -573,7 +576,7 @@
             tooltip: 'Reproduções completas de vídeos curtos ou de pelo menos 15 segundos',
             beginnerDescription: 'Visualizações de alta retenção no vídeo.',
             requiresFields: ['video_thruplay_watched_actions'],
-            calculate: (ins) => ins?.thruplay || Math.round((ins?.impressions || 0) * 0.22)
+            calculate: (ins) => ins?.thruplay !== undefined && ins?.thruplay !== null ? ins.thruplay : null
         },
 
         'cost_per_thruplay': {
@@ -581,7 +584,7 @@
             label: 'Custo por ThruPlay',
             shortLabel: 'Custo/ThruPlay',
             category: 'video',
-            source: 'DERIVED',
+            source: 'RADWAN_DERIVED',
             sourceField: 'spend,video_thruplay_watched_actions',
             format: 'currency',
             align: 'right',
@@ -592,8 +595,8 @@
             beginnerDescription: 'Quanto você pagou por cada visualização engajada de vídeo.',
             requiresFields: ['spend', 'video_thruplay_watched_actions'],
             calculate: (ins) => {
-                const tp = ins?.thruplay || Math.round((ins?.impressions || 0) * 0.22);
-                if (!ins || tp <= 0) return null;
+                const tp = ins?.thruplay;
+                if (!ins || tp === null || tp === undefined || tp <= 0) return null;
                 return ins.spend / tp;
             }
         },
@@ -613,7 +616,7 @@
             tooltip: 'Número de vezes que o vídeo foi assistido integralmente até o fim',
             beginnerDescription: 'Pessoas que assistiram o vídeo inteiro até o final.',
             requiresFields: ['video_p100_watched_actions'],
-            calculate: (ins) => ins?.video_p100 || Math.round((ins?.impressions || 0) * 0.12)
+            calculate: (ins) => ins?.video_p100 !== undefined && ins?.video_p100 !== null ? ins.video_p100 : null
         },
 
         // --- INTELIGÊNCIA RADWAN ---

@@ -425,10 +425,10 @@ class DashboardApp {
             this.renderOverviewMetrics();
             this.renderWhatShouldIDoNow();
             this.renderCampaignsTable();
-            this.renderFunnelView();
-            this.renderCreativesView();
-            this.renderAuditLogs();
-            this.renderTopOpportunities();
+            if (typeof this.renderFunnelView === 'function') this.renderFunnelView();
+            if (typeof this.renderCreativesView === 'function') this.renderCreativesView();
+            if (typeof this.renderAuditLogs === 'function') this.renderAuditLogs();
+            if (typeof this.renderTopOpportunities === 'function') this.renderTopOpportunities();
 
             // 6. Pedidos no período
             await this.loadOrdersData(true);
@@ -451,42 +451,22 @@ class DashboardApp {
     // ─── MÉTRICAS & VISÃO GERAL (OVERVIEW COMMAND CENTER) ─────────────────────
 
     renderOverviewMetrics() {
-        let totalSpend = 0, totalRevenue = 0, totalPurchases = 0, totalClicks = 0, totalImpressions = 0;
         const allMetrics = [];
-
         this.cachedCampaigns.forEach(camp => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
-            totalSpend += ins.spend;
-            totalRevenue += ins.revenue;
-            totalPurchases += ins.purchases;
-            totalClicks += ins.clicks;
-            totalImpressions += ins.impressions;
             allMetrics.push(ins);
         });
 
-        // Totais do período anterior para comparação
-        let prevSpend = 0, prevRevenue = 0, prevPurchases = 0;
-        if (window.periodStore && window.periodStore.comparisonMode) {
-            this.cachedCampaigns.forEach(camp => {
-                const prevIns = this.previousPeriodInsights.get(camp.id);
-                if (prevIns) {
-                    prevSpend += prevIns.spend;
-                    prevRevenue += prevIns.revenue;
-                    prevPurchases += prevIns.purchases;
-                }
-            });
-        }
+        // Agregação Canônica e Matematicamente Correta (sem média de taxas)
+        const agg = window.analyticsEngine.aggregateInsights(allMetrics);
+        const profit = agg.revenue - agg.spend;
 
-        const avgCpa = totalPurchases > 0 ? (totalSpend / totalPurchases) : null;
-        const avgRoas = totalSpend > 0 ? (totalRevenue / totalSpend) : null;
-        const profit = totalRevenue - totalSpend;
-
-        // Renderiza valores
+        // Renderiza valores no Snapshot Superior
         const spendEl = document.getElementById('kpi-spend');
-        if (spendEl) spendEl.textContent = window.analyticsEngine.formatMoney(totalSpend);
+        if (spendEl) spendEl.textContent = window.analyticsEngine.formatMoney(agg.spend);
 
         const revEl = document.getElementById('kpi-revenue');
-        if (revEl) revEl.textContent = window.analyticsEngine.formatMoney(totalRevenue);
+        if (revEl) revEl.textContent = window.analyticsEngine.formatMoney(agg.revenue);
 
         const profitEl = document.getElementById('kpi-profit');
         if (profitEl) {
@@ -495,13 +475,20 @@ class DashboardApp {
         }
 
         const roasEl = document.getElementById('kpi-roas');
-        if (roasEl) roasEl.textContent = avgRoas !== null ? `${avgRoas.toFixed(2)}x` : '0.00x';
+        if (roasEl) roasEl.textContent = agg.roas !== null ? `${agg.roas.toFixed(2)}x` : '0,00x';
 
         const cpaEl = document.getElementById('kpi-cpa');
-        if (cpaEl) cpaEl.textContent = avgCpa !== null ? window.analyticsEngine.formatMoney(avgCpa) : 'R$ 0,00';
+        if (cpaEl) cpaEl.textContent = agg.cpa !== null ? window.analyticsEngine.formatMoney(agg.cpa) : '–';
 
         const purchasesEl = document.getElementById('kpi-purchases');
-        if (purchasesEl) purchasesEl.textContent = `${totalPurchases} un`;
+        if (purchasesEl) purchasesEl.textContent = `${agg.purchases} un`;
+
+        // Renderiza KPIs de Tráfego Agregados (Saúde da Operação)
+        const ctrEl = document.getElementById('kpi-ctr');
+        if (ctrEl) ctrEl.textContent = agg.ctr !== null ? `${agg.ctr.toFixed(2).replace('.', ',')}%` : '–';
+
+        const cpcEl = document.getElementById('kpi-cpc');
+        if (cpcEl) cpcEl.textContent = agg.cpc !== null ? window.analyticsEngine.formatMoney(agg.cpc) : '–';
     }
 
     renderWhatShouldIDoNow() {

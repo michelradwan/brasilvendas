@@ -6,7 +6,7 @@
 class MetaDataProvider {
     constructor() {
         this.cache = new Map();
-        this.proxyEndpoint = (typeof window !== 'undefined' && window.location.protocol === 'file:') ? 'https://brasilvendas.vercel.app/api/meta-proxy' : '/api/meta-proxy';
+        this.proxyEndpoint = (typeof window !== 'undefined' && window.location?.protocol === 'file:') ? 'https://brasilvendas.vercel.app/api/meta-proxy' : '/api/meta-proxy';
         this.adminPassword = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('meta_admin_token') || localStorage.getItem('meta_admin_token') || 'mraa2004') : 'mraa2004';
     }
 
@@ -138,10 +138,32 @@ class MetaDataProvider {
         });
     }
 
-    // Buscar Insights (Suporta Presets e Intervalos Customizados)
-    async getInsights(objectId, periodParam = 'today') {
+    // Buscar Insights (Suporta Presets, Intervalos Customizados e Query Planner de Campos)
+    async getInsights(objectId, periodParam = 'today', customFields = null) {
+        const defaultFields = [
+            'spend',
+            'impressions',
+            'reach',
+            'clicks',
+            'cpc',
+            'cpm',
+            'ctr',
+            'frequency',
+            'inline_link_clicks',
+            'inline_link_click_ctr',
+            'cost_per_inline_link_click',
+            'actions',
+            'action_values',
+            'video_30_sec_watched_actions',
+            'video_thruplay_watched_actions',
+            'video_p25_watched_actions',
+            'video_p50_watched_actions',
+            'video_p75_watched_actions',
+            'video_p100_watched_actions'
+        ].join(',');
+
         const params = {
-            fields: 'spend,impressions,clicks,cpc,cpm,ctr,frequency,actions,action_values'
+            fields: customFields || defaultFields
         };
 
         if (typeof periodParam === 'object' && periodParam !== null && periodParam.since && periodParam.until) {
