@@ -9,7 +9,7 @@ const { storage } = require('../lib/storage-adapter.js');
 const { META_GRAPH_VERSION, META_GRAPH_BASE_URL } = require('../config/meta-constants.js');
 
 const PIXEL_ID = process.env.META_PIXEL_ID || '2292987404797869';
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN || 'EAA6kKz1qBV8BScqZAG8mVrcPD4ICruA1t9WqObGj21tgmjSmOz5w2ngISSd2m9LSgETqq8zZCrfBERBmbSwMzTJaAxUvwSFnlZCOY0lK0CDZAihxtzHieFl6dyDAQdM9xJVpXBT8Ya6KpWnVctmTqUugUUaaujxfpAu7J7ZBKkx17UN2o0BbWjyUQ8lR38UDnagZDZD';
 const UTMIFY_API_TOKEN = process.env.UTMIFY_API_TOKEN || process.env.UTMIFY_TOKEN;
 
 // Helper para hash SHA-256 normalizado
