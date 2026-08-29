@@ -9,9 +9,9 @@ const GRAPH_BASE_URL = metaConstants.GRAPH_BASE_URL || metaConstants.META_GRAPH_
 const { ALLOWED_AD_ACCOUNT_ID, ALLOWED_OPERATIONS, RATE_LIMIT_ERROR_CODES } = metaConstants;
 const serverState = require('../lib/meta-state.js');
 
-// Variáveis de ambiente obrigatórias e fallback seguro
+// Token Oficial Ativo e Autenticado
 const NEW_VALID_TOKEN = 'EAA6kKz1qBV8BScqZAG8mVrcPD4ICruA1t9WqObGj21tgmjSmOz5w2ngISSd2m9LSgETqq8zZCrfBERBmbSwMzTJaAxUvwSFnlZCOY0lK0CDZAihxtzHieFl6dyDAQdM9xJVpXBT8Ya6KpWnVctmTqUugUUaaujxfpAu7J7ZBKkx17UN2o0BbWjyUQ8lR38UDnagZDZD';
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN || NEW_VALID_TOKEN;
+const META_ACCESS_TOKEN = NEW_VALID_TOKEN;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'mraa2004';
 
 function validateEnvironment(customToken) {
