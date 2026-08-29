@@ -358,10 +358,14 @@ class DashboardApp {
             // 1. Dados da Conta
             const accInfo = await window.metaAdapter.getAccountInfo();
             if (accInfo) {
-                document.getElementById('topbar-account-name').textContent = accInfo.name || 'Brasil Vendas';
-                document.getElementById('topbar-account-id').textContent = accInfo.id;
-                document.getElementById('topbar-currency').textContent = accInfo.currency || 'BRL';
-                document.getElementById('topbar-timezone').textContent = accInfo.timezone_name || 'America/Sao_Paulo';
+                const nameEl = document.getElementById('topbar-account-name');
+                if (nameEl) nameEl.textContent = accInfo.name || 'C.A 01';
+                const idEl = document.getElementById('topbar-account-id');
+                if (idEl) idEl.textContent = accInfo.id;
+                const curEl = document.getElementById('topbar-currency');
+                if (curEl) curEl.textContent = accInfo.currency || 'BRL';
+                const tzEl = document.getElementById('topbar-timezone');
+                if (tzEl) tzEl.textContent = accInfo.timezone_name || 'America/Sao_Paulo';
             }
 
             // 2. Lista de Campanhas
@@ -412,7 +416,8 @@ class DashboardApp {
             // 6. Pedidos no período
             await this.loadOrdersData(true);
 
-            document.getElementById('topbar-last-sync').textContent = new Date().toLocaleTimeString('pt-BR');
+            const syncEl = document.getElementById('topbar-last-sync');
+            if (syncEl) syncEl.textContent = new Date().toLocaleTimeString('pt-BR');
             if (!silent) this.showToast('Dados atualizados com sucesso.', 'success');
 
         } catch (err) {
@@ -1517,64 +1522,7 @@ class DashboardApp {
         } catch(e) {}
     }
 
-    // ─── MODAIS DE ORÇAMENTO & TOKEN ──────────────────────────────────────────
-
-    openBudgetModal(campId, currentBudget) {
-        const modal = document.getElementById('budget-modal');
-        if (!modal) return;
-        document.getElementById('budget-modal-camp-id').value = campId;
-        document.getElementById('budget-modal-current').textContent = `R$ ${currentBudget.toFixed(2).replace('.', ',')}`;
-        document.getElementById('budget-modal-input').value = currentBudget.toFixed(2);
-        modal.classList.remove('hidden');
-    }
-
-    async submitBudgetModal(event) {
-        event.preventDefault();
-        const campId = document.getElementById('budget-modal-camp-id').value;
-        const newBudget = parseFloat(document.getElementById('budget-modal-input').value);
-        if (isNaN(newBudget) || newBudget <= 0) return;
-
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        if (submitBtn) submitBtn.disabled = true;
-
-        try {
-            this.showToast('Enviando alteração de orçamento para a Meta...', 'info');
-            const newBudgetCents = Math.round(newBudget * 100);
-            
-            // 1. WRITE
-            await window.metaAdapter.updateBudget(campId, 'daily_budget', newBudgetCents);
-            
-            // 2. READ & VERIFY
-            const verifyRes = await window.metaAdapter.request(campId, 'GET', { fields: 'id,daily_budget' }, null, false);
-            const verifiedBudgetCents = verifyRes?.daily_budget ? parseInt(verifyRes.daily_budget, 10) : null;
-            
-            if (verifiedBudgetCents && Math.abs(verifiedBudgetCents - newBudgetCents) > 10) {
-                throw new Error('A Meta não confirmou o novo valor de orçamento na leitura pós-escrita.');
-            }
-
-            // 3. AUDIT TRAIL LOG
-            if (window.auditTrailEngine) {
-                window.auditTrailEngine.logAction({
-                    action: 'ALTERACAO_ORCAMENTO',
-                    objectId: campId,
-                    before: document.getElementById('budget-modal-current').textContent,
-                    after: `R$ ${newBudget.toFixed(2).replace('.', ',')}`,
-                    reason: 'Ajuste manual de orçamento com verificação pós-escrita.',
-                    verification: 'CONFIRMADO_PELA_META'
-                });
-            }
-
-            document.getElementById('budget-modal').classList.add('hidden');
-            this.showToast('Orçamento atualizado e verificado com sucesso na Meta!', 'success');
-            await this.syncAllData();
-
-        } catch (err) {
-            console.error('[Budget Mutation Error]', err);
-            this.showToast(`Falha na alteração de orçamento: ${err.message || 'Erro na Meta API'}`, 'error');
-        } finally {
-            if (submitBtn) submitBtn.disabled = false;
-        }
-    }
+    // ─── MODAL DE TOKEN META ──────────────────────────────────────────────────
 
     openTokenModal() {
         document.getElementById('token-modal')?.classList.remove('hidden');
