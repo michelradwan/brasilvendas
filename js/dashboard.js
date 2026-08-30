@@ -208,21 +208,24 @@ class DashboardApp {
     // ─── NAVEGAÇÃO ENTRE ABAS ────────────────────────────────────────────────
 
     switchView(viewName) {
+        const canonical = (viewName === 'home' || viewName === 'overview') ? 'overview' : viewName;
+
         // Redireciona sub-níveis de campanhas para as abas internas consolidadas
-        if (viewName === 'adsets') {
+        if (canonical === 'adsets') {
             this.switchView('campaigns');
             this.switchCampaignTab('adsets');
             return;
         }
-        if (viewName === 'ads') {
+        if (canonical === 'ads') {
             this.switchView('campaigns');
             this.switchCampaignTab('ads');
             return;
         }
 
-        this.currentView = viewName;
+        this.currentView = canonical;
         document.querySelectorAll('.nav-item').forEach(item => {
-            if (item.getAttribute('data-nav-target') === viewName) {
+            const target = item.getAttribute('data-nav-target');
+            if (target === canonical || (canonical === 'overview' && (target === 'home' || target === 'overview'))) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');
@@ -230,7 +233,8 @@ class DashboardApp {
         });
 
         document.querySelectorAll('.mobile-dock-btn').forEach(btn => {
-            if (btn.getAttribute('data-dock-view') === viewName) {
+            const dockTarget = btn.getAttribute('data-dock-view');
+            if (dockTarget === canonical || (canonical === 'overview' && (dockTarget === 'home' || dockTarget === 'overview'))) {
                 btn.classList.add('active');
             } else {
                 btn.classList.remove('active');
@@ -238,23 +242,25 @@ class DashboardApp {
         });
 
         document.querySelectorAll('.view-section').forEach(sec => {
-            if (sec.id === `view-${viewName}`) {
+            if (sec.id === `view-${canonical}`) {
                 sec.classList.remove('hidden');
             } else {
                 sec.classList.add('hidden');
             }
         });
 
-        if (viewName === 'site-intelligence') {
+        if (canonical === 'site-intelligence') {
             this.loadSIData();
-        } else if (viewName === 'orders') {
+        } else if (canonical === 'orders') {
             this.loadOrdersData();
-        } else if (viewName === 'creatives') {
+        } else if (canonical === 'creatives') {
             this.renderCreativesView();
-        } else if (viewName === 'campaigns') {
+        } else if (canonical === 'campaigns') {
             this.switchCampaignTab(this.activeCampaignTab || 'campaigns');
-        } else if (viewName === 'autopilot') {
+        } else if (canonical === 'autopilot') {
             this.renderAutopilotView();
+        } else if (canonical === 'overview') {
+            this.renderOverviewMetrics();
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });

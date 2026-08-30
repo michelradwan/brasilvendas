@@ -99,6 +99,12 @@ test('9. Suporte a @media (prefers-reduced-motion: reduce) configurado para aces
     assert(cssContent.includes('animation: none !important'), 'Falta desativação de animações para reduced-motion');
 });
 
+// 8. Canonical Navigation Home / Overview
+test('10. Mapeamento canônico de Home -> Overview em switchView() restaura a tela inicial sem falha', () => {
+    assert(jsContent.includes("const canonical = (viewName === 'home' || viewName === 'overview') ? 'overview' : viewName;"), 'Falta canonical resolution de home -> overview em js/dashboard.js');
+    assert(htmlContent.includes('id="view-overview"'), 'Falta section #view-overview no HTML');
+});
+
 console.log(`\n========================================`);
 console.log(`📊 Resultado dos Testes: ${passedTests}/${totalTests} PASS`);
 console.log(`========================================\n`);
