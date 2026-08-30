@@ -1359,26 +1359,7 @@
         </div>
     </div>
 
-    <!-- Modal Análise Contextual do Radwan -->
-    <div id="radwan-analysis-modal" class="modal-overlay hidden">
-        <div class="modal-content max-w-lg p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
-                <div class="flex items-center space-x-2">
-                    <span class="w-6 h-6 rounded-md bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-xs">⌘</span>
-                    <h3 class="font-bold text-[#F5F5F7] text-base">Diagnóstico do Radwan Ads</h3>
-                </div>
-                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
-            </div>
 
-            <div id="radwan-analysis-body" class="space-y-3 text-xs">
-                <!-- Conteúdo gerado dinamicamente -->
-            </div>
-
-            <div class="flex items-center justify-end space-x-2 pt-3 border-t border-white/[0.05]">
-                <button type="button" onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Troca de Token Meta -->
     <div id="token-modal" class="modal-overlay hidden">
@@ -1659,21 +1640,24 @@
         </div>
     </div>
 
-    <!-- Modal Diagnóstico Radwan -->
-    <div id="radwan-analysis-modal" class="modal-overlay hidden">
-        <div class="modal-content max-w-lg p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
-                <div class="flex items-center space-x-2">
-                    <span class="w-6 h-6 rounded bg-[#FF2D2D]/15 text-[#FF2D2D] flex items-center justify-center font-bold text-xs">⌘</span>
-                    <h3 class="font-bold text-[#F5F5F7] text-base">Diagnóstico Radwan</h3>
+    <!-- Modal Diagnóstico Radwan Ads -->
+    <div id="radwan-analysis-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="radwan-analysis-title">
+        <div class="modal-content max-w-lg p-5 sm:p-6 space-y-4 max-h-[88vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3 flex-shrink-0">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-[#FF2D2D]/10 text-[#FF2D2D] border border-[#FF2D2D]/20 flex items-center justify-center font-bold text-xs font-mono">⌘</div>
+                    <div>
+                        <h3 id="radwan-analysis-title" class="font-bold text-[#F5F5F7] text-sm sm:text-base">Diagnóstico do Radwan Ads</h3>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Auditoria e Otimização em Tempo Real</p>
+                    </div>
                 </div>
-                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn-icon text-gray-400 hover:text-white" title="Fechar">✕</button>
             </div>
-            <div id="radwan-analysis-content" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs">
+            <div id="radwan-analysis-content" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs min-h-[120px]">
                 <!-- Conteúdo gerado dinamicamente -->
             </div>
-            <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
-                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
+            <div class="pt-3 border-t border-white/[0.05] flex items-center justify-end flex-shrink-0">
+                <button type="button" onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn btn-secondary text-xs px-4 py-2">Fechar</button>
             </div>
         </div>
     </div>

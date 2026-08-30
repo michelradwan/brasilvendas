@@ -320,5 +320,48 @@
     "data": {
       "step": "checkout_open"
     }
+  },
+  {
+    "event_id": "evt_test_1",
+    "event_type": "pageview",
+    "timestamp": "2026-08-30T04:52:12.249Z",
+    "session_id": "sess_live_1",
+    "visitor_id": "vis_live_1",
+    "device": {
+      "type": "mobile"
+    },
+    "context": {
+      "utm_source": "instagram",
+      "utm_campaign": "black_friday"
+    },
+    "metrics": {
+      "scroll_pct": 45,
+      "dwell_sec": 12,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    }
+  },
+  {
+    "event_id": "evt_test_2",
+    "event_type": "checkout_step",
+    "timestamp": "2026-08-30T04:52:12.249Z",
+    "session_id": "sess_live_1",
+    "visitor_id": "vis_live_1",
+    "device": {
+      "type": "mobile"
+    },
+    "context": {
+      "utm_source": "instagram",
+      "utm_campaign": "black_friday"
+    },
+    "metrics": {
+      "scroll_pct": 90,
+      "dwell_sec": 45,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {
+      "step": "checkout_open"
+    }
   }
 ]

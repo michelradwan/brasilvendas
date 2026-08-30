@@ -1646,83 +1646,183 @@ class DashboardApp {
 
     // ─── MODAL DE DIAGNÓSTICO RADWAN ──────────────────────────────────────────
 
-    openRadwanAnalysisModal(objectId) {
+    openRadwanAnalysisModal(objectId, entityType = 'auto') {
         const modal = document.getElementById('radwan-analysis-modal');
         const container = document.getElementById('radwan-analysis-content');
         if (!modal || !container) return;
 
-        const camp = this.cachedCampaigns.find(c => c.id === objectId);
-        const ins = this.cachedInsights.get(objectId) || window.analyticsEngine.parseInsights(null);
-
-        let advice = 'Campanha operando dentro dos parâmetros esperados. Manter observação com o orçamento atual.';
-        let tag = 'badge-active';
-        let actionSuggestion = 'Nenhuma intervenção necessária no momento.';
-        let healthScore = 78;
-
-        if (ins.roas && ins.roas >= 2.5 && ins.purchases >= 2) {
-            advice = 'Campanha com alto retorno e custo de aquisição controlado. Recomenda-se aumento gradual de 15% a 20% no orçamento.';
-            tag = 'badge-winner';
-            actionSuggestion = 'Aumentar orçamento em +15%';
-            healthScore = 94;
-        } else if (ins.spend > 40 && ins.purchases === 0) {
-            advice = 'Consumo relevante sem conversões registradas no período. Recomenda-se pausar temporariamente para proteger o caixa ou renovar o criativo.';
-            tag = 'badge-error';
-            actionSuggestion = 'Pausar campanha para estancar custo';
-            healthScore = 42;
-        } else if (ins.link_ctr && ins.link_ctr < 1.0) {
-            advice = 'Taxa de clique no link abaixo da média de referência (1.50%). O criativo ou gancho inicial precisa de refinamento.';
-            tag = 'badge-warning';
-            actionSuggestion = 'Trocar imagem/vídeo do anúncio';
-            healthScore = 61;
-        }
-
+        // 1. ESTADO DE LOADING IMEDIATO
         container.innerHTML = `
-            <div class="p-3.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-2.5">
-                <div class="flex items-center justify-between">
-                    <div class="min-w-0 pr-2">
-                        <span class="font-bold text-[#F5F5F7] text-sm block truncate">${escapeHTML(camp ? camp.name : objectId)}</span>
-                        <span class="text-[10px] text-[#6E6E73] font-mono">ID: ${objectId}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <span class="badge ${tag} text-[10px]">${tag === 'badge-winner' ? 'WINNER' : (tag === 'badge-error' ? 'ATENÇÃO' : 'SAUDÁVEL')}</span>
-                        <span class="font-mono font-bold text-xs ${healthScore >= 80 ? 'text-[#1FC16B]' : (healthScore < 50 ? 'text-[#FF453A]' : 'text-[#5DA9FF]')}">Score ${healthScore}</span>
-                    </div>
-                </div>
-                <div class="grid grid-cols-4 gap-2 text-xs pt-1 border-t border-white/[0.04]">
-                    <div>
-                        <span class="text-[#6E6E73] block text-[10px]">Investido</span>
-                        <b class="text-[#F5F5F7]">${window.analyticsEngine.formatMoney(ins.spend)}</b>
-                    </div>
-                    <div>
-                        <span class="text-[#6E6E73] block text-[10px]">Vendas</span>
-                        <b class="text-[#1FC16B]">${ins.purchases} un</b>
-                    </div>
-                    <div>
-                        <span class="text-[#6E6E73] block text-[10px]">CPA</span>
-                        <b class="text-[#F5F5F7]">${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : '–'}</b>
-                    </div>
-                    <div>
-                        <span class="text-[#6E6E73] block text-[10px]">ROAS</span>
-                        <b class="${ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${ins.roas ? `${ins.roas.toFixed(2)}x` : '–'}</b>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-3.5 rounded-lg bg-[#0E0E12] border border-white/[0.04] space-y-2">
-                <p class="font-bold text-[#F5F5F7] text-xs">Diagnóstico da Inteligência Radwan:</p>
-                <p class="text-[#A1A1A6] text-xs leading-relaxed">${escapeHTML(advice)}</p>
-                <div class="pt-2 border-t border-white/[0.04] flex items-center justify-between">
-                    <span class="text-[11px] text-[#5DA9FF] font-semibold">Ação Recomendada: ${escapeHTML(actionSuggestion)}</span>
-                    ${ins.roas >= 2.5 ? `
-                        <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden'); window.dashboard.openBudgetModal('${objectId}', ${camp?.daily_budget ? camp.daily_budget / 100 : 50}, '${escapeHTML(camp?.name || '')}', true)" class="btn btn-primary btn-sm text-[11px]">
-                            Aumentar +15% ➔
-                        </button>
-                    ` : ''}
-                </div>
+            <div class="py-8 text-center space-y-3">
+                <div class="w-8 h-8 rounded-full border-2 border-[#FF2D2D] border-t-transparent animate-spin mx-auto"></div>
+                <p class="text-xs text-[#A1A1A6]">Analisando métricas e gerando diagnóstico da inteligência...</p>
             </div>
         `;
-
         modal.classList.remove('hidden');
+
+        try {
+            // 2. RESOLUÇÃO DE ENTIDADE (Campanha, Conjunto ou Anúncio)
+            let entity = null;
+            let ins = null;
+            let entityCategory = 'Campanha';
+
+            // Busca em Campanhas
+            const camp = (this.cachedCampaigns || []).find(c => c.id === objectId);
+            if (camp) {
+                entity = camp;
+                ins = this.cachedInsights?.get(objectId);
+                entityCategory = 'Campanha';
+            }
+
+            // Busca em Conjuntos (AdSets) se não for campanha
+            if (!entity && this.cachedAdSets) {
+                const adset = this.cachedAdSets.find(a => a.id === objectId);
+                if (adset) {
+                    entity = adset;
+                    ins = this.cachedAdSetInsights?.get(objectId);
+                    entityCategory = 'Conjunto de Anúncios';
+                }
+            }
+
+            // Busca em Anúncios (Ads) se não for conjunto
+            if (!entity && this.cachedAds) {
+                const ad = this.cachedAds.find(a => a.id === objectId);
+                if (ad) {
+                    entity = ad;
+                    ins = this.cachedAdInsights?.get(objectId);
+                    entityCategory = 'Anúncio Individual';
+                }
+            }
+
+            // Fallback de Insights
+            if (!ins) {
+                ins = window.analyticsEngine?.parseInsights?.(null) || { spend: 0, purchases: 0, cpa: 0, roas: 0, link_ctr: 0 };
+            }
+
+            const entityName = entity ? entity.name : `Entidade ${objectId}`;
+            const isPaused = entity && entity.status === 'PAUSED';
+
+            // 3. ESTADO: DADOS INSUFICIENTES
+            if (ins.spend === 0 && ins.purchases === 0 && (!ins.impressions || ins.impressions < 20)) {
+                container.innerHTML = `
+                    <div class="p-4 rounded-xl bg-[#15151A] border border-white/[0.05] space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <span class="font-bold text-[#F5F5F7] text-sm block truncate">${escapeHTML(entityName)}</span>
+                                <span class="text-[10px] text-[#6E6E73] font-mono">${escapeHTML(entityCategory)} • ID: ${escapeHTML(objectId)}</span>
+                            </div>
+                            <span class="badge badge-paused text-[10px] flex-shrink-0">${isPaused ? 'PAUSADA' : 'SEM DADOS'}</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.04] text-center space-y-1.5">
+                            <p class="font-bold text-[#F5F5F7] text-xs">Dados insuficientes para diagnóstico no período</p>
+                            <p class="text-[#A1A1A6] text-xs leading-relaxed">
+                                Esta entidade ainda não acumulou volume estatístico suficiente no intervalo de datas selecionado. O RADWAN aguarda veiculação de dados para emitir recomendações de escala ou parada.
+                            </p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 4. ESTADO: SUCESSO / DIAGNÓSTICO COMPLETO
+            let advice = 'Entidade operando dentro dos parâmetros de estabilidade da conta. Manter observação com o orçamento atual.';
+            let tag = 'badge-active';
+            let tagLabel = 'SAUDÁVEL';
+            let actionSuggestion = 'Nenhuma intervenção necessária no momento.';
+            let healthScore = 75;
+
+            if (ins.roas && ins.roas >= 2.5 && ins.purchases >= 2) {
+                advice = 'Desempenho excelente com ROAS acima da meta e custo por aquisição controlado. Alta propensão para escala financeira com segurança.';
+                tag = 'badge-winner';
+                tagLabel = 'WINNER';
+                actionSuggestion = 'Aumentar orçamento diário em +15%';
+                healthScore = 95;
+            } else if (ins.spend >= 35 && ins.purchases === 0) {
+                advice = 'Gasto relevante consumido sem conversões registradas no período. Recomenda-se pausar temporariamente para conter queima de caixa ou reformular o criativo.';
+                tag = 'badge-error';
+                tagLabel = 'ATENÇÃO CRÍTICA';
+                actionSuggestion = 'Pausar entidade para estancar custo';
+                healthScore = 38;
+            } else if (ins.link_ctr && ins.link_ctr < 1.0) {
+                advice = 'Taxa de clique no link (CTR) abaixo do benchmark de referência (1.50%). O gancho do criativo ou público alvo está gerando pouca tração.';
+                tag = 'badge-warning';
+                tagLabel = 'BAIXA ATRAÇÃO';
+                actionSuggestion = 'Testar novo ângulo ou criativo alternativo';
+                healthScore = 58;
+            } else if (ins.cpa && ins.cpa > 45.00) {
+                advice = 'Custo por aquisição (CPA) acima da meta de rentabilidade. Otimize os conjuntos de anúncios ou melhore a taxa de conversão do checkout.';
+                tag = 'badge-warning';
+                tagLabel = 'CPA ELEVADO';
+                actionSuggestion = 'Reduzir orçamento ou refinar público';
+                healthScore = 62;
+            }
+
+            const formattedSpend = window.analyticsEngine?.formatMoney?.(ins.spend) || `R$ ${Number(ins.spend || 0).toFixed(2)}`;
+            const formattedCpa = ins.cpa ? (window.analyticsEngine?.formatMoney?.(ins.cpa) || `R$ ${Number(ins.cpa).toFixed(2)}`) : '–';
+            const formattedRoas = ins.roas ? `${Number(ins.roas).toFixed(2)}x` : '–';
+            const budgetVal = camp?.daily_budget ? (camp.daily_budget / 100) : 50;
+
+            container.innerHTML = `
+                <div class="p-3.5 rounded-xl bg-[#15151A] border border-white/[0.05] space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="min-w-0 pr-2">
+                            <span class="font-bold text-[#F5F5F7] text-sm block truncate">${escapeHTML(entityName)}</span>
+                            <span class="text-[10px] text-[#6E6E73] font-mono">${escapeHTML(entityCategory)} • ID: ${escapeHTML(objectId)}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <span class="badge ${tag} text-[10px] font-bold">${tagLabel}</span>
+                            <span class="font-mono font-bold text-xs ${healthScore >= 80 ? 'text-[#1FC16B]' : (healthScore < 50 ? 'text-[#FF453A]' : 'text-[#5DA9FF]')}">Score ${healthScore}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 text-xs pt-2 border-t border-white/[0.04]">
+                        <div>
+                            <span class="text-[#6E6E73] block text-[10px] uppercase font-bold">Investido</span>
+                            <b class="text-[#F5F5F7] font-mono">${formattedSpend}</b>
+                        </div>
+                        <div>
+                            <span class="text-[#6E6E73] block text-[10px] uppercase font-bold">Vendas</span>
+                            <b class="text-[#1FC16B] font-mono">${ins.purchases || 0} un</b>
+                        </div>
+                        <div>
+                            <span class="text-[#6E6E73] block text-[10px] uppercase font-bold">CPA</span>
+                            <b class="text-[#F5F5F7] font-mono">${formattedCpa}</b>
+                        </div>
+                        <div>
+                            <span class="text-[#6E6E73] block text-[10px] uppercase font-bold">ROAS</span>
+                            <b class="${(ins.roas && ins.roas >= 2.2) ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'} font-mono">${formattedRoas}</b>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-[#0E0E12] border border-white/[0.04] space-y-2.5">
+                    <div>
+                        <p class="font-bold text-[#F5F5F7] text-xs">Parecer da Inteligência Radwan:</p>
+                        <p class="text-[#A1A1A6] text-xs leading-relaxed mt-1">${escapeHTML(advice)}</p>
+                    </div>
+                    <div class="pt-2.5 border-t border-white/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div class="text-[11px] text-[#5DA9FF] font-semibold flex items-center gap-1">
+                            <span>💡 Ação Recomendada:</span>
+                            <span>${escapeHTML(actionSuggestion)}</span>
+                        </div>
+                        ${(ins.roas && ins.roas >= 2.5 && camp) ? `
+                            <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden'); window.dashboard.openBudgetModal('${objectId}', ${budgetVal}, '${escapeHTML(camp.name || '')}', true)" class="btn btn-primary btn-sm text-[11px] whitespace-nowrap self-end sm:self-auto">
+                                Aumentar +15% ➔
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+        } catch (err) {
+            console.error('[Radwan Analysis Modal Error]', err);
+            container.innerHTML = `
+                <div class="p-4 rounded-xl bg-[#FF453A]/10 border border-[#FF453A]/30 space-y-2 text-center">
+                    <div class="text-2xl">⚠️</div>
+                    <h4 class="font-bold text-[#F5F5F7] text-sm">Não foi possível carregar o diagnóstico</h4>
+                    <p class="text-xs text-[#A1A1A6]">Ocorreu um erro ao processar os dados da entidade selecionada.</p>
+                </div>
+            `;
+        }
     }
 
     // ─── CONTROLE DE CONJUNTOS DE ANÚNCIOS (AD SETS CONSOLE) ─────────────────
