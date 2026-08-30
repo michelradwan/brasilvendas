@@ -65,11 +65,13 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ─── Scrollbar ─── */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--border-focus); }
+        /* ─── Scrollbar Ergonômica ─── */
+        * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.28) rgba(255, 255, 255, 0.03); }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.03); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.26); border-radius: 99px; border: 2px solid transparent; background-clip: padding-box; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.45); }
+        ::-webkit-scrollbar-thumb:active { background: #FF2D2D; }
 
         /* ─── Utilities ─── */
         .tabular-nums { font-variant-numeric: tabular-nums; }
