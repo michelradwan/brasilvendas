@@ -169,8 +169,14 @@ module.exports = async (req, res) => {
     };
 
     try {
+        const isPreviewEnvironment = process.env.VERCEL_ENV === 'preview' || process.env.PREVIEW_MODE === 'true';
         const { target_cpa = 35.00, mode = 'AUTOPILOT', dry_run = false } = req.body || {};
+        const effectiveDryRun = dry_run || isPreviewEnvironment;
         const isUnitEconomicsVerified = serverState.isUnitEconomicsVerified();
+
+        if (isPreviewEnvironment) {
+            report.preview_safety_guard = 'Ativo: Execução restrita a simulação (dry-run) no ambiente Preview.';
+        }
 
         // 4. Busca Paginada de Todas as Campanhas
         const campaigns = await fetchAllCampaigns(adAccountId);
@@ -207,7 +213,7 @@ module.exports = async (req, res) => {
                     const idemp = serverState.checkIdempotency(actionId);
 
                     if (!idemp.isDuplicate) {
-                        if (mode === 'AUTOPILOT' && !dry_run) {
+                        if (mode === 'AUTOPILOT' && !effectiveDryRun) {
                             // Salva snapshot persistente antes de pausar
                             serverState.saveSnapshot(camp.id, { status: 'ACTIVE', beforeSpend: spend });
                             await graphCallWithRetry(camp.id, 'POST', {}, { status: 'PAUSED' });
@@ -239,7 +245,7 @@ module.exports = async (req, res) => {
                         const newBudget = Math.round(curBudget * 1.15); // +15%
                         const actionId = `ACT_SCALE_${camp.id}_${Date.now()}`;
 
-                        if (mode === 'AUTOPILOT' && !dry_run) {
+                        if (mode === 'AUTOPILOT' && !effectiveDryRun) {
                             serverState.saveSnapshot(camp.id, { daily_budget: curBudget });
                             await graphCallWithRetry(camp.id, 'POST', {}, { daily_budget: newBudget });
                             serverState.setCooldown(camp.id);

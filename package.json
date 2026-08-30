@@ -1,7 +1,7 @@
 {
-  "name": "meta-ads-command-center",
+  "name": "radwan-ads",
   "version": "2.0.0",
-  "description": "Meta Ads Autonomous Command Center — Institutional Performance Operations & AI Decision Engine",
+  "description": "RADWAN ADS — Institutional Decision OS & Autonomous Performance Marketing",
   "main": "api/meta-proxy.js",
   "scripts": {
     "test": "node tests/verify-all-fixes.js",
