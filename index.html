@@ -2017,6 +2017,16 @@
 
             currentStep = targetStep;
 
+            // Rastreamento comportamental de etapa do checkout
+            if (window.SiteIntelligence && targetStep > 1) {
+                try {
+                    window.SiteIntelligence.trackStep(`step_${targetStep}`, {
+                        step_number: targetStep,
+                        quantity: currentQuantity
+                    });
+                } catch(e){}
+            }
+
             // Rola o container interno do modal para o topo suavemente
             const modalContent = document.getElementById('checkout-modal-content');
             if (modalContent) modalContent.scrollTop = 0;
@@ -2051,6 +2061,16 @@
                 
                 goToStep(1);
                 recalculateTotals();
+
+                // Notifica Site Intelligence do início do checkout
+                if (window.SiteIntelligence) {
+                    try {
+                        window.SiteIntelligence.trackStep('checkout_open', {
+                            size: tamanhoSelecionado,
+                            quantity: currentQuantity
+                        });
+                    } catch(e){}
+                }
 
                 // Dispara InitiateCheckout no Meta Pixel
                 if (typeof fbq === 'function') {
@@ -2213,6 +2233,17 @@
                     }).catch(()=>{});
                 } catch(e){}
 
+                // Notifica Site Intelligence da geração do PIX
+                if (window.SiteIntelligence) {
+                    try {
+                        window.SiteIntelligence.trackPix({
+                            transaction_id: currentTransactionId,
+                            amount: finalAmountNum,
+                            quantity: currentQuantity
+                        });
+                    } catch(e){}
+                }
+
                 if (typeof fbq === 'function') {
                     try {
                         fbq('track', 'AddPaymentInfo', {
@@ -2299,6 +2330,16 @@
                             list.forEach(p => { if (p.transaction_id === txId) p.status = 'APROVADO'; });
                             localStorage.setItem('pedidos_brasilvendas', JSON.stringify(list));
                         } catch(e){}
+
+                        // Notifica Site Intelligence da compra concluída
+                        if (window.SiteIntelligence) {
+                            try {
+                                window.SiteIntelligence.trackPurchase({
+                                    transaction_id: txId,
+                                    amount: amount || 89.90
+                                });
+                            } catch(e){}
+                        }
 
                         if (typeof fbq === 'function') {
                             fbq('track', 'Purchase', {

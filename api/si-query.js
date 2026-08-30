@@ -24,8 +24,13 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const events = await storage.getEvents(500);
-        const sessions = await storage.getSessions(100);
+        const query = req.query || {};
+        const startDate = query.start_date || query.since || null;
+        const endDate = query.end_date || query.until || null;
+
+        const events = await storage.getFilteredEvents(startDate, endDate, 1000);
+        const sessions = await storage.getFilteredSessions(startDate, endDate, 200);
+        const lastEventInfo = await storage.getLastEventInfo();
 
         const overviewMetrics = sessionEngine.aggregateMetrics(sessions);
         const funnelData = funnelEngine.calculateFunnel(sessions);
@@ -35,13 +40,18 @@ module.exports = async function handler(req, res) {
 
         return res.status(200).json({
             success: true,
+            period: {
+                start_date: startDate,
+                end_date: endDate
+            },
+            tracking_health: lastEventInfo,
             data: {
                 overview: overviewMetrics,
                 funnel: funnelData,
                 friction: frictionData,
                 bottleneck: mainBottleneck,
                 diagnosis: aiDiagnosis,
-                recent_sessions: sessions.slice(-30).reverse()
+                recent_sessions: sessions.slice(-50).reverse()
             }
         });
 

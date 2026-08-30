@@ -630,114 +630,149 @@
             </section>
 
             <!-- ===================================================================
-                 SEÇÃO 5: SITE INTELLIGENCE (FASE 1)
+                 SEÇÃO 5: SITE INTELLIGENCE (BEHAVIOR & CONVERSION INTELLIGENCE)
                  =================================================================== -->
             <section id="view-site-intelligence" class="view-section hidden space-y-5">
-                <!-- Header -->
-                <div class="flex items-center justify-between">
+                <!-- Header com Status Real do Rastreador -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
                     <div>
-                        <h2 class="text-lg font-bold text-[#F5F5F7]">Site Intelligence</h2>
-                        <p class="text-xs text-[#A1A1A6]">Análise comportamental do visitante — Funil, Fricção, Gargalos e Diagnóstico de Conversão</p>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Site Intelligence</h2>
+                            <span id="si-tracking-status-badge" class="badge badge-active text-[10px]">🟢 Rastreamento Ativo</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Inteligência comportamental do site — Funil, Fricção, Gargalos e Diagnóstico Real</p>
                     </div>
-                    <span class="badge badge-active text-[10px]">OBSERVE ONLY</span>
-                </div>
 
-                <!-- Overview Metrics SI -->
-                <div class="snapshot-grid">
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões</p>
-                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-sessions">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Visitas únicas</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Checkout</p>
-                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-checkout">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Iniciaram preenchimento</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">PIX Criado</p>
-                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-pix">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Clicaram em gerar</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
-                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums" id="si-kpi-purchases">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Pagamento confirmado</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Rage Clicks</p>
-                        <p class="text-xl font-bold font-mono text-[#FF453A] tabular-nums" id="si-kpi-rage">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Sessões com fricção</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Scroll Médio</p>
-                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-scroll">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Profundidade média</p>
-                    </div>
-                    <div class="snapshot-cell space-y-1">
-                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Conversion Health</p>
-                        <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-health">—</p>
-                        <p class="text-[10px] text-[#6E6E73] font-mono">Score de conversão</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div id="si-last-event-info" class="text-[11px] text-[#A1A1A6] font-mono px-2.5 py-1 rounded bg-[#15151A] border border-white/[0.05]">
+                            Último evento: verificando...
+                        </div>
+                        <button onclick="window.dashboard.loadSIData()" class="btn btn-secondary btn-sm text-xs flex items-center gap-1">
+                            <span>🔄</span>
+                            <span>Atualizar</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Main Bottleneck + AI Diagnosis -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                    <!-- Bottleneck Card -->
-                    <div class="lg:col-span-5 panel p-5 space-y-3">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Main Bottleneck</span>
-                            <span id="si-bottleneck-severity" class="badge badge-error text-[9px]">—</span>
+                <!-- Container Principal: Se 0 sessões, exibe Empty State Consolidado; se houver sessões, exibe Métricas Completas -->
+                <div id="si-empty-state" class="panel p-8 text-center space-y-3 hidden">
+                    <div class="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto text-xl">
+                        📡
+                    </div>
+                    <h3 class="text-base font-bold text-[#F5F5F7]">Ainda não recebemos sessões neste período</h3>
+                    <p class="text-xs text-[#A1A1A6] max-w-md mx-auto">
+                        O rastreador passivo do site está configurado e pronto. Assim que novos visitantes acessarem o site e navegarem pelas páginas, o funil e os diagnósticos serão calculados em tempo real.
+                    </p>
+                    <div class="flex items-center justify-center gap-2 text-xs font-mono text-[#6E6E73] pt-2">
+                        <span id="si-empty-tracker-status" class="badge badge-active text-[10px]">Tracker Ativo</span>
+                        <span id="si-empty-period-label">Período: Hoje</span>
+                    </div>
+                </div>
+
+                <div id="si-data-container" class="space-y-5">
+                    <!-- Overview Metrics SI (7 Cards de KPIs) -->
+                    <div class="snapshot-grid">
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-sessions">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Sessões únicas</p>
                         </div>
-                        <div id="si-bottleneck-content" class="space-y-2 text-xs">
-                            <p class="text-[#6E6E73] text-center py-4 italic">Aguardando dados suficientes...</p>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Checkout</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-checkout">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Iniciaram compra</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">PIX Criado</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-pix">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Códigos gerados</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
+                            <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums" id="si-kpi-purchases">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Pagamento aprovado</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Cliques de Frustração</p>
+                            <p class="text-xl font-bold font-mono text-[#FF453A] tabular-nums" id="si-kpi-rage">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Sessões c/ rage clicks</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Profundidade Média</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-scroll">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Scroll máx. por sessão</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Saúde da Conversão</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-health">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono" id="si-kpi-health-label">Score interno Radwan</p>
                         </div>
                     </div>
 
-                    <!-- AI Diagnosis -->
-                    <div class="lg:col-span-7 panel p-5 space-y-3">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <div class="flex items-center space-x-2">
-                                <span class="w-2 h-2 rounded-full bg-[#FF2D2D]"></span>
-                                <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">AI Diagnosis</span>
+                    <!-- Principal Gargalo + Diagnóstico do RADWAN -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <!-- Card: Principal Gargalo -->
+                        <div class="lg:col-span-5 panel p-5 space-y-3">
+                            <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Principal Gargalo</span>
+                                <span id="si-bottleneck-severity" class="badge badge-paused text-[9px]">—</span>
                             </div>
-                            <span id="si-diagnosis-confidence" class="text-[10px] text-[#6E6E73] font-mono">—</span>
+                            <div id="si-bottleneck-content" class="space-y-2 text-xs">
+                                <p class="text-[#6E6E73] text-center py-4 italic">Aguardando dados suficientes...</p>
+                            </div>
                         </div>
-                        <div id="si-diagnosis-content" class="space-y-3 text-xs">
-                            <p class="text-[#6E6E73] text-center py-4 italic">Insufficient data — coletando primeiras sessões...</p>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Funnel Visual -->
-                <div class="panel p-5 space-y-4">
-                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                        <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Funil de Conversão do Site</span>
-                        <span class="text-[10px] text-[#6E6E73] font-mono">Dados reais — sem estimativas</span>
-                    </div>
-                    <div id="si-funnel-container" class="space-y-2">
-                        <p class="text-[#6E6E73] text-center py-4 italic text-xs">Aguardando sessões...</p>
-                    </div>
-                </div>
-
-                <!-- Sessions List -->
-                <div class="panel overflow-hidden">
-                    <div class="flex items-center justify-between p-5 border-b border-white/[0.05]">
-                        <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões Recentes</span>
-                        <div class="flex items-center space-x-2">
-                            <select id="si-session-filter" class="bg-[#101014] border border-white/[0.08] text-[#F5F5F7] text-xs rounded-md px-2 py-1 focus:outline-none focus:border-[#FF2D2D]">
-                                <option value="all">Todas</option>
-                                <option value="converted">Convertidas</option>
-                                <option value="abandoned">Abandonadas</option>
-                                <option value="rage_click">Rage Click</option>
-                                <option value="mobile">Mobile</option>
-                                <option value="desktop">Desktop</option>
-                            </select>
-                            <button onclick="window.dashboard.loadSIData()" class="btn btn-secondary btn-sm">Atualizar</button>
+                        <!-- Card: Diagnóstico do RADWAN -->
+                        <div class="lg:col-span-7 panel p-5 space-y-3">
+                            <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#1FC16B]"></span>
+                                    <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">Diagnóstico do RADWAN</span>
+                                </div>
+                                <span id="si-diagnosis-confidence" class="text-[10px] text-[#6E6E73] font-mono">—</span>
+                            </div>
+                            <div id="si-diagnosis-content" class="space-y-3 text-xs">
+                                <p class="text-[#6E6E73] text-center py-4 italic">Coletando sessões para diagnóstico...</p>
+                            </div>
                         </div>
                     </div>
-                    <div id="si-sessions-container">
-                        <p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada ainda.</p>
+
+                    <!-- Funil Visual do Site -->
+                    <div class="panel p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm">🌪️</span>
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Funil Comportamental do Site</span>
+                            </div>
+                            <span class="text-[10px] text-[#6E6E73] font-mono">Dados reais do tráfego on-site</span>
+                        </div>
+                        <div id="si-funnel-container" class="space-y-3">
+                            <p class="text-[#6E6E73] text-center py-4 italic text-xs">Aguardando sessões...</p>
+                        </div>
+                    </div>
+
+                    <!-- Sessões Recentes -->
+                    <div class="panel overflow-hidden">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 border-b border-white/[0.05] gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões de Visitantes</span>
+                                <p class="text-[11px] text-[#6E6E73]">Acessos individuais, origem de tráfego, profundidade e conversão</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select id="si-session-filter" onchange="window.dashboard.filterSISessions(this.value)" class="bg-[#101014] border border-white/[0.08] text-[#F5F5F7] text-xs rounded-md px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]">
+                                    <option value="all">Todas as Sessões</option>
+                                    <option value="converted">Convertidas (Compras)</option>
+                                    <option value="pix">Geraram PIX</option>
+                                    <option value="checkout">Chegaram ao Checkout</option>
+                                    <option value="rage_click">Com Frustração (Rage Clicks)</option>
+                                    <option value="mobile">Mobile / Celular</option>
+                                    <option value="desktop">Desktop / Computador</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="si-sessions-container">
+                            <p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada no período.</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1489,6 +1524,27 @@
             <div id="mobile-modal-metrics-grid" class="overflow-y-auto space-y-2 flex-1 pr-1 text-xs divide-y divide-white/[0.04]"></div>
             <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
                 <button onclick="document.getElementById('mobile-metric-details-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes de Sessão do Site Intelligence -->
+    <div id="si-session-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-lg p-5 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div>
+                    <h3 id="si-modal-title" class="font-bold text-[#F5F5F7] text-sm">Inspeção de Sessão</h3>
+                    <p id="si-modal-subtitle" class="text-[10px] text-[#6E6E73] font-mono">ID da Sessão: --</p>
+                </div>
+                <button onclick="document.getElementById('si-session-modal').classList.add('hidden')" class="btn-icon text-gray-400 hover:text-white">✕</button>
+            </div>
+            
+            <div id="si-modal-content" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs">
+                <!-- Conteúdo da sessão injetado dinamicamente -->
+            </div>
+
+            <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
+                <button onclick="document.getElementById('si-session-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 const PORT = 3333;
 const ROOT = path.resolve(__dirname, '..');
@@ -15,12 +16,66 @@ const MIME_TYPES = {
     '.svg': 'image/svg+xml'
 };
 
-const server = http.createServer((req, res) => {
-    let reqUrl = req.url.split('?')[0];
-    if (reqUrl === '/') reqUrl = '/admin-ads.html';
-    if (reqUrl === '/admin-ads') reqUrl = '/admin-ads.html';
+const server = http.createServer(async (req, res) => {
+    const parsedUrl = url.parse(req.url, true);
+    let reqPath = parsedUrl.pathname;
 
-    const filePath = path.join(ROOT, reqUrl);
+    // Roteamento de API Serverless Local
+    if (reqPath.startsWith('/api/')) {
+        const apiName = reqPath.replace('/api/', '').replace('.js', '');
+        const apiFile = path.join(ROOT, 'api', `${apiName}.js`);
+
+        if (fs.existsSync(apiFile)) {
+            let bodyData = '';
+            req.on('data', chunk => { bodyData += chunk; });
+            req.on('end', async () => {
+                let parsedBody = {};
+                try {
+                    parsedBody = bodyData ? JSON.parse(bodyData) : {};
+                } catch(e) {
+                    parsedBody = bodyData;
+                }
+
+                const mockReq = {
+                    method: req.method,
+                    url: req.url,
+                    headers: req.headers,
+                    query: parsedUrl.query,
+                    body: parsedBody
+                };
+
+                const mockRes = {
+                    statusCode: 200,
+                    headers: {},
+                    setHeader(k, v) { this.headers[k] = v; },
+                    status(code) { this.statusCode = code; return this; },
+                    json(data) {
+                        this.headers['Content-Type'] = 'application/json; charset=utf-8';
+                        res.writeHead(this.statusCode, this.headers);
+                        res.end(JSON.stringify(data));
+                    },
+                    end(data) {
+                        res.writeHead(this.statusCode, this.headers);
+                        res.end(data);
+                    }
+                };
+
+                try {
+                    delete require.cache[require.resolve(apiFile)];
+                    const handler = require(apiFile);
+                    await handler(mockReq, mockRes);
+                } catch (err) {
+                    console.error(`[API Error in ${apiName}]`, err);
+                    mockRes.status(500).json({ success: false, error: err.message });
+                }
+            });
+            return;
+        }
+    }
+
+    if (reqPath === '/' || reqPath === '/admin-ads') reqPath = '/admin-ads.html';
+
+    const filePath = path.join(ROOT, reqPath);
 
     fs.readFile(filePath, (err, data) => {
         if (err) {

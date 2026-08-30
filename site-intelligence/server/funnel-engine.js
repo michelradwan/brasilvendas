@@ -24,33 +24,52 @@ class FunnelEngine {
         const dropCheckoutToPix = checkoutStarted > 0 ? parseFloat((((checkoutStarted - pixGenerated) / checkoutStarted) * 100).toFixed(1)) : 0;
         const dropPixToPurchase = pixGenerated > 0 ? parseFloat((((pixGenerated - purchaseCompleted) / pixGenerated) * 100).toFixed(1)) : 0;
 
+        // Taxas de Progressão entre Etapas
+        const rateSessionToCheckout = totalSessions > 0 ? parseFloat(((checkoutStarted / totalSessions) * 100).toFixed(1)) : 0;
+        const rateCheckoutToPix = checkoutStarted > 0 ? parseFloat(((pixGenerated / checkoutStarted) * 100).toFixed(1)) : 0;
+        const ratePixToPurchase = pixGenerated > 0 ? parseFloat(((purchaseCompleted / pixGenerated) * 100).toFixed(1)) : 0;
+
         return {
             steps: [
                 {
-                    name: 'Pageview',
+                    id: 'pageview',
+                    name: '1. Sessões no Site',
                     count: totalSessions,
                     pct: 100,
-                    drop_off_pct: dropPageToCheckout
+                    drop_off_pct: dropPageToCheckout,
+                    progression_rate: rateSessionToCheckout
                 },
                 {
-                    name: 'Initiated Checkout',
+                    id: 'checkout',
+                    name: '2. Checkout Iniciado',
                     count: checkoutStarted,
                     pct: totalSessions > 0 ? parseFloat(((checkoutStarted / totalSessions) * 100).toFixed(1)) : 0,
-                    drop_off_pct: dropCheckoutToPix
+                    drop_off_pct: dropCheckoutToPix,
+                    progression_rate: rateCheckoutToPix
                 },
                 {
-                    name: 'PIX Generated',
+                    id: 'pix',
+                    name: '3. PIX Gerado',
                     count: pixGenerated,
                     pct: totalSessions > 0 ? parseFloat(((pixGenerated / totalSessions) * 100).toFixed(1)) : 0,
-                    drop_off_pct: dropPixToPurchase
+                    drop_off_pct: dropPixToPurchase,
+                    progression_rate: ratePixToPurchase
                 },
                 {
-                    name: 'Purchase Success',
+                    id: 'purchase',
+                    name: '4. Compra Confirmada',
                     count: purchaseCompleted,
                     pct: totalSessions > 0 ? parseFloat(((purchaseCompleted / totalSessions) * 100).toFixed(1)) : 0,
-                    drop_off_pct: 0
+                    drop_off_pct: 0,
+                    progression_rate: 100
                 }
             ],
+            rates: {
+                session_to_checkout: rateSessionToCheckout,
+                checkout_to_pix: rateCheckoutToPix,
+                pix_to_purchase: ratePixToPurchase,
+                session_to_purchase: totalSessions > 0 ? parseFloat(((purchaseCompleted / totalSessions) * 100).toFixed(2)) : 0
+            },
             summary: {
                 total_visitors: totalSessions,
                 converters: purchaseCompleted,

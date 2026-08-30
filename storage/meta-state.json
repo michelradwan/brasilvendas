@@ -131,6 +131,18 @@
       "action": "STATUS_CHANGE",
       "objectName": "Camp A",
       "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
     }
   ],
   "approvals": [],
@@ -198,12 +210,24 @@
         "meta_capi_sent": true,
         "utmify_sale_sent": true
       }
+    },
+    "ACT_IDEMP_1788060764221": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1788061425510": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
     }
   },
   "cooldowns": {
-    "999888777": 1787522002157,
+    "999888777": 1788061415617,
     "TEST_CAMP_999": {
-      "timestamp": 1787539290834,
+      "timestamp": 1788061425507,
       "actionType": "BUDGET_CHANGE"
     }
   },
@@ -215,6 +239,14 @@
     "checkoutLearnings": []
   },
   "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
     {
       "actionId": "ACT_SHADOW_1",
       "reason": "Simulação"
@@ -345,6 +377,20 @@
   "idempotency_keys": {
     "ACT_TEST_1787522002128": {
       "executedAt": "2026-08-23T21:53:22.153Z",
+      "result": {
+        "success": true,
+        "budget": 6000
+      }
+    },
+    "ACT_TEST_1788060757420": {
+      "executedAt": "2026-08-30T03:32:37.422Z",
+      "result": {
+        "success": true,
+        "budget": 6000
+      }
+    },
+    "ACT_TEST_1788061415611": {
+      "executedAt": "2026-08-30T03:43:35.614Z",
       "result": {
         "success": true,
         "budget": 6000

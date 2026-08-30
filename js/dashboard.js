@@ -1966,6 +1966,444 @@ class DashboardApp {
         } catch(e) {}
     }
 
+    // ─── SITE INTELLIGENCE (BEHAVIOR & CONVERSION INTELLIGENCE) ──────────────
+
+    async loadSIData(silent = false) {
+        if (!silent) this.showToast('Atualizando dados do Site Intelligence...', 'info');
+
+        try {
+            const range = window.periodStore ? window.periodStore.globalRange : null;
+            let url = '/api/si-query';
+            if (range && range.since && range.until && range.preset !== 'today') {
+                url += `?start_date=${encodeURIComponent(range.since)}&end_date=${encodeURIComponent(range.until)}`;
+            }
+
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Falha ao consultar métricas');
+
+            const payload = await res.json();
+            if (payload && payload.success) {
+                this.cachedSIData = payload.data || {};
+                this.cachedSIHealth = payload.tracking_health || {};
+                this.cachedSIPeriod = payload.period || {};
+            } else {
+                this.cachedSIData = null;
+            }
+
+            this.renderSiteIntelligenceView();
+
+        } catch (err) {
+            console.error('[Site Intelligence Load Error]', err);
+            this.renderSiteIntelligenceView();
+        }
+    }
+
+    renderSiteIntelligenceView() {
+        const data = this.cachedSIData;
+        const health = this.cachedSIHealth || {};
+        const emptyState = document.getElementById('si-empty-state');
+        const dataContainer = document.getElementById('si-data-container');
+        const badgeEl = document.getElementById('si-tracking-status-badge');
+        const lastEvtEl = document.getElementById('si-last-event-info');
+        const emptyPeriodLabel = document.getElementById('si-empty-period-label');
+        const emptyTrackerStatus = document.getElementById('si-empty-tracker-status');
+
+        // Atualizar Informação de Saúde do Rastreador
+        if (badgeEl) {
+            if (health.status === 'RASTREAMENTO_ATIVO') {
+                badgeEl.className = 'badge badge-active text-[10px]';
+                badgeEl.textContent = '🟢 Rastreamento Ativo';
+            } else if (health.status === 'DADOS_PARCIAIS') {
+                badgeEl.className = 'badge badge-warning text-[10px]';
+                badgeEl.textContent = '🟡 Dados Parciais';
+            } else {
+                badgeEl.className = 'badge badge-paused text-[10px]';
+                badgeEl.textContent = '⚪ Aguardando Visitantes';
+            }
+        }
+
+        if (lastEvtEl) {
+            if (health.has_events && health.seconds_ago !== null) {
+                if (health.seconds_ago < 60) {
+                    lastEvtEl.textContent = `Último evento: há ${health.seconds_ago}s`;
+                } else if (health.seconds_ago < 3600) {
+                    const mins = Math.round(health.seconds_ago / 60);
+                    lastEvtEl.textContent = `Último evento: há ${mins} min`;
+                } else {
+                    const hours = Math.round(health.seconds_ago / 3600);
+                    lastEvtEl.textContent = `Último evento: há ${hours}h`;
+                }
+            } else {
+                lastEvtEl.textContent = 'Nenhum evento no período';
+            }
+        }
+
+        const totalSessions = data?.overview?.total_sessions || 0;
+
+        if (!data || totalSessions === 0) {
+            if (emptyState) emptyState.classList.remove('hidden');
+            if (dataContainer) dataContainer.classList.add('hidden');
+            if (emptyPeriodLabel) {
+                const range = window.periodStore ? window.periodStore.globalRange : null;
+                emptyPeriodLabel.textContent = `Período: ${range?.label || 'Hoje'}`;
+            }
+            if (emptyTrackerStatus) {
+                emptyTrackerStatus.textContent = health.has_events ? 'Tracker Conectado' : 'Tracker Pronto';
+            }
+            return;
+        }
+
+        if (emptyState) emptyState.classList.add('hidden');
+        if (dataContainer) dataContainer.classList.remove('hidden');
+
+        this.renderSIOverviewMetrics(data.overview);
+        this.renderSIBottleneck(data.bottleneck);
+        this.renderSIDiagnosis(data.diagnosis);
+        this.renderSIFunnel(data.funnel);
+        this.renderSISessions(data.recent_sessions || []);
+    }
+
+    renderSIOverviewMetrics(ov) {
+        if (!ov) return;
+
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+
+        const total = ov.total_sessions || 0;
+        setVal('si-kpi-sessions', total.toLocaleString('pt-BR'));
+
+        const checkoutPct = total > 0 ? ((ov.checkout_count / total) * 100).toFixed(1) : '0.0';
+        setVal('si-kpi-checkout', `${ov.checkout_count || 0} (${checkoutPct}%)`);
+
+        const pixPct = total > 0 ? ((ov.pix_count / total) * 100).toFixed(1) : '0.0';
+        setVal('si-kpi-pix', `${ov.pix_count || 0} (${pixPct}%)`);
+
+        const purchasePct = total > 0 ? ((ov.purchase_count / total) * 100).toFixed(1) : '0.0';
+        setVal('si-kpi-purchases', `${ov.purchase_count || 0} (${purchasePct}%)`);
+
+        setVal('si-kpi-rage', ov.rage_click_sessions !== undefined ? `${ov.rage_click_sessions} un` : '0 un');
+        setVal('si-kpi-scroll', ov.avg_scroll !== undefined ? `${ov.avg_scroll}%` : '0%');
+
+        const health = ov.conversion_health;
+        if (health && health.score !== null) {
+            setVal('si-kpi-health', `${health.score}/100`);
+            const healthLbl = document.getElementById('si-kpi-health-label');
+            if (healthLbl) healthLbl.textContent = `${health.label} — ${health.rating}`;
+        } else {
+            setVal('si-kpi-health', '—');
+            const healthLbl = document.getElementById('si-kpi-health-label');
+            if (healthLbl) healthLbl.textContent = 'Aguardando sessões';
+        }
+    }
+
+    renderSIBottleneck(b) {
+        const container = document.getElementById('si-bottleneck-content');
+        const sevBadge = document.getElementById('si-bottleneck-severity');
+        if (!container) return;
+
+        if (!b || b.id === 'NO_DATA') {
+            if (sevBadge) {
+                sevBadge.className = 'badge badge-paused text-[9px]';
+                sevBadge.textContent = 'SEM DADOS';
+            }
+            container.innerHTML = `<p class="text-[#6E6E73] text-center py-4 italic">Aguardando primeiras sessões para análise.</p>`;
+            return;
+        }
+
+        if (b.id === 'INSUFFICIENT_SAMPLE') {
+            if (sevBadge) {
+                sevBadge.className = 'badge badge-paused text-[9px]';
+                sevBadge.textContent = 'COLETANDO';
+            }
+            container.innerHTML = `
+                <div class="p-3 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1.5">
+                    <div class="flex items-center gap-1.5 font-bold text-[#F5F5F7]">
+                        <span>⏳</span>
+                        <span>${escapeHTML(b.name)}</span>
+                    </div>
+                    <p class="text-[#A1A1A6] text-[11px] leading-relaxed">${escapeHTML(b.evidence)}</p>
+                </div>
+            `;
+            return;
+        }
+
+        if (sevBadge) {
+            if (b.severity === 'HIGH') {
+                sevBadge.className = 'badge badge-error text-[9px]';
+                sevBadge.textContent = 'CRÍTICO';
+            } else if (b.severity === 'MEDIUM') {
+                sevBadge.className = 'badge badge-warning text-[9px]';
+                sevBadge.textContent = 'MODERADO';
+            } else {
+                sevBadge.className = 'badge badge-active text-[9px]';
+                sevBadge.textContent = 'ESTÁVEL';
+            }
+        }
+
+        container.innerHTML = `
+            <div class="p-3 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-[#F5F5F7] text-xs">${escapeHTML(b.name)}</span>
+                    ${b.drop_rate ? `<span class="font-mono text-xs font-bold ${b.severity === 'HIGH' ? 'text-[#FF453A]' : 'text-[#F5A524]'}">Queda: ${b.drop_rate}%</span>` : ''}
+                </div>
+                <p class="text-[#A1A1A6] text-[11px] leading-relaxed">${escapeHTML(b.evidence)}</p>
+            </div>
+        `;
+    }
+
+    renderSIDiagnosis(diag) {
+        const container = document.getElementById('si-diagnosis-content');
+        const confBadge = document.getElementById('si-diagnosis-confidence');
+        if (!container) return;
+
+        if (!diag) {
+            container.innerHTML = `<p class="text-[#6E6E73] text-center py-4 italic">Aguardando dados...</p>`;
+            return;
+        }
+
+        if (confBadge) {
+            confBadge.textContent = `Confiança: ${diag.confidence_rating || 'Normal'}`;
+        }
+
+        const bulletsHtml = (diag.bullets || []).map(b => `
+            <li class="flex items-start gap-1.5 text-[11px] text-[#A1A1A6]">
+                <span class="text-[#1FC16B] font-bold mt-0.5">•</span>
+                <span>${escapeHTML(b)}</span>
+            </li>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="space-y-2">
+                <h4 class="font-bold text-xs text-[#F5F5F7] flex items-center gap-1.5">
+                    <span>💡</span>
+                    <span>${escapeHTML(diag.headline || 'Análise Operacional')}</span>
+                </h4>
+                <ul class="space-y-1 pl-1">
+                    ${bulletsHtml}
+                </ul>
+                ${diag.recommended_action ? `
+                    <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[11px] text-[#F5F5F7] flex items-center gap-2 mt-2">
+                        <span class="text-sm">🎯</span>
+                        <div>
+                            <span class="font-bold text-[#1FC16B]">Ação Recomendada:</span>
+                            <span class="text-[#A1A1A6] ml-1">${escapeHTML(diag.recommended_action)}</span>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    renderSIFunnel(funnel) {
+        const container = document.getElementById('si-funnel-container');
+        if (!container) return;
+
+        const steps = funnel?.steps || [];
+        if (steps.length === 0) {
+            container.innerHTML = `<p class="text-[#6E6E73] text-center py-4 italic text-xs">Aguardando sessões...</p>`;
+            return;
+        }
+
+        container.innerHTML = steps.map((s, idx) => {
+            const dropHtml = s.drop_off_pct > 0 && idx < steps.length - 1 ? `
+                <span class="text-[10px] font-mono text-[#FF453A] bg-[#FF453A]/10 px-1.5 py-0.5 rounded border border-[#FF453A]/20">
+                    Queda: -${s.drop_off_pct}%
+                </span>
+            ` : '';
+
+            const barWidth = s.pct ? `${Math.max(2, s.pct)}%` : '0%';
+
+            return `
+                <div class="space-y-1.5 p-2.5 rounded-lg bg-[#101014] border border-white/[0.04]">
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[#F5F5F7] font-semibold">${escapeHTML(s.name)}</span>
+                            ${dropHtml}
+                        </div>
+                        <div class="flex items-center gap-2 font-mono text-xs">
+                            <span class="font-bold text-[#F5F5F7]">${(s.count || 0).toLocaleString('pt-BR')} un</span>
+                            <span class="text-[#6E6E73]">(${s.pct}%)</span>
+                        </div>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-white/[0.05] overflow-hidden">
+                        <div class="h-full ${idx === 3 ? 'bg-[#1FC16B]' : 'bg-[#FF2D2D]'} rounded-full transition-all duration-500" style="width: ${barWidth}"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderSISessions(sessions = []) {
+        const container = document.getElementById('si-sessions-container');
+        if (!container) return;
+
+        this.rawSISessions = sessions;
+
+        if (sessions.length === 0) {
+            container.innerHTML = `<p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada no período.</p>`;
+            return;
+        }
+
+        this.filterSISessions(this.siCurrentFilter || 'all');
+    }
+
+    filterSISessions(filterValue) {
+        this.siCurrentFilter = filterValue;
+        const container = document.getElementById('si-sessions-container');
+        if (!container || !this.rawSISessions) return;
+
+        let filtered = this.rawSISessions;
+
+        if (filterValue === 'converted') {
+            filtered = filtered.filter(s => s.purchased || s.status === 'converted');
+        } else if (filterValue === 'pix') {
+            filtered = filtered.filter(s => s.generated_pix);
+        } else if (filterValue === 'checkout') {
+            filtered = filtered.filter(s => s.reached_checkout);
+        } else if (filterValue === 'rage_click') {
+            filtered = filtered.filter(s => s.rage_clicks > 0);
+        } else if (filterValue === 'mobile') {
+            filtered = filtered.filter(s => s.device_type === 'mobile');
+        } else if (filterValue === 'desktop') {
+            filtered = filtered.filter(s => s.device_type === 'desktop');
+        }
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão encontrada para o filtro selecionado.</p>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="overflow-x-auto">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>HORA</th>
+                            <th>VISITANTE / SESSÃO</th>
+                            <th>DISPOSITIVO</th>
+                            <th>ORIGEM / UTM</th>
+                            <th>PROFUNDIDADE</th>
+                            <th>ETAPA DO FUNIL</th>
+                            <th>FRICÇÃO</th>
+                            <th class="text-right">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/[0.04] text-xs">
+                        ${filtered.map(s => {
+                            const dt = s.start_time || s.last_seen ? new Date(s.start_time || s.last_seen).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '–';
+                            const deviceIcon = s.device_type === 'mobile' ? '📱 Celular' : (s.device_type === 'tablet' ? '💻 Tablet' : '🖥️ Desktop');
+                            const utmStr = s.utm_campaign && s.utm_campaign !== 'none' ? `${s.utm_source} / ${s.utm_campaign}` : (s.utm_source || 'Direto');
+                            
+                            let funnelBadge = '<span class="badge badge-paused text-[9px]">Página</span>';
+                            if (s.purchased) {
+                                funnelBadge = '<span class="badge badge-winner text-[9px]">✓ Compra</span>';
+                            } else if (s.generated_pix) {
+                                funnelBadge = '<span class="badge badge-active text-[9px]">PIX Gerado</span>';
+                            } else if (s.reached_checkout) {
+                                funnelBadge = '<span class="badge badge-warning text-[9px]">Checkout</span>';
+                            }
+
+                            const frictionBadge = s.rage_clicks > 0 
+                                ? `<span class="badge badge-error text-[9px]">⚠️ ${s.rage_clicks} Rage Clicks</span>`
+                                : `<span class="text-[10px] text-[#6E6E73] font-mono">Normal</span>`;
+
+                            return `
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="py-2.5 px-3 font-mono text-[#A1A1A6]">${escapeHTML(dt)}</td>
+                                    <td class="py-2.5 px-3 font-mono text-[11px] text-[#F5F5F7]">
+                                        <div class="truncate max-w-[140px]" title="${escapeHTML(s.session_id)}">${escapeHTML(s.session_id)}</div>
+                                    </td>
+                                    <td class="py-2.5 px-3 text-[11px] text-[#A1A1A6]">${escapeHTML(deviceIcon)}</td>
+                                    <td class="py-2.5 px-3 font-mono text-[10px] text-[#A1A1A6] truncate max-w-[150px]" title="${escapeHTML(utmStr)}">${escapeHTML(utmStr)}</td>
+                                    <td class="py-2.5 px-3 font-mono text-[11px] ${s.max_scroll >= 70 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${s.max_scroll || 0}%</td>
+                                    <td class="py-2.5 px-3">${funnelBadge}</td>
+                                    <td class="py-2.5 px-3">${frictionBadge}</td>
+                                    <td class="py-2.5 px-3 text-right">
+                                        <button onclick="window.dashboard.openSISessionDetail('${escapeHTML(s.session_id)}')" class="btn btn-secondary btn-sm text-[10px] px-2 py-1">
+                                            <span>🔍</span> Detalhes
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    openSISessionDetail(sessionId) {
+        const session = (this.rawSISessions || []).find(s => s.session_id === sessionId);
+        const modal = document.getElementById('si-session-modal');
+        const titleEl = document.getElementById('si-modal-title');
+        const subtitleEl = document.getElementById('si-modal-subtitle');
+        const contentEl = document.getElementById('si-modal-content');
+        if (!modal || !contentEl) return;
+
+        if (!session) {
+            this.showToast('Sessão não encontrada', 'warning');
+            return;
+        }
+
+        if (titleEl) titleEl.textContent = `Sessão: ${session.session_id.substring(0, 16)}...`;
+        if (subtitleEl) subtitleEl.textContent = `Início: ${session.start_time ? new Date(session.start_time).toLocaleString('pt-BR') : '–'}`;
+
+        contentEl.innerHTML = `
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Dispositivo</span>
+                    <p class="font-semibold text-[#F5F5F7]">${escapeHTML(session.device_type || 'Desktop')}</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Origem de Tráfego</span>
+                    <p class="font-semibold text-[#F5F5F7]">${escapeHTML(session.utm_source || 'Direto')}</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Campanha UTM</span>
+                    <p class="font-semibold text-[#F5F5F7]">${escapeHTML(session.utm_campaign || 'Nenhuma')}</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Scroll Máximo</span>
+                    <p class="font-semibold text-[#1FC16B] font-mono">${session.max_scroll || 0}%</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Tempo na Página</span>
+                    <p class="font-semibold text-[#F5F5F7] font-mono">${session.dwell_sec || 0} segundos</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-1">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Cliques de Frustração</span>
+                    <p class="font-semibold ${session.rage_clicks > 0 ? 'text-[#FF453A]' : 'text-[#A1A1A6]'} font-mono">${session.rage_clicks || 0}</p>
+                </div>
+            </div>
+
+            <div class="p-3 rounded-lg bg-[#101014] border border-white/[0.05] space-y-2 mt-3">
+                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Etapas Percorridas no Funil</span>
+                <div class="space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between text-[#1FC16B]">
+                        <span>✓ Visualizou Página</span>
+                        <span class="font-mono text-[10px]">100%</span>
+                    </div>
+                    <div class="flex items-center justify-between ${session.reached_checkout ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">
+                        <span>${session.reached_checkout ? '✓ Abriu Formulário de Checkout' : '✗ Não abriu Checkout'}</span>
+                        <span class="font-mono text-[10px]">${session.reached_checkout ? 'Concluído' : 'Abandonou'}</span>
+                    </div>
+                    <div class="flex items-center justify-between ${session.generated_pix ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">
+                        <span>${session.generated_pix ? '✓ Gerou Chave PIX' : '✗ Não gerou PIX'}</span>
+                        <span class="font-mono text-[10px]">${session.generated_pix ? 'Concluído' : 'Pendente'}</span>
+                    </div>
+                    <div class="flex items-center justify-between ${session.purchased ? 'text-[#1FC16B] font-bold' : 'text-[#6E6E73]'}">
+                        <span>${session.purchased ? '✓ Compra Aprovada (PIX Pago)' : '✗ Pagamento não realizado'}</span>
+                        <span class="font-mono text-[10px]">${session.purchased ? 'APROVADO' : 'Incompleto'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
     // ─── MODAL DE TOKEN META ──────────────────────────────────────────────────
 
     openTokenModal() {

@@ -1,0 +1,195 @@
+[
+  {
+    "event_id": "evt_test_1",
+    "event_type": "pageview",
+    "timestamp": "2026-08-30T03:42:11.748Z",
+    "session_id": "sess_live_1",
+    "visitor_id": "vis_live_1",
+    "device": {
+      "type": "mobile"
+    },
+    "context": {
+      "utm_source": "instagram",
+      "utm_campaign": "black_friday"
+    },
+    "metrics": {
+      "scroll_pct": 45,
+      "dwell_sec": 12,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    }
+  },
+  {
+    "event_id": "evt_test_2",
+    "event_type": "checkout_step",
+    "timestamp": "2026-08-30T03:42:11.748Z",
+    "session_id": "sess_live_1",
+    "visitor_id": "vis_live_1",
+    "device": {
+      "type": "mobile"
+    },
+    "context": {
+      "utm_source": "instagram",
+      "utm_campaign": "black_friday"
+    },
+    "metrics": {
+      "scroll_pct": 90,
+      "dwell_sec": 45,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {
+      "step": "checkout_open"
+    }
+  },
+  {
+    "event_id": "evt_test_1",
+    "event_type": "pageview",
+    "timestamp": "2026-08-30T03:42:27.003Z",
+    "session_id": "sess_live_1",
+    "visitor_id": "vis_live_1",
+    "device": {
+      "type": "mobile"
+    },
+    "context": {
+      "utm_source": "instagram",
+      "utm_campaign": "black_friday"
+    },
+    "metrics": {
+      "scroll_pct": 45,
+      "dwell_sec": 12,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    }
+  },
+  {
+    "event_id": "evt_test_2",
+    "event_type": "checkout_step",
+    "timestamp": "2026-08-30T03:42:27.003Z",
+    "session_id": "sess_live_1",
+    "visitor_id": "vis_live_1",
+    "device": {
+      "type": "mobile"
+    },
+    "context": {
+      "utm_source": "instagram",
+      "utm_campaign": "black_friday"
+    },
+    "metrics": {
+      "scroll_pct": 90,
+      "dwell_sec": 45,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {
+      "step": "checkout_open"
+    }
+  },
+  {
+    "event_id": "evt_sim_1",
+    "event_type": "pageview",
+    "timestamp": "2026-08-30T03:43:28.703Z",
+    "session_id": "test_sim_sess_1788061408703",
+    "visitor_id": "test_sim_vis_1788061408703",
+    "device": {
+      "type": "mobile",
+      "viewport_w": 390,
+      "viewport_h": 844
+    },
+    "context": {
+      "page_path": "/",
+      "utm_source": "instagram",
+      "utm_campaign": "patriota_escala"
+    },
+    "metrics": {
+      "scroll_pct": 35,
+      "dwell_sec": 10,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {}
+  },
+  {
+    "event_id": "evt_sim_2",
+    "event_type": "checkout_step",
+    "timestamp": "2026-08-30T03:43:28.757Z",
+    "session_id": "test_sim_sess_1788061408703",
+    "visitor_id": "test_sim_vis_1788061408703",
+    "device": {
+      "type": "mobile",
+      "viewport_w": 390,
+      "viewport_h": 844
+    },
+    "context": {
+      "page_path": "/",
+      "utm_source": "instagram",
+      "utm_campaign": "patriota_escala"
+    },
+    "metrics": {
+      "scroll_pct": 85,
+      "dwell_sec": 45,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {
+      "step": "checkout_open",
+      "size": "G",
+      "quantity": 1
+    }
+  },
+  {
+    "event_id": "evt_sim_3",
+    "event_type": "pix_generated",
+    "timestamp": "2026-08-30T03:43:28.765Z",
+    "session_id": "test_sim_sess_1788061408703",
+    "visitor_id": "test_sim_vis_1788061408703",
+    "device": {
+      "type": "mobile",
+      "viewport_w": 390,
+      "viewport_h": 844
+    },
+    "context": {
+      "page_path": "/",
+      "utm_source": "instagram",
+      "utm_campaign": "patriota_escala"
+    },
+    "metrics": {
+      "scroll_pct": 95,
+      "dwell_sec": 75,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {
+      "transaction_id": "tx_sim_999",
+      "amount": 89.9,
+      "quantity": 1
+    }
+  },
+  {
+    "event_id": "evt_sim_4",
+    "event_type": "purchase_success",
+    "timestamp": "2026-08-30T03:43:28.771Z",
+    "session_id": "test_sim_sess_1788061408703",
+    "visitor_id": "test_sim_vis_1788061408703",
+    "device": {
+      "type": "mobile",
+      "viewport_w": 390,
+      "viewport_h": 844
+    },
+    "context": {
+      "page_path": "/",
+      "utm_source": "instagram",
+      "utm_campaign": "patriota_escala"
+    },
+    "metrics": {
+      "scroll_pct": 100,
+      "dwell_sec": 120,
+      "rage_click_count": 0,
+      "dead_click_count": 0
+    },
+    "data": {
+      "transaction_id": "tx_sim_999",
+      "amount": 89.9
+    }
+  }
+]
