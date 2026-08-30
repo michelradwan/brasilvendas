@@ -969,9 +969,9 @@ class DashboardApp {
                 if (metricId === 'status_toggle') {
                     const isActive = camp.status === 'ACTIVE';
                     cellContent = `
-                        <label class="toggle-switch" title="${isActive ? 'Campanha Ativa • Clique para pausar' : 'Campanha Pausada • Clique para reativar'}">
+                        <label class="apple-switch" title="${isActive ? 'Campanha Ativa • Clique para pausar' : 'Campanha Pausada • Clique para reativar'}">
                             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}', this)">
-                            <span class="toggle-slider"></span>
+                            <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
                         </label>
                     `;
                 } else if (metricId === 'name') {
@@ -1061,9 +1061,9 @@ class DashboardApp {
                                     </p>
                                 </div>
                             </div>
-                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Campanha Ativa • Toque para pausar' : 'Campanha Pausada • Toque para reativar'}">
+                            <label class="apple-switch flex-shrink-0" title="${isActive ? 'Campanha Ativa • Toque para pausar' : 'Campanha Pausada • Toque para reativar'}">
                                 <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}', this)">
-                                <span class="toggle-slider"></span>
+                                <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
                             </label>
                         </div>
 
@@ -1972,9 +1972,9 @@ class DashboardApp {
             return `
                 <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] group">
                     <td class="sticky-col-status text-center py-3">
-                        <label class="toggle-switch" title="${isActive ? 'Conjunto Ativo • Clique para pausar' : 'Conjunto Pausado • Clique para reativar'}">
+                        <label class="apple-switch" title="${isActive ? 'Conjunto Ativo • Clique para pausar' : 'Conjunto Pausado • Clique para reativar'}">
                             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)">
-                            <span class="toggle-slider"></span>
+                            <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
                         </label>
                     </td>
                     <td class="text-xs text-[#F5F5F7] min-w-[200px] max-w-[280px]">
@@ -2035,9 +2035,9 @@ class DashboardApp {
                                 <h4 class="font-bold text-xs text-[#F5F5F7] truncate" title="${safeName}">${safeName}</h4>
                                 <p class="text-[10.5px] text-[#A1A1A6] truncate" title="${safeCampName}">Campanha: ${safeCampName}</p>
                             </div>
-                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Pausar Conjunto' : 'Ativar Conjunto'}">
+                            <label class="apple-switch flex-shrink-0" title="${isActive ? 'Pausar Conjunto' : 'Ativar Conjunto'}">
                                 <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)">
-                                <span class="toggle-slider"></span>
+                                <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
                             </label>
                         </div>
                         <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] border border-white/[0.04] text-xs">
@@ -2077,7 +2077,7 @@ class DashboardApp {
     async toggleAdSetStatus(adsetId, currentStatus, inputEl = null) {
         const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
         const actionLabel = newStatus === 'ACTIVE' ? 'reativar' : 'pausar';
-        const toggleWrapper = inputEl?.closest('.toggle-switch');
+        const toggleWrapper = inputEl?.closest('.apple-switch, .toggle-switch');
 
         if (!confirm(`Deseja realmente ${actionLabel} o conjunto ${adsetId}?`)) {
             if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
@@ -2254,9 +2254,9 @@ class DashboardApp {
             return `
                 <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] group">
                     <td class="sticky-col-status text-center py-3">
-                        <label class="toggle-switch" title="${isActive ? 'Anúncio Ativo • Clique para pausar' : 'Anúncio Pausado • Clique para reativar'}">
+                        <label class="apple-switch" title="${isActive ? 'Anúncio Ativo • Clique para pausar' : 'Anúncio Pausado • Clique para reativar'}">
                             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)">
-                            <span class="toggle-slider"></span>
+                            <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
                         </label>
                     </td>
                     <td class="text-xs text-[#F5F5F7] min-w-[220px] max-w-[300px]">
@@ -2319,9 +2319,9 @@ class DashboardApp {
                                     <p class="text-[10px] text-[#A1A1A6] truncate" title="${safeCampName} › ${safeAdSetName}">${safeCampName} › ${safeAdSetName}</p>
                                 </div>
                             </div>
-                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Pausar Anúncio' : 'Ativar Anúncio'}">
+                            <label class="apple-switch flex-shrink-0" title="${isActive ? 'Pausar Anúncio' : 'Ativar Anúncio'}">
                                 <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)">
-                                <span class="toggle-slider"></span>
+                                <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
                             </label>
                         </div>
                         <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] border border-white/[0.04] text-xs">
@@ -2353,7 +2353,7 @@ class DashboardApp {
     async toggleAdStatus(adId, currentStatus, inputEl = null) {
         const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
         const actionLabel = newStatus === 'ACTIVE' ? 'reativar' : 'pausar';
-        const toggleWrapper = inputEl?.closest('.toggle-switch');
+        const toggleWrapper = inputEl?.closest('.apple-switch, .toggle-switch');
 
         if (!confirm(`Deseja realmente ${actionLabel} o anúncio ${adId}?`)) {
             if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';

@@ -13,6 +13,7 @@
     class SalesAudioEngine {
         constructor() {
             this.storageKey = 'radwan_sales_audio_settings';
+            // Arquivo oficial idêntico para PIX pendente e Pagamento aprovado
             this.audioAssetPath = 'assets/sounds/sale-approved.mp3';
             
             // Configurações Padrão
@@ -35,7 +36,7 @@
 
             this.loadSettings();
             this.setupAutoplayUnlockListeners();
-            this.preloadApprovedSound();
+            this.preloadSoundAsset();
         }
 
         loadSettings() {
@@ -99,7 +100,7 @@
             }
         }
 
-        preloadApprovedSound() {
+        preloadSoundAsset() {
             try {
                 this.preloadedAudio = new Audio();
                 this.preloadedAudio.src = this.audioAssetPath;
@@ -136,11 +137,7 @@
             while (this.queue.length > 0) {
                 const item = this.queue.shift();
                 try {
-                    if (item.type === 'approved') {
-                        await this.playApprovedSound();
-                    } else if (item.type === 'pending') {
-                        await this.playPendingTone();
-                    }
+                    await this.playOfficialSound();
                 } catch (err) {
                     console.warn(`[SalesAudio] Erro ao reproduzir som ${item.type}:`, err);
                 }
@@ -155,9 +152,10 @@
         }
 
         /**
-         * Reproduz o som de Venda Aprovada (MP3 Oficial fornecido).
+         * Reproduz o som oficial de venda (MP3 Oficial fornecido).
+         * Utilizado tanto para PIX Pendente quanto para Pagamento Aprovado.
          */
-        playApprovedSound() {
+        playOfficialSound() {
             return new Promise((resolve) => {
                 try {
                     const audio = new Audio(this.audioAssetPath);
@@ -190,59 +188,13 @@
             });
         }
 
-        /**
-         * Síntese de Áudio para PIX/Venda Pendente via Web Audio API.
-         * Acústica suave: Acorde duplo de C5 (523.25Hz) para E5 (659.25Hz), envelope suave e discreto.
-         */
+        // Aliases para compatibilidade com testes e chamadas diretas
+        playApprovedSound() {
+            return this.playOfficialSound();
+        }
+
         playPendingTone() {
-            return new Promise((resolve) => {
-                try {
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioContextClass) return resolve();
-
-                    if (!this.audioCtx) {
-                        this.audioCtx = new AudioContextClass();
-                    }
-                    if (this.audioCtx.state === 'suspended') {
-                        this.audioCtx.resume();
-                    }
-
-                    const ctx = this.audioCtx;
-                    const now = ctx.currentTime;
-                    const duration = 0.22; // 220ms
-
-                    const gainNode = ctx.createGain();
-                    gainNode.gain.setValueAtTime(0.0001, now);
-                    // Volume calibrado mais suave que a aprovação
-                    const peakVolume = Math.max(0.01, this.settings.volume * 0.35);
-                    gainNode.gain.exponentialRampToValueAtTime(peakVolume, now + 0.02);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-                    gainNode.connect(ctx.destination);
-
-                    // Oscilador 1: Tom Principal (523.25 Hz - C5)
-                    const osc1 = ctx.createOscillator();
-                    osc1.type = 'sine';
-                    osc1.frequency.setValueAtTime(523.25, now);
-                    osc1.frequency.exponentialRampToValueAtTime(587.33, now + duration); // Sobe levemente para D5
-                    osc1.connect(gainNode);
-
-                    // Oscilador 2: Harmônico Suave (659.25 Hz - E5)
-                    const osc2 = ctx.createOscillator();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(659.25, now);
-                    osc2.frequency.exponentialRampToValueAtTime(783.99, now + duration); // Sobe para G5
-                    osc2.connect(gainNode);
-
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + duration);
-                    osc2.stop(now + duration);
-
-                    setTimeout(resolve, 250);
-                } catch (e) {
-                    resolve();
-                }
-            });
+            return this.playOfficialSound();
         }
 
         updateAutoplayUIBadge(isActive) {
@@ -451,28 +403,53 @@
             }, 5500);
         }
 
-        showBrowserNotification(evt) {
-            if (typeof window.Notification === 'undefined' || Notification.permission !== 'granted') return;
+        async showBrowserNotification(evt) {
+            const isApproved = evt.type === 'PAYMENT_APPROVED';
+            const formattedAmount = window.analyticsEngine?.formatMoney(evt.amount) || `R$ ${evt.amount.toFixed(2).replace('.', ',')}`;
+            const title = isApproved ? '💰 Venda Aprovada!' : '⏳ PIX Pendente';
+            const body = `${isApproved ? 'Pagamento confirmado' : 'Novo PIX gerado'} • ${formattedAmount}`;
 
-            try {
-                const isApproved = evt.type === 'PAYMENT_APPROVED';
-                const formattedAmount = window.analyticsEngine?.formatMoney(evt.amount) || `R$ ${evt.amount.toFixed(2).replace('.', ',')}`;
-                const title = isApproved ? '💰 Venda Aprovada!' : '⏳ PIX Pendente';
-                const body = `${isApproved ? 'Pagamento confirmado' : 'Novo PIX gerado'} • ${formattedAmount}`;
+            // 1. Tenta disparar via Service Worker se registrado (PWA / Mobile / Background)
+            if ('serviceWorker' in navigator) {
+                try {
+                    const reg = await navigator.serviceWorker.ready;
+                    if (reg && reg.showNotification) {
+                        await reg.showNotification(title, {
+                            body: body,
+                            icon: 'assets/logo-radwan-ads.png',
+                            badge: 'assets/logo-radwan-ads.png',
+                            tag: evt.eventId,
+                            data: {
+                                url: '/#view-home',
+                                eventId: evt.eventId,
+                                timestamp: Date.now()
+                            },
+                            vibrate: [200, 100, 200]
+                        });
+                        return;
+                    }
+                } catch (swErr) {
+                    console.warn('[SalesNotification] Falha ao exibir via ServiceWorker:', swErr);
+                }
+            }
 
-                const n = new Notification('RADWAN ADS', {
-                    body: body,
-                    icon: '/favicon.ico',
-                    tag: evt.eventId, // Previne duplicação no sistema operacional
-                    silent: true // Som já gerenciado pelo AudioEngine
-                });
+            // 2. Fallback para Notification API nativa
+            if (typeof window.Notification !== 'undefined' && Notification.permission === 'granted') {
+                try {
+                    const n = new Notification(title, {
+                        body: body,
+                        icon: 'assets/logo-radwan-ads.png',
+                        tag: evt.eventId,
+                        silent: true
+                    });
 
-                n.onclick = () => {
-                    window.focus();
-                    n.close();
-                };
-            } catch (e) {
-                console.warn('[SalesNotification] Falha ao disparar notificação nativa:', e);
+                    n.onclick = () => {
+                        window.focus();
+                        n.close();
+                    };
+                } catch (e) {
+                    console.warn('[SalesNotification] Falha ao disparar notificação nativa:', e);
+                }
             }
         }
 
@@ -488,21 +465,63 @@
                 return;
             }
 
-            if (Notification.permission === 'granted') {
+            let permission = Notification.permission;
+            if (permission !== 'granted' && permission !== 'denied') {
+                permission = await Notification.requestPermission();
+            }
+
+            if (permission === 'granted') {
                 this.audioEngine.updateSetting('browserNotifications', true);
-            } else if (Notification.permission !== 'denied') {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    this.audioEngine.updateSetting('browserNotifications', true);
-                } else {
-                    this.audioEngine.updateSetting('browserNotifications', false);
-                }
+                this.registerPushServiceWorker();
             } else {
                 alert('Notificações estão bloqueadas no seu navegador. Permita o acesso nas configurações do site para ativar.');
                 this.audioEngine.updateSetting('browserNotifications', false);
             }
 
             this.audioEngine.syncSettingsUI();
+        }
+
+        async registerPushServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+                console.log('[SW] Service Worker registrado com sucesso:', reg.scope);
+
+                if ('PushManager' in window && reg.pushManager) {
+                    // Obtém a chave pública VAPID do servidor
+                    const res = await fetch('/api/push-subscriptions', { method: 'GET' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.publicKey) {
+                            const sub = await reg.pushManager.subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: this.urlBase64ToUint8Array(data.publicKey)
+                            });
+
+                            // Salva a subscription no backend
+                            await fetch('/api/push-subscriptions', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ subscription: sub })
+                            });
+                            console.log('[SW] Push Subscription registrada e sincronizada com sucesso!');
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('[SW] Falha ao configurar Service Worker Push:', err);
+            }
+        }
+
+        urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
         }
 
         updateAudioSetting(key, val) {
@@ -518,11 +537,23 @@
          */
         testSound(soundType) {
             this.audioEngine.unlockAudioContext();
-            if (soundType === 'approved') {
-                this.audioEngine.playApprovedSound();
-            } else {
-                this.audioEngine.playPendingTone();
-            }
+            this.audioEngine.playOfficialSound();
+        }
+
+        /**
+         * Teste isolado de Web Push (Preview visual, NÃO gera pedidos).
+         */
+        testPush(type = 'approved') {
+            const isApproved = type === 'approved';
+            this.dispatchCanonicalNotification({
+                type: isApproved ? 'PAYMENT_APPROVED' : 'PAYMENT_PENDING',
+                eventId: `test_${Date.now()}`,
+                orderId: 'TEST-9999',
+                status: isApproved ? 'PAID' : 'PENDING',
+                amount: 89.90,
+                customerName: 'Michel',
+                occurredAt: new Date().toISOString()
+            });
         }
     }
 

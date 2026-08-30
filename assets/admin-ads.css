@@ -558,6 +558,7 @@ body.sidebar-open {
     cursor: pointer;
     transition: all var(--transition-fast);
     white-space: nowrap;
+    min-width: 0;
 }
 
 .segmented-btn:hover {
@@ -569,6 +570,77 @@ body.sidebar-open {
     color: var(--text-primary);
     font-weight: 600;
     box-shadow: var(--shadow-subtle);
+}
+
+/* Tab labels e badges sem colapso */
+.tab-label {
+    min-width: 0;
+}
+
+/* ==============================================================================
+   FILTER CHIPS SYSTEM (RESPONSIVE SCROLL ROW)
+   ============================================================================== */
+
+.filter-chips-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.filter-chips-row::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 5px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: #15151A;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #A1A1A6;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.filter-chip:hover {
+    color: #F5F5F7;
+    background: #1C1C22;
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+.filter-chip.active {
+    background: rgba(255, 45, 45, 0.12);
+    border-color: rgba(255, 45, 45, 0.35);
+    color: #FF453A;
+    font-weight: 700;
+}
+
+/* Presets & Colunas Mobile Layout Guard */
+.controls-action-row {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.preset-select-wrap {
+    min-width: 140px;
 }
 
 /* ==============================================================================
@@ -1790,7 +1862,7 @@ tr:hover .row-quick-actions {
 }
 
 /* ==============================================================================
-   5. MOBILE BOTTOM DOCK (ERGONOMIC 4-ITEM NAVIGATION)
+   5. MACOS & MOBILE DOCK (DESKTOP GAUSSIAN PHYSICS + MOBILE BOTTOM BAR)
    ============================================================================== */
 
 #mobile-bottom-dock {
@@ -1798,23 +1870,26 @@ tr:hover .row-quick-actions {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 40;
-    background: rgba(10, 10, 12, 0.92);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 0.45rem;
+    z-index: 45;
+    pointer-events: none; /* Container invisível para cliques fora do dock */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
     padding-bottom: max(0.45rem, env(safe-area-inset-bottom));
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.dock-container {
+    pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: space-around;
-}
-
-@media (min-width: 768px) {
-    #mobile-bottom-dock {
-        display: none !important;
-    }
+    width: 100%;
+    background: rgba(10, 10, 12, 0.92);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.7);
+    padding: 0.35rem 0.5rem;
 }
 
 .mobile-dock-btn {
@@ -1823,22 +1898,48 @@ tr:hover .row-quick-actions {
     align-items: center;
     justify-content: center;
     gap: 3px;
-    padding: 4px 12px;
+    padding: 4px 10px;
     color: #8E8E93;
     font-size: 10px;
     font-weight: 600;
     text-decoration: none;
-    border-radius: 8px;
-    transition: color var(--motion-fast), transform var(--motion-instant);
+    border-radius: 10px;
+    transition: color var(--motion-fast);
     background: transparent;
     border: none;
     cursor: pointer;
-    min-width: 60px;
+    min-width: 58px;
+    position: relative;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-.mobile-dock-btn:active {
-    transform: scale(0.94);
+.mobile-dock-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transform-origin: center bottom;
+    will-change: transform;
+    transition: transform var(--motion-instant);
+}
+
+.mobile-dock-icon {
+    font-size: 17px;
+    line-height: 1;
+    display: inline-block;
+    transition: color var(--motion-fast);
+}
+
+.dock-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.dock-tooltip {
+    display: none;
 }
 
 .mobile-dock-btn.active {
@@ -1847,6 +1948,84 @@ tr:hover .row-quick-actions {
 
 .mobile-dock-btn.active .mobile-dock-icon {
     color: var(--accent-red);
+}
+
+/* ─── DESKTOP MACOS FLOATING DOCK STYLING (>= 768px) ────────────────────────── */
+@media (min-width: 768px) {
+    #mobile-bottom-dock {
+        bottom: 16px;
+        padding-bottom: 0;
+    }
+
+    .dock-container {
+        width: auto;
+        min-width: 280px;
+        max-width: 440px;
+        border-radius: 20px;
+        padding: 6px 14px;
+        gap: 6px;
+        background: rgba(18, 18, 24, 0.75);
+        backdrop-filter: blur(24px) saturate(200%);
+        -webkit-backdrop-filter: blur(24px) saturate(200%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .mobile-dock-btn {
+        padding: 6px 12px;
+        min-width: 52px;
+        border-radius: 12px;
+        transition: background-color var(--motion-fast);
+    }
+
+    .mobile-dock-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .mobile-dock-icon-wrapper {
+        width: 36px;
+        height: 36px;
+    }
+
+    .mobile-dock-icon {
+        font-size: 20px;
+    }
+
+    .dock-label {
+        display: none; /* No Desktop macOS o visual é icônico limpo com tooltip superior */
+    }
+
+    .dock-tooltip {
+        display: block;
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-14px) scale(0.92);
+        background: #111116;
+        color: #F5F5F7;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 9px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.85);
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity var(--motion-fast), transform var(--motion-fast);
+        z-index: 50;
+    }
+
+    .dock-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 4px;
+        border-style: solid;
+        border-color: #111116 transparent transparent transparent;
+    }
 }
 
 /* ==============================================================================
@@ -1944,5 +2123,148 @@ tr:hover .row-quick-actions {
     70% { transform: scale(1.2); }
     100% { transform: scale(1); opacity: 1; }
 }
+
+/* ==============================================================================
+   8. APPLE SWITCH PREMIUM (ON: #34c759 • SPRING THUMB • GLOW & PRESS)
+   ============================================================================== */
+
+.apple-switch-wrapper {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.apple-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 26px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.apple-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.apple-switch-track {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(120, 120, 128, 0.32);
+    border-radius: 26px;
+    transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.apple-switch-thumb {
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    transition: transform 240ms cubic-bezier(0.175, 0.885, 0.32, 1.275), width 160ms ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Estado Ativo (ON) Apple #34c759 */
+.apple-switch input:checked + .apple-switch-track {
+    background-color: #34C759;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), 0 0 12px rgba(52, 199, 89, 0.35);
+}
+
+.apple-switch input:checked + .apple-switch-track .apple-switch-thumb {
+    transform: translate3d(18px, 0, 0);
+}
+
+/* Feedback Tátil de Press / Hold */
+.apple-switch:active .apple-switch-thumb {
+    width: 26px;
+}
+
+.apple-switch input:checked:active + .apple-switch-track .apple-switch-thumb {
+    transform: translate3d(14px, 0, 0);
+}
+
+/* Estado de Processamento / Loading */
+.apple-switch.is-loading {
+    pointer-events: none;
+    opacity: 0.75;
+}
+
+.apple-switch.is-loading .apple-switch-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 2px solid transparent;
+    border-top-color: #34C759;
+    border-radius: 50%;
+    animation: apple-switch-spin 600ms linear infinite;
+}
+
+@keyframes apple-switch-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Legacy toggle-switch backwards-compatibility */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(120, 120, 128, 0.32);
+    border-radius: 24px;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #34C759;
+    box-shadow: 0 0 10px rgba(52, 199, 89, 0.3);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(18px);
+}
+
 
 

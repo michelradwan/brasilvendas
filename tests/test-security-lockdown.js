@@ -259,8 +259,8 @@ function makeRequest(options, postData = null) {
         console.log('\n6. Auditando código-fonte frontend contra credenciais ou tokens expostos...');
 
         const frontendFiles = [
+            'index.html',
             'admin-ads.html',
-            'admin.html',
             'js/meta-adapter.js',
             'js/dashboard.js',
             'js/auth-gate.js'
