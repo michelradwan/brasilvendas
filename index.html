@@ -105,16 +105,28 @@
 <body class="bg-[#050506] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2D2D] selection:text-white">
 
     <!-- ===================================================================
-         1. SPLASH SCREEN MINIMALISTA (PRIMEIRA TELA COM BOTÃO SCAN GRID)
+         1. SPLASH SCREEN MINIMALISTA (BOTÃO EXCLUSIVO DE ENTRADA RADWAN ADS)
          =================================================================== -->
     <div id="splash-screen">
-        <button id="btn-start-radwan" class="scan-grid-btn" aria-label="Iniciar RADWAN ADS">
-            <span class="scan-bracket scan-bracket-tl"></span>
-            <span class="scan-bracket scan-bracket-tr"></span>
-            <span class="scan-bracket scan-bracket-bl"></span>
-            <span class="scan-bracket scan-bracket-br"></span>
-            <span class="scan-line"></span>
-            <span>INICIAR RADWAN</span>
+        <button id="btn-start-radwan" class="radwan-launch-btn" type="button" aria-label="Iniciar RADWAN">
+            <!-- Borda Externa e Halo de Glow -->
+            <span class="radwan-launch-glow"></span>
+            
+            <!-- Hotspots de Energia Vermelha (Centro Superior e Inferior) -->
+            <span class="radwan-launch-hotspot hotspot-top"></span>
+            <span class="radwan-launch-hotspot hotspot-bottom"></span>
+            
+            <!-- Moldura Interna Metálica / Vidro Escuro -->
+            <span class="radwan-launch-rim"></span>
+            
+            <!-- Reflexo Diagonal Glass Ultra Suave -->
+            <span class="radwan-launch-shine"></span>
+            
+            <!-- Linha de Scan Subliminar -->
+            <span class="radwan-launch-scan"></span>
+
+            <!-- Texto Centralizado em Caixa Alta (Apple Aesthetic) -->
+            <span class="radwan-launch-label">INICIAR RADWAN</span>
         </button>
     </div>
 
