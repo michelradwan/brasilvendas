@@ -1186,3 +1186,122 @@ tbody tr.is-selected .sticky-col-status {
     background: #15151A;
 }
 
+/* ==============================================================================
+   CAMPAIGN MOBILE CARDS (TOUCH-OPTIMIZED 320PX - 640PX)
+   ============================================================================== */
+.campaign-mobile-card {
+    background: #0E0E12;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.campaign-mobile-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.campaign-mobile-card.is-selected {
+    border-color: rgba(255, 45, 45, 0.4);
+    background: rgba(255, 45, 45, 0.02);
+}
+
+.mobile-card-actions-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-card-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 2px;
+    border-radius: 8px;
+    background: #15151A;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #F5F5F7;
+    font-size: 10px;
+    font-weight: 500;
+    min-height: 42px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mobile-card-action-btn:hover {
+    background: #1C1C22;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+}
+
+/* ==============================================================================
+   CAMPAIGN METRICS INSPECTOR (5 THEMATIC BLOCKS)
+   ============================================================================== */
+.metric-group-card {
+    background: #111115;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.metric-group-header {
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.metric-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.metric-stat-cell {
+    background: #111115;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 70px;
+}
+
+.metric-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #8E8E93;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.metric-stat-val {
+    font-size: 15px;
+    font-weight: 800;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: #F5F5F7;
+    letter-spacing: -0.02em;
+}
+
+/* Responsividade Mobile para Drawer de Métricas (< 640px) */
+@media (max-width: 639px) {
+    #campaign-drawer {
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+    
+    .metric-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+

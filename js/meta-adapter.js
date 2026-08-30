@@ -189,6 +189,11 @@ class MetaDataProvider {
     async updateBudget(objectId, budgetField, newAmountCents, actionId = null) {
         return this.request(objectId, 'POST', {}, { [budgetField]: newAmountCents }, true, actionId);
     }
+
+    // Mutação de Nome da Campanha (Renomeação Oficial na Meta)
+    async updateName(objectId, newName, actionId = null) {
+        return this.request(objectId, 'POST', {}, { name: newName }, true, actionId);
+    }
 }
 
 // Instância Singleton

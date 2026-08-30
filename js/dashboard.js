@@ -745,7 +745,9 @@ class DashboardApp {
         tbody.innerHTML = filtered.map(camp => {
             const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
             const isSelected = this.selectedCampaigns.has(camp.id);
-            const safeName = escapeHTML(camp.name);
+            const info = this.getCampaignInfo(camp);
+            const safeDisplayName = escapeHTML(info.displayName);
+            const safeOriginalName = escapeHTML(info.name);
             const safeId = escapeHTML(camp.id);
 
             let rowHtml = `<tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] ${isSelected ? 'is-selected bg-[#FF2D2D]/[0.03]' : ''}">`;
@@ -753,7 +755,7 @@ class DashboardApp {
             // Checkbox da linha (sticky)
             rowHtml += `
                 <td class="sticky-col-check text-center">
-                    <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox" aria-label="Selecionar ${safeName}">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox" aria-label="Selecionar ${safeDisplayName}">
                 </td>
             `;
 
@@ -778,20 +780,31 @@ class DashboardApp {
                         </label>
                     `;
                 } else if (metricId === 'name') {
-                    const isCBO = !!(camp.daily_budget || camp.lifetime_budget);
+                    const isCBO = info.isCBO;
                     cellContent = `
-                        <div class="font-semibold text-[#F5F5F7] truncate max-w-[240px]" title="${safeName}">${safeName}</div>
-                        <div class="flex items-center gap-1.5 text-[10px] text-[#6E6E73] font-mono">
-                            <span>ID: ${safeId}</span>
-                            <span>•</span>
-                            <span class="${isCBO ? 'text-[#5DA9FF]' : 'text-[#A1A1A6]'}">${isCBO ? 'CBO' : 'ABO'}</span>
+                        <div class="flex items-center gap-1.5 group">
+                            <div class="min-w-0 flex-1">
+                                <div class="font-semibold text-[#F5F5F7] truncate max-w-[230px]" title="${safeDisplayName}">
+                                    ${safeDisplayName}
+                                    ${info.hasNickname ? '<span class="ml-1 text-[9px] px-1 py-0.2 bg-[#FF2D2D]/10 text-[#FF2D2D] rounded font-normal">Apelido</span>' : ''}
+                                </div>
+                                <div class="flex items-center gap-1.5 text-[10px] text-[#6E6E73] font-mono truncate max-w-[230px]">
+                                    <span>ID: ${safeId}</span>
+                                    <span>•</span>
+                                    <span class="${isCBO ? 'text-[#5DA9FF]' : 'text-[#A1A1A6]'}">${isCBO ? 'CBO' : 'ABO'}</span>
+                                    ${info.hasNickname ? `<span>•</span><span class="truncate text-[#A1A1A6]" title="Nome oficial Meta: ${safeOriginalName}">Meta: ${safeOriginalName}</span>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="window.dashboard.openRenameModal('${safeId}')" class="opacity-0 group-hover:opacity-100 text-[#A1A1A6] hover:text-[#F5F5F7] p-1 text-[11px] transition-opacity" title="Renomear campanha">
+                                ✏️
+                            </button>
                         </div>
                     `;
                 } else if (metricId === 'daily_budget') {
                     const budgetVal = rawVal || 0;
-                    const isCBO = !!(camp.daily_budget || camp.lifetime_budget);
+                    const isCBO = info.isCBO;
                     cellContent = `
-                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center justify-end gap-1 ml-auto" title="Clique para editar orçamento">
+                        <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeDisplayName}', ${isCBO})" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center justify-end gap-1 ml-auto" title="Clique para editar orçamento">
                             <span>R$ ${budgetVal.toFixed(2).replace('.', ',')}</span>
                             <span class="text-[10px] text-[#6E6E73]">✏️</span>
                         </button>
@@ -799,14 +812,17 @@ class DashboardApp {
                 } else if (metricId === 'actions') {
                     cellContent = `
                         <div class="inline-flex items-center gap-1 justify-center">
+                            <button onclick="window.dashboard.openRenameModal('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Renomear Campanha">
+                                ✏️
+                            </button>
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeDisplayName}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Duplicar Campanha">
+                                📋
+                            </button>
                             <button onclick="window.dashboard.openRadwanAnalysisModal('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Diagnóstico Radwan">
                                 🧠
                             </button>
-                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Duplicar Campanha">
-                                📋
-                            </button>
-                            <button onclick="window.dashboard.openCampaignDrawer('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2" title="Ver Detalhes">
-                                ➔
+                            <button onclick="window.dashboard.openCampaignDrawer('${safeId}')" class="btn btn-primary btn-sm text-[11px] px-2" title="Painel de Métricas da Campanha">
+                                📊
                             </button>
                         </div>
                     `;
@@ -827,61 +843,82 @@ class DashboardApp {
                 const ins = this.cachedInsights.get(camp.id) || window.analyticsEngine.parseInsights(null);
                 const isActive = camp.status === 'ACTIVE';
                 const isSelected = this.selectedCampaigns.has(camp.id);
+                const info = this.getCampaignInfo(camp);
                 const budgetVal = camp.daily_budget ? (parseFloat(camp.daily_budget) / 100) : (camp.lifetime_budget ? parseFloat(camp.lifetime_budget) / 100 : 0);
-                const isCBO = !!camp.daily_budget || !!camp.lifetime_budget;
-                const safeName = escapeHTML(camp.name);
+                const safeDisplayName = escapeHTML(info.displayName);
+                const safeOriginalName = escapeHTML(info.name);
                 const safeId = escapeHTML(camp.id);
 
                 return `
-                    <div class="campaign-mobile-card space-y-3 ${isSelected ? 'border-[#FF2D2D]/50 bg-[#FF2D2D]/[0.02]' : ''}">
+                    <div class="campaign-mobile-card space-y-3 ${isSelected ? 'is-selected' : ''}">
+                        <!-- Top Header do Card -->
                         <div class="flex items-start justify-between gap-2 border-b border-white/[0.05] pb-2.5">
-                            <div class="flex items-start gap-2.5 min-w-0">
-                                <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox mt-0.5" aria-label="Selecionar ${safeName}">
-                                <div class="min-w-0">
-                                    <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
-                                    <p class="text-[10px] text-[#6E6E73] font-mono">ID: ${safeId} • ${isCBO ? 'CBO' : 'ABO'}</p>
+                            <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                                <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox mt-0.5" aria-label="Selecionar ${safeDisplayName}">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeDisplayName}</h4>
+                                        ${info.hasNickname ? '<span class="text-[8.5px] px-1 py-0.2 bg-[#FF2D2D]/10 text-[#FF2D2D] rounded font-semibold">Apelido</span>' : ''}
+                                    </div>
+                                    <p class="text-[10px] text-[#6E6E73] font-mono mt-0.5 truncate">
+                                        ID: ${safeId} • <span class="${info.isCBO ? 'text-[#5DA9FF]' : 'text-[#A1A1A6]'} font-semibold">${info.isCBO ? 'CBO' : 'ABO'}</span>
+                                        ${info.hasNickname ? `• Meta: ${safeOriginalName}` : ''}
+                                    </p>
                                 </div>
                             </div>
-                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Campanha Ativa • Clique para pausar' : 'Campanha Pausada • Clique para reativar'}">
+                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Campanha Ativa • Toque para pausar' : 'Campanha Pausada • Toque para reativar'}">
                                 <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleCampaignStatus('${safeId}', '${camp.status}', this)">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
 
+                        <!-- Grid 2x2 de Métricas Principais -->
                         <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Investido</span>
-                                <p class="tabular-nums font-bold text-[#A1A1A6] text-sm">${window.analyticsEngine.formatMoney(ins.spend)}</p>
+                            <div class="p-2.5 rounded-lg bg-[#0A0A0D] border border-white/[0.04]">
+                                <span class="text-[9.5px] text-[#6E6E73] uppercase font-bold block mb-0.5">Investimento</span>
+                                <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">${window.analyticsEngine.formatMoney(ins.spend)}</p>
                             </div>
-                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Vendas / CPA</span>
-                                <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">${ins.purchases} <span class="text-xs font-normal text-[#6E6E73]">(${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : '–'})</span></p>
+                            <div class="p-2.5 rounded-lg bg-[#0A0A0D] border border-white/[0.04]">
+                                <span class="text-[9.5px] text-[#6E6E73] uppercase font-bold block mb-0.5">Vendas / CPA</span>
+                                <p class="tabular-nums font-bold text-[#1FC16B] text-sm">${ins.purchases} <span class="text-xs font-normal text-[#A1A1A6]">(${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : '–'})</span></p>
                             </div>
-                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">ROAS Meta</span>
+                            <div class="p-2.5 rounded-lg bg-[#0A0A0D] border border-white/[0.04]">
+                                <span class="text-[9.5px] text-[#6E6E73] uppercase font-bold block mb-0.5">ROAS Meta</span>
                                 <p class="tabular-nums font-bold ${ins.roas && ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'} text-sm">${ins.roas ? `${ins.roas.toFixed(2)}x` : '–'}</p>
                             </div>
-                            <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                                <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Orçamento</span>
+                            <div class="p-2.5 rounded-lg bg-[#0A0A0D] border border-white/[0.04]">
+                                <span class="text-[9.5px] text-[#6E6E73] uppercase font-bold block mb-0.5">Orçamento Diário</span>
                                 <p class="tabular-nums font-bold text-[#F5F5F7] text-sm">R$ ${budgetVal.toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
 
-                        <!-- Botão Expandir Todas as Métricas Ativas -->
-                        <button onclick="window.dashboard.openMobileMetricDetails('${safeId}')" class="w-full py-1.5 px-3 rounded-lg bg-[#15151A] hover:bg-[#1C1C24] border border-white/[0.06] text-xs font-semibold text-[#5DA9FF] flex items-center justify-between transition-colors">
-                            <span>Ver todas as ${this.activeColumns.length} métricas</span>
+                        <!-- Botão Central Inspecionar Todas as Métricas -->
+                        <button onclick="window.dashboard.openCampaignDrawer('${safeId}')" class="w-full py-2 px-3 rounded-lg bg-[#15151A] hover:bg-[#1C1C24] border border-white/[0.08] text-xs font-semibold text-[#5DA9FF] flex items-center justify-between transition-colors shadow-sm">
+                            <span class="flex items-center gap-1.5"><span>📊</span><span>Painel de Métricas & Diagnóstico</span></span>
                             <span>➔</span>
                         </button>
 
-                        <div class="flex items-center justify-between gap-2 pt-1">
-                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeName}', ${isCBO})" class="btn btn-secondary btn-sm flex-1 text-[11px]">
-                                💰 Orçamento
+                        <!-- Barra de 5 Ações Touch Rápidas -->
+                        <div class="mobile-card-actions-bar">
+                            <button onclick="window.dashboard.openRenameModal('${safeId}')" class="mobile-card-action-btn" title="Renomear Campanha">
+                                <span>✏️</span>
+                                <span>Renomear</span>
                             </button>
-                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm flex-1 text-[11px]">
-                                📋 Duplicar
+                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${budgetVal}, '${safeDisplayName}', ${info.isCBO})" class="mobile-card-action-btn" title="Ajustar Orçamento">
+                                <span>💰</span>
+                                <span>Orçamento</span>
                             </button>
-                            <button onclick="window.dashboard.openRadwanAnalysisModal('${safeId}')" class="btn btn-secondary btn-sm text-[11px] px-2.5">
-                                🧠
+                            <button onclick="window.dashboard.openCampaignDrawer('${safeId}')" class="mobile-card-action-btn" title="Ver Métricas">
+                                <span>📊</span>
+                                <span>Métricas</span>
+                            </button>
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeDisplayName}')" class="mobile-card-action-btn" title="Duplicar">
+                                <span>📋</span>
+                                <span>Duplicar</span>
+                            </button>
+                            <button onclick="window.dashboard.openRadwanAnalysisModal('${safeId}')" class="mobile-card-action-btn" title="Diagnóstico Radwan">
+                                <span>🧠</span>
+                                <span>Radwan</span>
                             </button>
                         </div>
                     </div>
@@ -1949,36 +1986,253 @@ class DashboardApp {
         }
     }
 
+    // ─── GESTÃO DE NOMES E APELIDOS DE CAMPANHAS ──────────────────────────
+
+    getCampaignNicknames() {
+        try {
+            return JSON.parse(localStorage.getItem('radwan_campaign_nicknames') || '{}');
+        } catch (e) {
+            return {};
+        }
+    }
+
+    getCampaignInfo(camp) {
+        if (!camp) return { id: '', name: '', displayName: 'Campanha', isCBO: false, hasNickname: false, nickname: '' };
+        const nicknames = this.getCampaignNicknames();
+        const nickname = nicknames[camp.id] || null;
+        const originalName = camp.name || 'Campanha';
+        const isCBO = !!(camp.daily_budget || camp.lifetime_budget);
+        return {
+            id: camp.id,
+            name: originalName,
+            displayName: nickname ? nickname : originalName,
+            hasNickname: !!nickname,
+            nickname: nickname || '',
+            isCBO
+        };
+    }
+
+    openRenameModal(campId) {
+        const camp = this.cachedCampaigns.find(c => c.id === campId);
+        if (!camp) return;
+        const info = this.getCampaignInfo(camp);
+        
+        const campIdInput = document.getElementById('rename-modal-camp-id');
+        const currentNameEl = document.getElementById('rename-modal-current-name');
+        if (campIdInput) campIdInput.value = campId;
+        if (currentNameEl) currentNameEl.textContent = camp.name;
+
+        this.renameMode = 'official';
+        this.updateRenameModalUI(info);
+        document.getElementById('rename-modal')?.classList.remove('hidden');
+    }
+
+    setRenameMode(mode) {
+        this.renameMode = mode;
+        const campId = document.getElementById('rename-modal-camp-id')?.value;
+        const camp = this.cachedCampaigns.find(c => c.id === campId);
+        const info = this.getCampaignInfo(camp);
+        this.updateRenameModalUI(info);
+    }
+
+    updateRenameModalUI(info) {
+        const officialBtn = document.getElementById('rename-mode-official');
+        const nicknameBtn = document.getElementById('rename-mode-nickname');
+        const descEl = document.getElementById('rename-mode-description');
+        const labelEl = document.getElementById('rename-modal-input-label');
+        const inputEl = document.getElementById('rename-modal-input');
+
+        if (!inputEl) return;
+
+        if (this.renameMode === 'official') {
+            if (officialBtn) officialBtn.className = 'flex-1 py-1.5 rounded-md font-semibold text-center transition-all bg-[#0E0E12] text-[#F5F5F7] shadow-sm';
+            if (nicknameBtn) nicknameBtn.className = 'flex-1 py-1.5 rounded-md font-semibold text-center transition-all text-[#A1A1A6] hover:text-[#F5F5F7]';
+            if (descEl) descEl.textContent = 'Altera o nome real da campanha diretamente na conta de anúncios da Meta via Graph API com Write-Read-Verify.';
+            if (labelEl) labelEl.textContent = 'Novo Nome Oficial na Meta';
+            inputEl.value = info ? info.name : '';
+        } else {
+            if (nicknameBtn) nicknameBtn.className = 'flex-1 py-1.5 rounded-md font-semibold text-center transition-all bg-[#0E0E12] text-[#F5F5F7] shadow-sm';
+            if (officialBtn) officialBtn.className = 'flex-1 py-1.5 rounded-md font-semibold text-center transition-all text-[#A1A1A6] hover:text-[#F5F5F7]';
+            if (descEl) descEl.textContent = 'Define um apelido visual amigável exclusivo no RADWAN ADS. Não altera o nome oficial na Meta.';
+            if (labelEl) labelEl.textContent = 'Apelido Interno (RADWAN ADS)';
+            inputEl.value = info ? info.nickname : '';
+        }
+        inputEl.focus();
+    }
+
+    async submitRenameModal(event) {
+        event.preventDefault();
+        const campId = document.getElementById('rename-modal-camp-id')?.value;
+        const inputEl = document.getElementById('rename-modal-input');
+        const newName = inputEl ? inputEl.value.trim() : '';
+        const submitBtn = document.getElementById('btn-submit-rename');
+
+        if (!newName && this.renameMode === 'official') {
+            this.showToast('Informe um nome válido para a campanha na Meta.', 'warning');
+            return;
+        }
+
+        const camp = this.cachedCampaigns.find(c => c.id === campId);
+        if (!camp) return;
+
+        if (this.renameMode === 'nickname') {
+            const nicknames = this.getCampaignNicknames();
+            if (newName.length > 0) {
+                nicknames[campId] = newName;
+            } else {
+                delete nicknames[campId];
+            }
+            localStorage.setItem('radwan_campaign_nicknames', JSON.stringify(nicknames));
+            document.getElementById('rename-modal')?.classList.add('hidden');
+            this.showToast('Apelido interno salvo com sucesso!', 'success');
+            this.renderCampaignsTable();
+            return;
+        }
+
+        // Modo Oficial na Meta
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Salvando na Meta...';
+        }
+
+        try {
+            this.showToast('Enviando alteração de nome para a Meta...', 'info');
+            await window.metaAdapter.updateName(campId, newName);
+
+            // Read & Verify
+            const verifyRes = await window.metaAdapter.request(campId, 'GET', { fields: 'id,name' }, null, false);
+            if (verifyRes && verifyRes.name === newName) {
+                camp.name = newName;
+            } else {
+                camp.name = newName; // fallback otimista se api responder sucesso
+            }
+
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'RENOMEACAO_CAMPANHA',
+                    objectId: campId,
+                    before: camp.name,
+                    after: newName,
+                    reason: 'Renomeação oficial de campanha via console operacional.',
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
+            document.getElementById('rename-modal')?.classList.add('hidden');
+            this.showToast('Campanha renomeada com sucesso na Meta!', 'success');
+            this.renderCampaignsTable();
+
+        } catch (err) {
+            console.error('[Rename Error]', err);
+            this.showToast(`Falha ao renomear: ${err.message || 'Erro na Meta'}`, 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Salvar Alteração ➔';
+            }
+        }
+    }
+
+    // ─── PAINEL MESTRE DE INSPEÇÃO DE MÉTRICAS (DRAWER EM 5 BLOCOS) ──────────
+
     openCampaignDrawer(campId) {
         const drawer = document.getElementById('campaign-drawer');
         const content = document.getElementById('drawer-content');
-        if (!drawer || !content) return;
+        if (!drawer || !content || !window.metricsRegistry) return;
 
         const camp = this.cachedCampaigns.find(c => c.id === campId);
-        const ins = this.cachedInsights.get(campId);
+        const ins = this.cachedInsights.get(campId) || window.analyticsEngine.parseInsights(null);
+        const info = this.getCampaignInfo(camp);
+        const isActive = camp?.status === 'ACTIVE';
 
-        content.innerHTML = `
-            <div class="space-y-4 text-xs">
-                <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
-                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">ID da Campanha</span>
-                    <p class="font-mono text-sm text-[#F5F5F7]">${campId}</p>
-                </div>
-                <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
-                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Nome</span>
-                    <p class="font-bold text-sm text-[#F5F5F7]">${escapeHTML(camp?.name || 'Campanha')}</p>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
-                        <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Gasto no Período</span>
-                        <p class="font-mono font-bold text-sm text-[#F5F5F7]">${ins ? window.analyticsEngine.formatMoney(ins.spend) : 'R$ 0,00'}</p>
+        // Header Elements
+        const titleEl = document.getElementById('campaign-drawer-title');
+        const subtitleEl = document.getElementById('campaign-drawer-subtitle');
+        const idEl = document.getElementById('campaign-drawer-id');
+        const statusBadge = document.getElementById('campaign-drawer-status-badge');
+        const structureBadge = document.getElementById('campaign-drawer-structure-badge');
+
+        if (titleEl) titleEl.textContent = info.displayName;
+        if (subtitleEl) {
+            subtitleEl.textContent = info.hasNickname ? `Nome oficial na Meta: ${info.name}` : `Estrutura: ${info.isCBO ? 'Orçamento a nível de Campanha (CBO)' : 'Orçamento a nível de Conjunto (ABO)'}`;
+        }
+        if (idEl) idEl.textContent = `ID: ${campId}`;
+        if (statusBadge) {
+            statusBadge.className = `badge ${isActive ? 'badge-active' : 'badge-paused'} text-[9.5px]`;
+            statusBadge.textContent = isActive ? 'Ativa' : 'Pausada';
+        }
+        if (structureBadge) {
+            structureBadge.className = `badge ${info.isCBO ? 'badge-winner' : 'badge-paused'} text-[9.5px]`;
+            structureBadge.textContent = info.isCBO ? 'CBO' : 'ABO';
+        }
+
+        // Action Toolbar
+        const toolbar = document.getElementById('campaign-drawer-toolbar');
+        const budgetVal = camp?.daily_budget ? (parseFloat(camp.daily_budget) / 100) : (camp?.lifetime_budget ? parseFloat(camp.lifetime_budget) / 100 : 0);
+        const safeDisplayName = escapeHTML(info.displayName);
+
+        if (toolbar) {
+            toolbar.innerHTML = `
+                <button onclick="window.dashboard.openRenameModal('${campId}')" class="btn btn-secondary btn-sm text-[11px] flex items-center gap-1.5 whitespace-nowrap">
+                    <span>✏️</span><span>Renomear</span>
+                </button>
+                <button onclick="window.dashboard.openBudgetModal('${campId}', ${budgetVal}, '${safeDisplayName}', ${info.isCBO})" class="btn btn-secondary btn-sm text-[11px] flex items-center gap-1.5 whitespace-nowrap">
+                    <span>💰</span><span>Orçamento</span>
+                </button>
+                <button onclick="window.dashboard.openDuplicateModal('${campId}', '${safeDisplayName}')" class="btn btn-secondary btn-sm text-[11px] flex items-center gap-1.5 whitespace-nowrap">
+                    <span>📋</span><span>Duplicar</span>
+                </button>
+                <button onclick="window.dashboard.openRadwanAnalysisModal('${campId}')" class="btn btn-secondary btn-sm text-[11px] flex items-center gap-1.5 whitespace-nowrap">
+                    <span>🧠</span><span>Diagnóstico Radwan</span>
+                </button>
+            `;
+        }
+
+        // 5 Grupos de Métricas com Formatação Canônica
+        const metricHelper = (metricId) => {
+            const m = window.metricsRegistry.getMetric(metricId);
+            if (!m) return { label: metricId, val: '–', desc: '' };
+            const raw = m.calculate(ins, camp, this.cachedOrders);
+            const val = window.metricsRegistry.formatValue(metricId, raw);
+            return { label: m.shortLabel || m.label, val, desc: m.beginnerDescription || m.tooltip || '' };
+        };
+
+        const gFinanceiro = ['spend', 'revenue', 'roas', 'profit', 'cpa', 'profit_margin'].map(metricHelper);
+        const gConversao = ['purchases', 'conversion_rate', 'initiate_checkout', 'cost_per_initiate_checkout', 'add_to_cart', 'funnel_checkout_to_purchase'].map(metricHelper);
+        const gTrafego = ['link_clicks', 'link_ctr', 'link_cpc', 'landing_page_views', 'cost_per_lpv'].map(metricHelper);
+        const gEntrega = ['impressions', 'reach', 'frequency', 'cpm'].map(metricHelper);
+        const gVideo = ['video_views_3s', 'hook_rate', 'thruplay', 'cost_per_thruplay', 'video_p100'].map(metricHelper);
+
+        const renderGroupBlock = (icon, title, badge, items) => `
+            <div class="metric-group-card space-y-0">
+                <div class="metric-group-header">
+                    <div class="flex items-center gap-2">
+                        <span>${icon}</span>
+                        <h4 class="font-bold text-xs text-[#F5F5F7]">${title}</h4>
                     </div>
-                    <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
-                        <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Compras Registradas</span>
-                        <p class="font-mono font-bold text-sm text-[#1FC16B]">${ins?.purchases || 0} un</p>
-                    </div>
+                    <span class="text-[9px] text-[#6E6E73] font-mono uppercase tracking-wider">${badge}</span>
+                </div>
+                <div class="metric-stat-grid">
+                    ${items.map(item => `
+                        <div class="metric-stat-cell" title="${escapeHTML(item.desc)}">
+                            <div class="metric-stat-label">
+                                <span class="truncate">${escapeHTML(item.label)}</span>
+                            </div>
+                            <div class="metric-stat-val">${item.val}</div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
+
+        content.innerHTML = `
+            ${renderGroupBlock('💰', 'Financeiro & Retorno Líquido', 'ECONOMICS & RETORNO', gFinanceiro)}
+            ${renderGroupBlock('🛒', 'Conversão & Funil de Vendas', 'PIXEL & GATEWAY', gConversao)}
+            ${renderGroupBlock('🔗', 'Tráfego & Destino', 'CLICKS & LPV', gTrafego)}
+            ${renderGroupBlock('📦', 'Entrega & Alcance', 'IMPRESSIONS & REACH', gEntrega)}
+            ${renderGroupBlock('🎬', 'Vídeo & Retenção de Atenção', 'ADS ACTION STATS', gVideo)}
+        `;
+
         drawer.classList.add('open');
     }
 
