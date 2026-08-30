@@ -20,9 +20,6 @@
   "license": "UNLICENSED",
   "private": true,
   "engines": {
-    "node": "20.x"
-  },
-  "devDependencies": {
-    "vercel": "^59.10.0"
+    "node": ">=18.x"
   }
 }
