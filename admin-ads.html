@@ -81,11 +81,6 @@
         .snapshot-cell:hover { background: var(--surface-elevated); }
         .cause-map-flow { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1rem 1.25rem; background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
         .cause-map-node { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 600; background: var(--surface-1); border: 1px solid var(--border-subtle); }
-        .creatives-grid { display: grid; grid-template-columns: repeat(3, minmax(280px, 1fr)); gap: 20px; width: 100%; }
-        @media (max-width: 1399px) { .creatives-grid { grid-template-columns: repeat(2, minmax(280px, 1fr)); } }
-        @media (max-width: 799px) { .creatives-grid { grid-template-columns: 1fr; } }
-        .creative-card { min-height: 200px; padding: 22px; border-radius: var(--radius-lg); background: var(--surface-1); border: 1px solid var(--border-subtle); transition: all 180ms ease-out; }
-        .creative-card:hover { border-color: var(--border-hover); background: var(--surface-elevated); }
         .data-table-container { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .data-table th { background: var(--bg-secondary); color: var(--text-tertiary); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 0.85rem 1.15rem; border-bottom: 1px solid var(--border-subtle); }
@@ -593,23 +588,21 @@
                  SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA COM PERIOD OVERRIDE)
                  =================================================================== -->
             <section id="view-creatives" class="view-section hidden space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0F0F12] border border-white/[0.07] p-3 sm:p-4 rounded-xl">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-lg font-bold text-[#F5F5F7]">Galeria e Diagnóstico de Criativos</h2>
-                            <span id="creatives-override-badge" class="badge badge-paused text-[10px]">Período Global</span>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0F0F12] border border-white/[0.07] p-3 sm:p-4 rounded-xl min-w-0">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Criativos</h2>
+                            <span id="creatives-override-badge" class="badge badge-paused text-[9.5px]">Período Global</span>
                         </div>
-                        <p class="text-xs text-[#A1A1A6]">Análise de fadiga, hook rate, taxa de retenção e Creative Score</p>
+                        <p class="text-xs text-[#A1A1A6] truncate">Desempenho de copies, fadiga, retenção e Creative Score</p>
                     </div>
 
                     <!-- Controles de Período Local para Criativos -->
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <div class="flex items-center space-x-1 bg-[#15151A] border border-white/[0.05] p-1 rounded-lg">
-                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'global')" data-sec-preset="global" class="segmented-btn active px-2.5 py-1 text-xs">Global</button>
-                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_7d')" data-sec-preset="last_7d" class="segmented-btn px-2.5 py-1 text-xs">7D</button>
-                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_30d')" data-sec-preset="last_30d" class="segmented-btn px-2.5 py-1 text-xs">30D (Recomendado)</button>
-                            <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_90d')" data-sec-preset="last_90d" class="segmented-btn px-2.5 py-1 text-xs">90D</button>
-                        </div>
+                    <div class="creatives-period-bar max-w-full overflow-x-auto scrollbar-none">
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'global')" data-sec-preset="global" class="segmented-btn active px-2.5 py-1 text-xs">Geral</button>
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_7d')" data-sec-preset="last_7d" class="segmented-btn px-2.5 py-1 text-xs">7 dias</button>
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_30d')" data-sec-preset="last_30d" class="segmented-btn px-2.5 py-1 text-xs">30 dias (Recomendado)</button>
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_90d')" data-sec-preset="last_90d" class="segmented-btn px-2.5 py-1 text-xs">90 dias</button>
                     </div>
                 </div>
 

@@ -1526,44 +1526,62 @@ class DashboardApp {
             const spendFormatted = window.analyticsEngine.formatMoney(ins.spend);
 
             let badgeClass = 'badge-active';
-            if (evalResult.classification === 'WINNER') badgeClass = 'badge-winner';
-            else if (evalResult.classification === 'FATIGUE') badgeClass = 'badge-error';
-            else if (evalResult.classification === 'WATCH') badgeClass = 'badge-warning';
+            let classificationLabel = 'Em teste';
+            if (evalResult.classification === 'WINNER') {
+                badgeClass = 'badge-winner';
+                classificationLabel = 'Vencedor';
+            } else if (evalResult.classification === 'FATIGUE') {
+                badgeClass = 'badge-error';
+                classificationLabel = 'Fadiga';
+            } else if (evalResult.classification === 'WATCH') {
+                badgeClass = 'badge-warning';
+                classificationLabel = 'Atenção';
+            }
 
             return `
-                <div class="creative-card space-y-3">
-                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
-                        <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="text-sm">🎬</span>
-                            <span class="font-bold text-xs text-[#F5F5F7] truncate" title="${escapeHTML(camp.name)}">${escapeHTML(camp.name)}</span>
+                <div class="creative-card">
+                    <!-- Header do Card com Grid 1fr auto -->
+                    <div class="creative-card-header">
+                        <div class="creative-card-title-group">
+                            <span class="creative-card-icon">🎬</span>
+                            <div class="creative-card-title-wrap">
+                                <span class="creative-card-name" title="${escapeHTML(camp.name)}">${escapeHTML(camp.name)}</span>
+                                <span class="creative-card-sub">Campanha Meta Ads</span>
+                            </div>
                         </div>
-                        <span class="badge ${badgeClass} text-[10px]">
-                            ${escapeHTML(evalResult.classification)} (${evalResult.score || 70})
+                        <div class="creative-card-badge-wrap">
+                            <span class="badge ${badgeClass} creative-status-badge">
+                                ${escapeHTML(classificationLabel)} · ${evalResult.score || 70}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Métricas 2x2 Estritamente Blindado -->
+                    <div class="creative-metrics-grid">
+                        <div class="creative-metric-cell">
+                            <span class="creative-metric-label">CTR Link</span>
+                            <p class="creative-metric-value ${ins.ctr && ins.ctr >= 2.0 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${ctrFormatted}</p>
+                        </div>
+                        <div class="creative-metric-cell">
+                            <span class="creative-metric-label">CPC Médio</span>
+                            <p class="creative-metric-value text-[#F5F5F7]">${cpcFormatted}</p>
+                        </div>
+                        <div class="creative-metric-cell">
+                            <span class="creative-metric-label">Taxa Retenção</span>
+                            <p class="creative-metric-value text-[#5DA9FF]">${hookRate}</p>
+                        </div>
+                        <div class="creative-metric-cell">
+                            <span class="creative-metric-label">Investido</span>
+                            <p class="creative-metric-value text-[#A1A1A6]">${spendFormatted}</p>
+                        </div>
+                    </div>
+
+                    <!-- Footer do Card com ID e Vendas -->
+                    <div class="creative-card-footer">
+                        <span class="creative-card-id" title="${escapeHTML(camp.id)}">ID: ${escapeHTML(camp.id)}</span>
+                        <span class="creative-card-sales ${ins.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#A1A1A6]'}">
+                            ${ins.purchases} ${ins.purchases === 1 ? 'venda' : 'vendas'}
                         </span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">CTR Link</span>
-                            <p class="font-mono font-bold ${ins.ctr && ins.ctr >= 2.0 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'} text-sm">${ctrFormatted}</p>
-                        </div>
-                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">CPC Médio</span>
-                            <p class="font-mono font-bold text-[#F5F5F7] text-sm">${cpcFormatted}</p>
-                        </div>
-                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Taxa de Retenção</span>
-                            <p class="font-mono font-bold text-[#5DA9FF] text-sm">${hookRate}</p>
-                        </div>
-                        <div class="p-2 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
-                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold">Investido</span>
-                            <p class="font-mono font-bold text-[#A1A1A6] text-sm">${spendFormatted}</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between text-[11px] pt-1">
-                        <span class="text-[#6E6E73] font-mono">ID: ${escapeHTML(camp.id)}</span>
-                        <span class="font-semibold ${ins.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#A1A1A6]'}">${ins.purchases} vendas</span>
                     </div>
                 </div>
             `;
