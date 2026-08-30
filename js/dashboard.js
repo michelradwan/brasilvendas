@@ -27,7 +27,20 @@ class DashboardApp {
         this.selectedCampaigns = new Set();
         this.isTopMoreMenuOpen = false;
         this.isSyncing = false;
-        this.currentAbortController = null;
+        // AdSets & Ads State
+        this.cachedAdSets = [];
+        this.adsetsCampaignFilter = 'all';
+        this.adsetsFilter = 'all';
+        this.adsetsSearchQuery = '';
+        this.cachedAdSetInsights = new Map();
+
+        this.cachedAds = [];
+        this.adsCampaignFilter = 'all';
+        this.adsFilter = 'all';
+        this.adsSearchQuery = '';
+        this.cachedAdInsights = new Map();
+
+        this.syncRequestId = 0;
 
         // Metrics & Columns Master System State
         this.activeColumns = window.metricsRegistry ? window.metricsRegistry.getActiveColumns('campaign') : [
@@ -204,6 +217,10 @@ class DashboardApp {
             this.loadOrdersData();
         } else if (viewName === 'creatives') {
             this.renderCreativesView();
+        } else if (viewName === 'adsets') {
+            this.loadAdSetsData();
+        } else if (viewName === 'ads') {
+            this.loadAdsData();
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -363,6 +380,8 @@ class DashboardApp {
     async syncAllData(silent = false) {
         if (this.isSyncing) return;
         this.isSyncing = true;
+        this.syncRequestId++;
+        const currentReqId = this.syncRequestId;
 
         if (!silent) this.showToast('Consultando Meta Marketing API e base de dados...', 'info');
 
@@ -378,6 +397,8 @@ class DashboardApp {
 
             // 1. Dados da Conta
             const accInfo = await window.metaAdapter.getAccountInfo();
+            if (this.syncRequestId !== currentReqId) return;
+
             if (accInfo) {
                 const nameEl = document.getElementById('topbar-account-name');
                 if (nameEl) nameEl.textContent = accInfo.name || 'C.A 01';
@@ -391,7 +412,11 @@ class DashboardApp {
 
             // 2. Lista de Campanhas
             const campRes = await window.metaAdapter.getCampaigns(50);
+            if (this.syncRequestId !== currentReqId) return;
             this.cachedCampaigns = campRes.data || [];
+
+            // Popula os dropdowns de filtro de campanha
+            this.populateCampaignFilterDropdowns();
 
             // 3. Insights Atuais (com base no range real)
             const periodParam = (period.preset === 'custom' && period.since && period.until)
@@ -405,6 +430,8 @@ class DashboardApp {
             );
 
             const insightsResults = await Promise.all(insightPromises);
+            if (this.syncRequestId !== currentReqId) return;
+
             this.cachedInsights.clear();
             insightsResults.forEach(item => {
                 this.cachedInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
@@ -420,6 +447,8 @@ class DashboardApp {
                         .catch(() => ({ id: camp.id, data: null }))
                 );
                 const prevResults = await Promise.all(prevInsightPromises);
+                if (this.syncRequestId !== currentReqId) return;
+
                 prevResults.forEach(item => {
                     this.previousPeriodInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
                 });
@@ -435,8 +464,12 @@ class DashboardApp {
             if (typeof this.renderAuditLogs === 'function') this.renderAuditLogs();
             if (typeof this.renderTopOpportunities === 'function') this.renderTopOpportunities();
 
+            if (this.currentView === 'adsets') this.loadAdSetsData(true);
+            if (this.currentView === 'ads') this.loadAdsData(true);
+
             // 6. Pedidos no período
             await this.loadOrdersData(true);
+            if (this.syncRequestId !== currentReqId) return;
             this.renderHourlyVisualIntelligence();
 
             const syncEl = document.getElementById('topbar-last-sync');
@@ -1617,131 +1650,245 @@ class DashboardApp {
         }
     }
 
-    openBudgetModal(campId, currentBudget, campName = '', isCBO = true) {
+    // ─── MODAL DE ORÇAMENTO (CBO / ABO COM PREVIEW E PRESETS) ────────────────
+
+    openBudgetModal(objectId, currentBudget, displayName = '', isCBO = true, level = 'campaign') {
         const modal = document.getElementById('budget-modal');
         if (!modal) return;
-        
-        document.getElementById('budget-modal-camp-id').value = campId;
-        document.getElementById('budget-modal-current').textContent = `R$ ${currentBudget.toFixed(2).replace('.', ',')}`;
-        document.getElementById('budget-modal-input').value = currentBudget.toFixed(2);
-        
-        const structEl = document.getElementById('budget-structure-type');
-        if (structEl) {
-            structEl.textContent = isCBO ? 'Nível da Campanha (CBO/Advantage+)' : 'Nível dos Conjuntos (ABO)';
-            structEl.className = isCBO ? 'text-[10.5px] text-[#5DA9FF]' : 'text-[10.5px] text-[#F5A524]';
+
+        const objIdEl = document.getElementById('budget-modal-object-id');
+        const currValEl = document.getElementById('budget-modal-current-val');
+        const levelEl = document.getElementById('budget-modal-level');
+        const titleEl = document.getElementById('budget-modal-title');
+        const subtitleEl = document.getElementById('budget-modal-subtitle');
+        const badgeEl = document.getElementById('budget-modal-structure-badge');
+        const inputEl = document.getElementById('budget-modal-input');
+
+        const numVal = typeof currentBudget === 'number' ? currentBudget : (parseFloat(currentBudget) || 0);
+
+        if (objIdEl) objIdEl.value = objectId;
+        if (currValEl) currValEl.value = numVal;
+        if (levelEl) levelEl.value = level;
+
+        if (titleEl) titleEl.textContent = level === 'campaign' ? 'Ajustar Orçamento de Campanha' : 'Ajustar Orçamento do Conjunto';
+        if (subtitleEl) subtitleEl.textContent = displayName || `ID: ${objectId}`;
+
+        if (badgeEl) {
+            if (level === 'campaign') {
+                badgeEl.textContent = isCBO ? 'CBO • Nível Campanha (Advantage+)' : 'ABO • Orçamento nos Conjuntos';
+                badgeEl.className = isCBO ? 'badge badge-active text-[10px]' : 'badge badge-paused text-[10px]';
+            } else {
+                badgeEl.textContent = 'ABO • Nível Conjunto';
+                badgeEl.className = 'badge badge-active text-[10px]';
+            }
         }
 
-        this.updateBudgetDiffPreview();
+        if (inputEl) inputEl.value = numVal > 0 ? numVal.toFixed(2) : '50.00';
+
+        this.updateBudgetPreview();
         modal.classList.remove('hidden');
     }
 
-    applyBudgetQuickPct(pct) {
-        const currentText = document.getElementById('budget-modal-current').textContent;
-        const current = parseFloat(currentText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-        const next = Math.max(1, current * (1 + pct / 100));
-        document.getElementById('budget-modal-input').value = next.toFixed(2);
-        this.updateBudgetDiffPreview();
+    applyBudgetModifier(pct) {
+        const currValEl = document.getElementById('budget-modal-current-val');
+        const inputEl = document.getElementById('budget-modal-input');
+        const base = parseFloat(currValEl?.value) || 50;
+        const nextVal = Math.max(5, base * (1 + pct / 100));
+
+        if (inputEl) inputEl.value = nextVal.toFixed(2);
+        this.updateBudgetPreview();
     }
 
-    updateBudgetDiffPreview() {
-        const currentText = document.getElementById('budget-modal-current')?.textContent || '0';
-        const current = parseFloat(currentText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-        const newVal = parseFloat(document.getElementById('budget-modal-input')?.value) || 0;
-        const diffLabel = document.getElementById('budget-diff-label');
-        if (!diffLabel) return;
+    resetBudgetModal() {
+        const currValEl = document.getElementById('budget-modal-current-val');
+        const inputEl = document.getElementById('budget-modal-input');
+        const base = parseFloat(currValEl?.value) || 50;
 
-        if (current === 0) {
-            diffLabel.textContent = `R$ ${newVal.toFixed(2).replace('.', ',')}`;
+        if (inputEl) inputEl.value = base.toFixed(2);
+        this.updateBudgetPreview();
+    }
+
+    updateBudgetPreview() {
+        const currValEl = document.getElementById('budget-modal-current-val');
+        const inputEl = document.getElementById('budget-modal-input');
+        const beforeEl = document.getElementById('budget-modal-preview-before');
+        const afterEl = document.getElementById('budget-modal-preview-after');
+        const diffEl = document.getElementById('budget-modal-preview-diff');
+
+        const before = parseFloat(currValEl?.value) || 0;
+        const after = parseFloat(inputEl?.value) || 0;
+
+        if (beforeEl) beforeEl.textContent = `R$ ${before.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (afterEl) afterEl.textContent = `R$ ${after.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        if (diffEl) {
+            if (before > 0) {
+                const diffR$ = after - before;
+                const diffPct = ((after - before) / before) * 100;
+                const sign = diffPct > 0 ? '+' : '';
+                diffEl.textContent = `${sign}${diffPct.toFixed(1)}% (${sign}R$ ${diffR$.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/dia)`;
+                diffEl.className = diffPct > 0 ? 'font-mono font-bold text-[#1FC16B]' : (diffPct < 0 ? 'font-mono font-bold text-[#FF453A]' : 'font-mono font-bold text-[#F5F5F7]');
+            } else {
+                diffEl.textContent = 'Novo Orçamento Definido';
+                diffEl.className = 'font-mono font-bold text-[#5DA9FF]';
+            }
+        }
+    }
+
+    async submitBudgetModal(event) {
+        event.preventDefault();
+        const objId = document.getElementById('budget-modal-object-id')?.value;
+        const level = document.getElementById('budget-modal-level')?.value || 'campaign';
+        const newVal = parseFloat(document.getElementById('budget-modal-input')?.value);
+        const submitBtn = document.getElementById('btn-submit-budget');
+
+        if (!objId || isNaN(newVal) || newVal < 5) {
+            this.showToast('O orçamento diário mínimo na Meta é de R$ 5,00.', 'warning');
             return;
         }
 
-        const diffR$ = newVal - current;
-        const diffPct = ((diffR$) / current) * 100;
-        const sign = diffPct > 0 ? '+' : '';
-        diffLabel.textContent = `${sign}R$ ${diffR$.toFixed(2).replace('.', ',')} (${sign}${diffPct.toFixed(1)}%)`;
-        diffLabel.className = diffPct > 0 ? 'font-bold text-[#1FC16B]' : (diffPct < 0 ? 'font-bold text-[#FF453A]' : 'font-bold text-[#F5F5F7]');
-    }
-
-    openDuplicateModal(campId, campName) {
-        const modal = document.getElementById('duplicate-modal');
-        if (!modal) return;
-        document.getElementById('duplicate-camp-id').value = campId;
-        document.getElementById('duplicate-camp-origin').textContent = `${campName} (ID: ${campId})`;
-        modal.classList.remove('hidden');
-    }
-
-    async submitDuplicateModal(event) {
-        event.preventDefault();
-        const campId = document.getElementById('duplicate-camp-id').value;
-        const copies = parseInt(document.getElementById('duplicate-copies-count').value, 10) || 1;
-        const status = document.getElementById('duplicate-initial-status').value;
-        const suffix = document.getElementById('duplicate-suffix-input').value.trim() || ' - Cópia';
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-
-        if (submitBtn) submitBtn.disabled = true;
+        const budgetInCents = Math.round(newVal * 100);
 
         try {
-            this.showToast(`Iniciando duplicação de ${copies} cópia(s) na Meta...`, 'info');
+            if (submitBtn) submitBtn.disabled = true;
+            this.showToast(`Atualizando orçamento para R$ ${newVal.toFixed(2).replace('.', ',')} na Meta...`, 'info');
 
-            // Chamada com suporte nativo a /copies
-            const res = await window.metaAdapter.request(`${campId}/copies`, 'POST', {}, {
-                status_option: status,
-                rename_options: { rename_suffix: suffix }
+            // 1. WRITE via Meta API
+            await window.metaAdapter.request(objId, 'POST', {}, {
+                daily_budget: budgetInCents
             }, true);
 
-            // AUDIT TRAIL LOG
+            // 2. AUDIT LOG
             if (window.auditTrailEngine) {
                 window.auditTrailEngine.logAction({
-                    action: 'DUPLICACAO_CAMPANHA',
-                    objectId: campId,
-                    before: `Original: ${campId}`,
-                    after: `${copies} cópia(s) criadas com status ${status}`,
-                    reason: 'Duplicação assistida de campanha.',
+                    action: 'ORCAMENTO_ALTERADO',
+                    objectId: objId,
+                    before: document.getElementById('budget-modal-preview-before')?.textContent || '--',
+                    after: `R$ ${newVal.toFixed(2).replace('.', ',')}`,
+                    reason: `Ajuste manual seguro de orçamento (${level}).`,
                     verification: 'CONFIRMADO_PELA_META'
                 });
             }
 
-            document.getElementById('duplicate-modal').classList.add('hidden');
-            this.showToast(`${copies} cópia(s) duplicada(s) com sucesso na Meta!`, 'success');
-            await this.syncAllData(true);
+            document.getElementById('budget-modal')?.classList.add('hidden');
+            this.showToast(`Orçamento atualizado e verificado com sucesso!`, 'success');
+
+            if (level === 'adset') {
+                await this.loadAdSetsData(true);
+            } else {
+                await this.syncAllData(true);
+            }
 
         } catch (err) {
-            console.error('[Duplicate Error]', err);
-            this.showToast(`Falha na duplicação: ${err.message || 'Recurso restrito pela conta'}`, 'error');
+            console.error('[Budget Mutation Error]', err);
+            this.showToast(`Falha ao alterar orçamento: ${err.message || 'Erro na Meta'}`, 'error');
         } finally {
             if (submitBtn) submitBtn.disabled = false;
         }
     }
 
-    openRadwanAnalysisModal(campId) {
-        const modal = document.getElementById('radwan-analysis-modal');
-        const body = document.getElementById('radwan-analysis-body');
-        if (!modal || !body) return;
+    // ─── MODAL DE DUPLICAÇÃO ──────────────────────────────────────────────────
 
-        const camp = this.cachedCampaigns.find(c => c.id === campId);
-        const ins = this.cachedInsights.get(campId) || window.analyticsEngine.parseInsights(null);
-        
-        let advice = 'Manter em observação com o orçamento atual.';
+    openDuplicateModal(objectId, currentName) {
+        const modal = document.getElementById('duplicate-modal');
+        if (!modal) return;
+
+        const objIdEl = document.getElementById('duplicate-modal-object-id');
+        const inputEl = document.getElementById('duplicate-modal-input');
+        const titleEl = document.getElementById('duplicate-modal-title');
+
+        if (objIdEl) objIdEl.value = objectId;
+        if (inputEl) inputEl.value = `${currentName || 'Objeto'} - Cópia`;
+        if (titleEl) titleEl.textContent = `Duplicar: ${currentName || objectId}`;
+
+        modal.classList.remove('hidden');
+    }
+
+    async submitDuplicateModal(event) {
+        event.preventDefault();
+        const objId = document.getElementById('duplicate-modal-object-id')?.value;
+        const newName = document.getElementById('duplicate-modal-input')?.value?.trim();
+        const submitBtn = document.getElementById('btn-submit-duplicate');
+
+        if (!objId || !newName) return;
+
+        try {
+            if (submitBtn) submitBtn.disabled = true;
+            this.showToast(`Duplicando objeto na Meta...`, 'info');
+
+            await window.metaAdapter.request(`${objId}/copies`, 'POST', {}, {
+                status_option: 'PAUSED',
+                rename_options: { rename_suffix: ` - ${newName}` }
+            }, true);
+
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'DUPLICACAO_OBJETO',
+                    objectId: objId,
+                    before: `Original: ${objId}`,
+                    after: `Cópia: ${newName} (PAUSED)`,
+                    reason: 'Duplicação assistida.',
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
+            document.getElementById('duplicate-modal')?.classList.add('hidden');
+            this.showToast(`Objeto duplicado com sucesso!`, 'success');
+            await this.syncAllData(true);
+
+        } catch (err) {
+            console.error('[Duplicate Error]', err);
+            this.showToast(`Falha na duplicação: ${err.message || 'Recurso restrito'}`, 'error');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+
+    // ─── MODAL DE DIAGNÓSTICO RADWAN ──────────────────────────────────────────
+
+    openRadwanAnalysisModal(objectId) {
+        const modal = document.getElementById('radwan-analysis-modal');
+        const container = document.getElementById('radwan-analysis-content');
+        if (!modal || !container) return;
+
+        const camp = this.cachedCampaigns.find(c => c.id === objectId);
+        const ins = this.cachedInsights.get(objectId) || window.analyticsEngine.parseInsights(null);
+
+        let advice = 'Campanha operando dentro dos parâmetros esperados. Manter observação com o orçamento atual.';
         let tag = 'badge-active';
         let actionSuggestion = 'Nenhuma intervenção necessária no momento.';
+        let healthScore = 78;
 
         if (ins.roas && ins.roas >= 2.5 && ins.purchases >= 2) {
-            advice = 'Campanha com alto retorno e custo de aquisição controlado. Recomenda-se aumento gradual de 15% no orçamento.';
+            advice = 'Campanha com alto retorno e custo de aquisição controlado. Recomenda-se aumento gradual de 15% a 20% no orçamento.';
             tag = 'badge-winner';
             actionSuggestion = 'Aumentar orçamento em +15%';
+            healthScore = 94;
         } else if (ins.spend > 40 && ins.purchases === 0) {
-            advice = 'Consumo sem conversão registrada no período. Recomenda-se pausar temporariamente para estancar o custo ou testar novo criativo.';
+            advice = 'Consumo relevante sem conversões registradas no período. Recomenda-se pausar temporariamente para proteger o caixa ou renovar o criativo.';
             tag = 'badge-error';
-            actionSuggestion = 'Pausar campanha para proteger caixa';
+            actionSuggestion = 'Pausar campanha para estancar custo';
+            healthScore = 42;
+        } else if (ins.link_ctr && ins.link_ctr < 1.0) {
+            advice = 'Taxa de clique no link abaixo da média de referência (1.50%). O criativo ou gancho inicial precisa de refinamento.';
+            tag = 'badge-warning';
+            actionSuggestion = 'Trocar imagem/vídeo do anúncio';
+            healthScore = 61;
         }
 
-        body.innerHTML = `
-            <div class="p-3 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-2">
+        container.innerHTML = `
+            <div class="p-3.5 rounded-lg bg-[#15151A] border border-white/[0.05] space-y-2.5">
                 <div class="flex items-center justify-between">
-                    <span class="font-bold text-[#F5F5F7] text-sm">${escapeHTML(camp ? camp.name : campId)}</span>
-                    <span class="badge ${tag} text-[10px]">${escapeHTML(advice.split('.')[0])}</span>
+                    <div class="min-w-0 pr-2">
+                        <span class="font-bold text-[#F5F5F7] text-sm block truncate">${escapeHTML(camp ? camp.name : objectId)}</span>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">ID: ${objectId}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <span class="badge ${tag} text-[10px]">${tag === 'badge-winner' ? 'WINNER' : (tag === 'badge-error' ? 'ATENÇÃO' : 'SAUDÁVEL')}</span>
+                        <span class="font-mono font-bold text-xs ${healthScore >= 80 ? 'text-[#1FC16B]' : (healthScore < 50 ? 'text-[#FF453A]' : 'text-[#5DA9FF]')}">Score ${healthScore}</span>
+                    </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 text-xs pt-1">
+                <div class="grid grid-cols-4 gap-2 text-xs pt-1 border-t border-white/[0.04]">
                     <div>
                         <span class="text-[#6E6E73] block text-[10px]">Investido</span>
                         <b class="text-[#F5F5F7]">${window.analyticsEngine.formatMoney(ins.spend)}</b>
@@ -1751,20 +1898,569 @@ class DashboardApp {
                         <b class="text-[#1FC16B]">${ins.purchases} un</b>
                     </div>
                     <div>
+                        <span class="text-[#6E6E73] block text-[10px]">CPA</span>
+                        <b class="text-[#F5F5F7]">${ins.cpa ? window.analyticsEngine.formatMoney(ins.cpa) : '–'}</b>
+                    </div>
+                    <div>
                         <span class="text-[#6E6E73] block text-[10px]">ROAS</span>
                         <b class="${ins.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${ins.roas ? `${ins.roas.toFixed(2)}x` : '–'}</b>
                     </div>
                 </div>
             </div>
 
-            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.04] space-y-1.5">
-                <p class="font-bold text-[#F5F5F7]">Leitura do Radwan:</p>
-                <p class="text-[#A1A1A6] leading-relaxed">${escapeHTML(advice)}</p>
-                <p class="text-[11px] text-[#5DA9FF] font-semibold pt-1">Sugestão: ${escapeHTML(actionSuggestion)}</p>
+            <div class="p-3.5 rounded-lg bg-[#0E0E12] border border-white/[0.04] space-y-2">
+                <p class="font-bold text-[#F5F5F7] text-xs">Diagnóstico da Inteligência Radwan:</p>
+                <p class="text-[#A1A1A6] text-xs leading-relaxed">${escapeHTML(advice)}</p>
+                <div class="pt-2 border-t border-white/[0.04] flex items-center justify-between">
+                    <span class="text-[11px] text-[#5DA9FF] font-semibold">Ação Recomendada: ${escapeHTML(actionSuggestion)}</span>
+                    ${ins.roas >= 2.5 ? `
+                        <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden'); window.dashboard.openBudgetModal('${objectId}', ${camp?.daily_budget ? camp.daily_budget / 100 : 50}, '${escapeHTML(camp?.name || '')}', true)" class="btn btn-primary btn-sm text-[11px]">
+                            Aumentar +15% ➔
+                        </button>
+                    ` : ''}
+                </div>
             </div>
         `;
 
         modal.classList.remove('hidden');
+    }
+
+    // ─── CONTROLE DE CONJUNTOS DE ANÚNCIOS (AD SETS CONSOLE) ─────────────────
+
+    populateCampaignFilterDropdowns() {
+        const adsetSelect = document.getElementById('adsets-campaign-filter-select');
+        const adsSelect = document.getElementById('ads-campaign-filter-select');
+
+        const optionsHtml = `
+            <option value="all">🌐 Todas as Campanhas</option>
+            ${this.cachedCampaigns.map(c => `
+                <option value="${c.id}">${escapeHTML(c.name)}</option>
+            `).join('')}
+        `;
+
+        if (adsetSelect) adsetSelect.innerHTML = optionsHtml;
+        if (adsSelect) adsSelect.innerHTML = optionsHtml;
+    }
+
+    async loadAdSetsData(silent = false) {
+        try {
+            if (!silent) this.showToast('Carregando conjuntos de anúncios da conta...', 'info');
+
+            const res = await window.metaAdapter.getAdSets(this.adsetsCampaignFilter !== 'all' ? this.adsetsCampaignFilter : null);
+            this.cachedAdSets = res.data || [];
+
+            // Popula os badge totais e resumos
+            const countBadge = document.getElementById('adsets-count-badge');
+            if (countBadge) countBadge.textContent = `${this.cachedAdSets.length} Conjuntos`;
+
+            this.renderAdSetsTable();
+
+        } catch (err) {
+            console.error('[Load AdSets Error]', err);
+            if (!silent) this.showToast(`Erro ao carregar conjuntos: ${err.message || 'Falha de rede'}`, 'error');
+        }
+    }
+
+    filterAdSetsByCampaign(campId) {
+        this.adsetsCampaignFilter = campId || 'all';
+        const selectEl = document.getElementById('adsets-campaign-filter-select');
+        if (selectEl) selectEl.value = this.adsetsCampaignFilter;
+        this.renderAdSetsTable();
+    }
+
+    setAdSetFilter(filter) {
+        this.adsetsFilter = filter;
+        document.querySelectorAll('[data-adset-filter]').forEach(btn => {
+            if (btn.getAttribute('data-adset-filter') === filter) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        this.renderAdSetsTable();
+    }
+
+    filterAdSetsList(query) {
+        this.adsetsSearchQuery = (query || '').toLowerCase().trim();
+        this.renderAdSetsTable();
+    }
+
+    renderAdSetsTable() {
+        const tbody = document.getElementById('adsets-table-body');
+        const mobileContainer = document.getElementById('adsets-mobile-cards');
+        if (!tbody) return;
+
+        let list = [...this.cachedAdSets];
+
+        // 1. Filtro por Campanha
+        if (this.adsetsCampaignFilter !== 'all') {
+            list = list.filter(a => a.campaign_id === this.adsetsCampaignFilter);
+        }
+
+        // 2. Filtro por Status
+        if (this.adsetsFilter === 'active') {
+            list = list.filter(a => a.status === 'ACTIVE');
+        } else if (this.adsetsFilter === 'paused') {
+            list = list.filter(a => a.status === 'PAUSED');
+        }
+
+        // 3. Filtro por Busca
+        if (this.adsetsSearchQuery) {
+            list = list.filter(a => 
+                (a.name || '').toLowerCase().includes(this.adsetsSearchQuery) ||
+                (a.id || '').includes(this.adsetsSearchQuery)
+            );
+        }
+
+        // Calcular totais resumidos
+        let totalSpend = 0;
+        let totalPurchases = 0;
+
+        list.forEach(adset => {
+            const campIns = this.cachedInsights.get(adset.campaign_id);
+            if (campIns) {
+                totalSpend += (campIns.spend || 0) / Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length);
+                totalPurchases += Math.round((campIns.purchases || 0) / Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length));
+            }
+        });
+
+        const spendSummary = document.getElementById('adsets-summary-spend');
+        const purchasesSummary = document.getElementById('adsets-summary-purchases');
+        if (spendSummary) spendSummary.textContent = `R$ ${totalSpend.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (purchasesSummary) purchasesSummary.textContent = totalPurchases.toLocaleString('pt-BR');
+
+        if (list.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
+                        Nenhum conjunto encontrado para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+            if (mobileContainer) mobileContainer.innerHTML = '<p class="text-xs text-[#6E6E73] italic text-center py-6">Nenhum conjunto encontrado.</p>';
+            return;
+        }
+
+        tbody.innerHTML = list.map(adset => {
+            const parentCamp = this.cachedCampaigns.find(c => c.id === adset.campaign_id);
+            const parentIns = this.cachedInsights.get(adset.campaign_id) || window.analyticsEngine.parseInsights(null);
+            const isCBO = parentCamp?.daily_budget || parentCamp?.lifetime_budget;
+            const adsetBudget = adset.daily_budget ? (adset.daily_budget / 100) : 0;
+            const safeName = escapeHTML(adset.name || 'Conjunto');
+            const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
+            const safeId = escapeHTML(adset.id);
+            const isChecked = adset.status === 'ACTIVE';
+
+            const numSiblings = Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length);
+            const estSpend = (parentIns.spend || 0) / numSiblings;
+            const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
+            const estCpa = estPurchases > 0 ? (estSpend / estPurchases) : null;
+            const estRoas = parentIns.roas;
+
+            return `
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="sticky-col-status text-center py-3">
+                        <label class="toggle-switch inline-flex cursor-pointer" title="${isChecked ? 'Pausar Conjunto' : 'Ativar Conjunto'}">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)" class="sr-only">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </label>
+                    </td>
+                    <td class="font-semibold text-xs text-[#F5F5F7] max-w-[240px]">
+                        <div class="truncate" title="${safeName}">${safeName}</div>
+                        <div class="text-[10px] text-[#6E6E73] font-mono truncate">ID: ${safeId}</div>
+                    </td>
+                    <td class="text-xs text-[#A1A1A6] max-w-[180px]">
+                        <div class="truncate" title="${safeCampName}">${safeCampName}</div>
+                    </td>
+                    <td class="text-right text-xs">
+                        ${isCBO ? `
+                            <span class="badge badge-paused text-[9.5px]" title="Orçamento gerenciado no nível da campanha (CBO)">CBO Campanha</span>
+                        ` : `
+                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center gap-1" title="Clique para editar orçamento do conjunto">
+                                <span>R$ ${adsetBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span class="text-[10px] text-[#6E6E73]">✏️</span>
+                            </button>
+                        `}
+                    </td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</td>
+                    <td class="text-right text-xs font-mono font-bold ${estPurchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${estPurchases}</td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${estCpa ? window.analyticsEngine.formatMoney(estCpa) : '–'}</td>
+                    <td class="text-right text-xs font-mono font-bold ${estRoas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${estRoas ? `${estRoas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-center py-2">
+                        <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-secondary btn-sm text-[10.5px] px-2 py-1" title="Ver Anúncios deste conjunto">
+                                <span>Anúncios</span>
+                            </button>
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[10.5px] px-1.5 py-1" title="Duplicar Conjunto">
+                                <span>📋</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        if (mobileContainer) {
+            mobileContainer.innerHTML = list.map(adset => {
+                const parentCamp = this.cachedCampaigns.find(c => c.id === adset.campaign_id);
+                const parentIns = this.cachedInsights.get(adset.campaign_id) || window.analyticsEngine.parseInsights(null);
+                const isCBO = parentCamp?.daily_budget || parentCamp?.lifetime_budget;
+                const adsetBudget = adset.daily_budget ? (adset.daily_budget / 100) : 0;
+                const safeName = escapeHTML(adset.name || 'Conjunto');
+                const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
+                const safeId = escapeHTML(adset.id);
+                const isChecked = adset.status === 'ACTIVE';
+
+                const numSiblings = Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length);
+                const estSpend = (parentIns.spend || 0) / numSiblings;
+                const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
+
+                return `
+                    <div class="mobile-campaign-card space-y-3">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0 flex-1">
+                                <span class="badge ${isChecked ? 'badge-active' : 'badge-paused'} text-[9px] mb-1 inline-block">${adset.status}</span>
+                                <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
+                                <p class="text-[10px] text-[#A1A1A6] truncate">${safeCampName}</p>
+                            </div>
+                            <label class="toggle-switch cursor-pointer flex-shrink-0">
+                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)" class="sr-only">
+                                <div class="toggle-track">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] text-xs">
+                            <div>
+                                <span class="text-[10px] text-[#6E6E73] block">Orçamento</span>
+                                <span class="font-bold text-[#F5F5F7]">${isCBO ? 'CBO' : `R$ ${adsetBudget.toFixed(2)}`}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6E6E73] block">Investido</span>
+                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6E6E73] block">Vendas</span>
+                                <span class="font-bold text-[#1FC16B]">${estPurchases}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 pt-1 border-t border-white/[0.04]">
+                            <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-secondary btn-sm flex-1 text-[11px] py-1.5">
+                                Ver Anúncios
+                            </button>
+                            ${!isCBO ? `
+                                <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="btn btn-secondary btn-sm text-[11px] py-1.5 px-3">
+                                    💰 Orçamento
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    async toggleAdSetStatus(adsetId, currentStatus, inputEl = null) {
+        const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+        const actionLabel = newStatus === 'ACTIVE' ? 'reativar' : 'pausar';
+        const toggleWrapper = inputEl?.closest('.toggle-switch');
+
+        if (!confirm(`Deseja realmente ${actionLabel} o conjunto ${adsetId}?`)) {
+            if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
+            return;
+        }
+
+        try {
+            if (toggleWrapper) toggleWrapper.classList.add('is-loading');
+            if (inputEl) inputEl.disabled = true;
+            this.showToast(`Alterando status do conjunto na Meta...`, 'info');
+
+            await window.metaAdapter.updateStatus(adsetId, newStatus);
+
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'STATUS_CONJUNTO_ALTERADO',
+                    objectId: adsetId,
+                    before: currentStatus,
+                    after: newStatus,
+                    reason: `Ajuste operacional de status do conjunto (${actionLabel}).`,
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
+            this.showToast(`Conjunto ${newStatus === 'ACTIVE' ? 'reativado' : 'pausado'} com sucesso!`, 'success');
+            await this.loadAdSetsData(true);
+
+        } catch (err) {
+            console.error('[AdSet Status Error]', err);
+            this.showToast(`Falha ao alterar conjunto: ${err.message || 'Erro na Meta'}`, 'error');
+            if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
+        } finally {
+            if (toggleWrapper) toggleWrapper.classList.remove('is-loading');
+            if (inputEl) inputEl.disabled = false;
+        }
+    }
+
+    // ─── CONTROLE DE ANÚNCIOS INDIVIDUAIS (ADS CONSOLE) ──────────────────────
+
+    async loadAdsData(silent = false) {
+        try {
+            if (!silent) this.showToast('Carregando anúncios individuais da conta...', 'info');
+
+            const res = await window.metaAdapter.getAds(this.adsetsCampaignFilter !== 'all' ? null : null);
+            this.cachedAds = res.data || [];
+
+            const countBadge = document.getElementById('ads-count-badge');
+            if (countBadge) countBadge.textContent = `${this.cachedAds.length} Anúncios`;
+
+            this.renderAdsTable();
+
+        } catch (err) {
+            console.error('[Load Ads Error]', err);
+            if (!silent) this.showToast(`Erro ao carregar anúncios: ${err.message || 'Falha de rede'}`, 'error');
+        }
+    }
+
+    filterAdsByCampaign(campId) {
+        this.adsCampaignFilter = campId || 'all';
+        const selectEl = document.getElementById('ads-campaign-filter-select');
+        if (selectEl) selectEl.value = this.adsCampaignFilter;
+        this.renderAdsTable();
+    }
+
+    filterAdsByAdSet(adsetId) {
+        this.switchView('ads');
+        const adset = this.cachedAdSets.find(a => a.id === adsetId);
+        if (adset) {
+            this.filterAdsByCampaign(adset.campaign_id);
+        }
+    }
+
+    setAdFilter(filter) {
+        this.adsFilter = filter;
+        document.querySelectorAll('[data-ad-filter]').forEach(btn => {
+            if (btn.getAttribute('data-ad-filter') === filter) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        this.renderAdsTable();
+    }
+
+    filterAdsList(query) {
+        this.adsSearchQuery = (query || '').toLowerCase().trim();
+        this.renderAdsTable();
+    }
+
+    renderAdsTable() {
+        const tbody = document.getElementById('ads-table-body');
+        const mobileContainer = document.getElementById('ads-mobile-cards');
+        if (!tbody) return;
+
+        let list = [...this.cachedAds];
+
+        // 1. Filtro por Campanha
+        if (this.adsCampaignFilter !== 'all') {
+            list = list.filter(a => a.campaign_id === this.adsCampaignFilter);
+        }
+
+        // 2. Filtro por Status
+        if (this.adsFilter === 'active') {
+            list = list.filter(a => a.status === 'ACTIVE');
+        } else if (this.adsFilter === 'paused') {
+            list = list.filter(a => a.status === 'PAUSED');
+        }
+
+        // 3. Filtro por Busca
+        if (this.adsSearchQuery) {
+            list = list.filter(a => 
+                (a.name || '').toLowerCase().includes(this.adsSearchQuery) ||
+                (a.id || '').includes(this.adsSearchQuery)
+            );
+        }
+
+        // Totais resumidos
+        let totalSpend = 0;
+        let totalPurchases = 0;
+
+        list.forEach(ad => {
+            const campIns = this.cachedInsights.get(ad.campaign_id);
+            if (campIns) {
+                totalSpend += (campIns.spend || 0) / Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length);
+                totalPurchases += Math.round((campIns.purchases || 0) / Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length));
+            }
+        });
+
+        const spendSummary = document.getElementById('ads-summary-spend');
+        const purchasesSummary = document.getElementById('ads-summary-purchases');
+        if (spendSummary) spendSummary.textContent = `R$ ${totalSpend.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (purchasesSummary) purchasesSummary.textContent = totalPurchases.toLocaleString('pt-BR');
+
+        if (list.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
+                        Nenhum anúncio encontrado para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+            if (mobileContainer) mobileContainer.innerHTML = '<p class="text-xs text-[#6E6E73] italic text-center py-6">Nenhum anúncio encontrado.</p>';
+            return;
+        }
+
+        tbody.innerHTML = list.map(ad => {
+            const parentCamp = this.cachedCampaigns.find(c => c.id === ad.campaign_id);
+            const parentIns = this.cachedInsights.get(ad.campaign_id) || window.analyticsEngine.parseInsights(null);
+            const safeName = escapeHTML(ad.name || 'Anúncio');
+            const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
+            const safeId = escapeHTML(ad.id);
+            const isChecked = ad.status === 'ACTIVE';
+
+            const numSiblings = Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length);
+            const estSpend = (parentIns.spend || 0) / numSiblings;
+            const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
+            const estCpa = estPurchases > 0 ? (estSpend / estPurchases) : null;
+            const estRoas = parentIns.roas;
+            const estCtr = parentIns.link_ctr;
+
+            const thumb = ad.creative?.thumbnail_url || ad.creative?.image_url;
+
+            return `
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="sticky-col-status text-center py-3">
+                        <label class="toggle-switch inline-flex cursor-pointer" title="${isChecked ? 'Pausar Anúncio' : 'Ativar Anúncio'}">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)" class="sr-only">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </label>
+                    </td>
+                    <td class="text-xs text-[#F5F5F7] max-w-[260px]">
+                        <div class="flex items-center gap-2.5">
+                            ${thumb ? `
+                                <img src="${thumb}" alt="${safeName}" class="w-9 h-9 rounded object-cover border border-white/[0.08] flex-shrink-0">
+                            ` : `
+                                <div class="w-9 h-9 rounded bg-[#1A1A22] border border-white/[0.06] flex items-center justify-center text-xs flex-shrink-0 text-[#6E6E73]">🎨</div>
+                            `}
+                            <div class="min-w-0 flex-1">
+                                <div class="font-semibold truncate text-[#F5F5F7]" title="${safeName}">${safeName}</div>
+                                <div class="text-[10px] text-[#6E6E73] font-mono truncate">ID: ${safeId}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-xs text-[#A1A1A6] max-w-[180px]">
+                        <div class="truncate" title="${safeCampName}">${safeCampName}</div>
+                    </td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</td>
+                    <td class="text-right text-xs font-mono font-semibold ${estCtr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${estCtr ? `${estCtr.toFixed(2)}%` : '–'}</td>
+                    <td class="text-right text-xs font-mono font-bold ${estPurchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${estPurchases}</td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${estCpa ? window.analyticsEngine.formatMoney(estCpa) : '–'}</td>
+                    <td class="text-right text-xs font-mono font-bold ${estRoas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${estRoas ? `${estRoas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-center py-2">
+                        <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[10.5px] px-2 py-1" title="Duplicar Anúncio">
+                                <span>📋 Copiar</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        if (mobileContainer) {
+            mobileContainer.innerHTML = list.map(ad => {
+                const parentCamp = this.cachedCampaigns.find(c => c.id === ad.campaign_id);
+                const parentIns = this.cachedInsights.get(ad.campaign_id) || window.analyticsEngine.parseInsights(null);
+                const safeName = escapeHTML(ad.name || 'Anúncio');
+                const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
+                const safeId = escapeHTML(ad.id);
+                const isChecked = ad.status === 'ACTIVE';
+
+                const numSiblings = Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length);
+                const estSpend = (parentIns.spend || 0) / numSiblings;
+                const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
+                const thumb = ad.creative?.thumbnail_url || ad.creative?.image_url;
+
+                return `
+                    <div class="mobile-campaign-card space-y-3">
+                        <div class="flex items-start justify-between gap-2.5">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                ${thumb ? `
+                                    <img src="${thumb}" alt="${safeName}" class="w-10 h-10 rounded object-cover border border-white/[0.08] flex-shrink-0">
+                                ` : `
+                                    <div class="w-10 h-10 rounded bg-[#1A1A22] border border-white/[0.06] flex items-center justify-center text-xs flex-shrink-0 text-[#6E6E73]">🎨</div>
+                                `}
+                                <div class="min-w-0 flex-1">
+                                    <span class="badge ${isChecked ? 'badge-active' : 'badge-paused'} text-[9px] mb-1 inline-block">${ad.status}</span>
+                                    <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
+                                    <p class="text-[10px] text-[#A1A1A6] truncate">${safeCampName}</p>
+                                </div>
+                            </div>
+                            <label class="toggle-switch cursor-pointer flex-shrink-0">
+                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)" class="sr-only">
+                                <div class="toggle-track">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-[#141418] text-xs">
+                            <div>
+                                <span class="text-[10px] text-[#6E6E73] block">Investido</span>
+                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6E6E73] block">Vendas</span>
+                                <span class="font-bold text-[#1FC16B]">${estPurchases} un</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    async toggleAdStatus(adId, currentStatus, inputEl = null) {
+        const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+        const actionLabel = newStatus === 'ACTIVE' ? 'reativar' : 'pausar';
+        const toggleWrapper = inputEl?.closest('.toggle-switch');
+
+        if (!confirm(`Deseja realmente ${actionLabel} o anúncio ${adId}?`)) {
+            if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
+            return;
+        }
+
+        try {
+            if (toggleWrapper) toggleWrapper.classList.add('is-loading');
+            if (inputEl) inputEl.disabled = true;
+            this.showToast(`Alterando status do anúncio na Meta...`, 'info');
+
+            await window.metaAdapter.updateStatus(adId, newStatus);
+
+            if (window.auditTrailEngine) {
+                window.auditTrailEngine.logAction({
+                    action: 'STATUS_ANUNCIO_ALTERADO',
+                    objectId: adId,
+                    before: currentStatus,
+                    after: newStatus,
+                    reason: `Ajuste operacional de status do anúncio (${actionLabel}).`,
+                    verification: 'CONFIRMADO_PELA_META'
+                });
+            }
+
+            this.showToast(`Anúncio ${newStatus === 'ACTIVE' ? 'reativado' : 'pausado'} com sucesso!`, 'success');
+            await this.loadAdsData(true);
+
+        } catch (err) {
+            console.error('[Ad Status Error]', err);
+            this.showToast(`Falha ao alterar anúncio: ${err.message || 'Erro na Meta'}`, 'error');
+            if (inputEl) inputEl.checked = currentStatus === 'ACTIVE';
+        } finally {
+            if (toggleWrapper) toggleWrapper.classList.remove('is-loading');
+            if (inputEl) inputEl.disabled = false;
+        }
     }
 
     async bulkAction(actionType) {

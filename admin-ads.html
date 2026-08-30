@@ -575,84 +575,160 @@
                  SEÇÃO 2B: CONJUNTOS DE ANÚNCIOS (AD SETS)
                  =================================================================== -->
             <section id="view-adsets" class="view-section hidden space-y-4">
+                <!-- Header do Console de Conjuntos -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Conjuntos de Anúncios</h2>
-                            <span id="adsets-count-badge" class="badge badge-active text-[10px]">Console Operacional</span>
+                            <span id="adsets-count-badge" class="badge badge-active text-[10px]">0 Conjuntos</span>
                         </div>
                         <p class="text-xs text-[#A1A1A6]">Visão de públicos, orçamentos ABO, segmentações e performance por conjunto</p>
                     </div>
-                </div>
 
-                <div class="data-table-container">
-                    <div class="overflow-x-auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 44px;" class="text-center">#</th>
-                                    <th>STATUS</th>
-                                    <th>NOME DO CONJUNTO</th>
-                                    <th>PÚBLICO / SEGMENTAÇÃO</th>
-                                    <th>ORÇAMENTO</th>
-                                    <th>INVESTIDO</th>
-                                    <th>COMPRAS</th>
-                                    <th>CPA</th>
-                                    <th>ROAS</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adsets-table-body" class="divide-y divide-white/[0.05]">
-                                <tr>
-                                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
-                                        Os conjuntos de anúncios estão ativos e sincronizados com a Meta API. Selecione uma campanha para detalhamento granular.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- Resumo Rápido Superior -->
+                    <div class="flex items-center gap-3 text-xs">
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Investimento</span>
+                            <span class="font-bold text-[#F5F5F7]" id="adsets-summary-spend">R$ 0,00</span>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Vendas</span>
+                            <span class="font-bold text-[#1FC16B]" id="adsets-summary-purchases">0</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Barra de Controle: Filtros por Campanha, Status e Busca -->
+                <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
+                    <div class="flex flex-wrap items-center justify-between gap-2.5">
+                        <!-- Filtro de Campanha Pai -->
+                        <div class="flex items-center gap-1.5 bg-[#15151A] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs">
+                            <span class="text-[11px] text-[#6E6E73]">Campanha:</span>
+                            <select id="adsets-campaign-filter-select" onchange="window.dashboard.filterAdSetsByCampaign(this.value)" class="bg-transparent text-xs text-[#F5F5F7] font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate">
+                                <option value="all">🌐 Todas as Campanhas</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter Chips -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                            <button onclick="window.dashboard.setAdSetFilter('all')" data-adset-filter="all" class="filter-chip active">Todos</button>
+                            <button onclick="window.dashboard.setAdSetFilter('active')" data-adset-filter="active" class="filter-chip">Ativos</button>
+                            <button onclick="window.dashboard.setAdSetFilter('paused')" data-adset-filter="paused" class="filter-chip">Pausados</button>
+                            <button onclick="window.dashboard.setAdSetFilter('sales')" data-adset-filter="sales" class="filter-chip">Com Vendas</button>
+                        </div>
+                    </div>
+
+                    <!-- Busca Rápida -->
+                    <div class="relative w-full">
+                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                        <input type="text" id="adsets-search-input" oninput="window.dashboard.filterAdSetsList(this.value)" placeholder="Buscar conjunto por nome ou ID..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Tabela Desktop -->
+                <div class="data-table-container hidden sm:block overflow-x-auto">
+                    <table class="data-table" id="adsets-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 64px;" class="sticky-col-status text-center">STATUS</th>
+                                <th>NOME DO CONJUNTO</th>
+                                <th>CAMPANHA</th>
+                                <th class="text-right">ORÇAMENTO</th>
+                                <th class="text-right">INVESTIDO</th>
+                                <th class="text-right">COMPRAS</th>
+                                <th class="text-right">CPA</th>
+                                <th class="text-right">ROAS</th>
+                                <th class="text-center" style="width: 140px;">AÇÕES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adsets-table-body" class="divide-y divide-white/[0.05]">
+                            <!-- Linhas injetadas dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cards Mobile -->
+                <div class="sm:hidden space-y-3" id="adsets-mobile-cards"></div>
             </section>
 
             <!-- ===================================================================
                  SEÇÃO 2C: ANÚNCIOS INDIVIDUAIS (ADS)
                  =================================================================== -->
             <section id="view-ads" class="view-section hidden space-y-4">
+                <!-- Header do Console de Anúncios -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Anúncios Individuais</h2>
-                            <span id="ads-count-badge" class="badge badge-active text-[10px]">Console Operacional</span>
+                            <span id="ads-count-badge" class="badge badge-active text-[10px]">0 Anúncios</span>
                         </div>
                         <p class="text-xs text-[#A1A1A6]">Gestão de criativos, copies, thumbnails e diagnósticos de CTR/Hook Rate por anúncio</p>
                     </div>
-                </div>
 
-                <div class="data-table-container">
-                    <div class="overflow-x-auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 44px;" class="text-center">#</th>
-                                    <th>STATUS</th>
-                                    <th>NOME DO ANÚNCIO</th>
-                                    <th>FORMATO</th>
-                                    <th>INVESTIDO</th>
-                                    <th>CTR LINK</th>
-                                    <th>COMPRAS</th>
-                                    <th>CPA</th>
-                                    <th>ROAS</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ads-table-body" class="divide-y divide-white/[0.05]">
-                                <tr>
-                                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
-                                        Anúncios veiculados com sucesso. Utilize a aba Criativos para análise de fadiga e Creative Score.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- Resumo Rápido Superior -->
+                    <div class="flex items-center gap-3 text-xs">
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Investimento</span>
+                            <span class="font-bold text-[#F5F5F7]" id="ads-summary-spend">R$ 0,00</span>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Vendas</span>
+                            <span class="font-bold text-[#1FC16B]" id="ads-summary-purchases">0</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Barra de Controle: Filtros e Busca de Anúncios -->
+                <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
+                    <div class="flex flex-wrap items-center justify-between gap-2.5">
+                        <!-- Filtro de Campanha Pai -->
+                        <div class="flex items-center gap-1.5 bg-[#15151A] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs">
+                            <span class="text-[11px] text-[#6E6E73]">Campanha:</span>
+                            <select id="ads-campaign-filter-select" onchange="window.dashboard.filterAdsByCampaign(this.value)" class="bg-transparent text-xs text-[#F5F5F7] font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate">
+                                <option value="all">🌐 Todas as Campanhas</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter Chips -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                            <button onclick="window.dashboard.setAdFilter('all')" data-ad-filter="all" class="filter-chip active">Todos</button>
+                            <button onclick="window.dashboard.setAdFilter('active')" data-ad-filter="active" class="filter-chip">Ativos</button>
+                            <button onclick="window.dashboard.setAdFilter('paused')" data-ad-filter="paused" class="filter-chip">Pausados</button>
+                            <button onclick="window.dashboard.setAdFilter('sales')" data-ad-filter="sales" class="filter-chip">Com Vendas</button>
+                        </div>
+                    </div>
+
+                    <!-- Busca Rápida -->
+                    <div class="relative w-full">
+                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                        <input type="text" id="ads-search-input" oninput="window.dashboard.filterAdsList(this.value)" placeholder="Buscar anúncio por nome ou ID..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Tabela Desktop -->
+                <div class="data-table-container hidden sm:block overflow-x-auto">
+                    <table class="data-table" id="ads-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 64px;" class="sticky-col-status text-center">STATUS</th>
+                                <th>CRIATIVO / NOME DO ANÚNCIO</th>
+                                <th>CAMPANHA</th>
+                                <th class="text-right">INVESTIDO</th>
+                                <th class="text-right">CTR LINK</th>
+                                <th class="text-right">COMPRAS</th>
+                                <th class="text-right">CPA</th>
+                                <th class="text-right">ROAS</th>
+                                <th class="text-center" style="width: 140px;">AÇÕES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ads-table-body" class="divide-y divide-white/[0.05]">
+                            <!-- Linhas injetadas dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cards Mobile -->
+                <div class="sm:hidden space-y-3" id="ads-mobile-cards"></div>
             </section>
 
             <!-- ===================================================================
@@ -1556,6 +1632,128 @@
                     <button type="submit" id="btn-submit-rename" class="btn btn-primary text-xs">Salvar Alteração ➔</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Ajuste de Orçamento (CBO / ABO com Previews e Presets) -->
+    <div id="budget-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">💰</span>
+                    <div>
+                        <h3 class="font-bold text-[#F5F5F7] text-base" id="budget-modal-title">Ajustar Orçamento</h3>
+                        <p class="text-[10.5px] text-[#A1A1A6]" id="budget-modal-subtitle">Controle financeiro seguro</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('budget-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+
+            <form onsubmit="window.dashboard.submitBudgetModal(event)" class="space-y-4">
+                <input type="hidden" id="budget-modal-object-id">
+                <input type="hidden" id="budget-modal-current-val">
+                <input type="hidden" id="budget-modal-level" value="campaign">
+
+                <!-- Estrutura CBO vs ABO Info Badge -->
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.06] flex items-center justify-between text-xs">
+                    <span class="text-[#A1A1A6]">Nível do Orçamento:</span>
+                    <span id="budget-modal-structure-badge" class="badge badge-active text-[10px]">CBO • Campanha</span>
+                </div>
+
+                <!-- Modificadores Rápidos em % (+/-) -->
+                <div>
+                    <label class="block text-[10px] text-[#6E6E73] uppercase font-bold mb-1.5">Ajuste Rápido Percentual</label>
+                    <div class="grid grid-cols-5 gap-1.5 text-xs">
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-20)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-20%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-15)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-15%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-10)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-10%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-5)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-5%</button>
+                        <button type="button" onclick="window.dashboard.resetBudgetModal()" class="py-1 px-1 rounded bg-[#15151A] text-[#A1A1A6] border border-white/[0.08] hover:text-white font-mono text-[10.5px]">Reset</button>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1.5 text-xs mt-1.5">
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(5)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+5%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(10)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+10%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(15)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+15%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(20)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+20%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(30)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+30%</button>
+                    </div>
+                </div>
+
+                <!-- Input de Valor Exato -->
+                <div>
+                    <label class="block text-[10px] text-[#F5F5F7] uppercase font-bold mb-1">Novo Orçamento Diário (R$)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 text-xs font-mono">R$</span>
+                        <input type="number" step="0.01" min="5" id="budget-modal-input" required oninput="window.dashboard.updateBudgetPreview()" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2.5 text-sm font-bold font-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Card de Preview Obrigatório: ANTES / DEPOIS / VARIAÇÃO -->
+                <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.06] space-y-1.5 text-xs">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold block">Preview do Ajuste</span>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[#A1A1A6]">Orçamento Anterior:</span>
+                        <span class="font-mono font-semibold text-[#F5F5F7]" id="budget-modal-preview-before">R$ 0,00</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[#A1A1A6]">Novo Orçamento:</span>
+                        <span class="font-mono font-bold text-[#5DA9FF]" id="budget-modal-preview-after">R$ 0,00</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+                        <span class="text-[#A1A1A6]">Variação Prevista:</span>
+                        <span class="font-mono font-bold" id="budget-modal-preview-diff">0,0% (R$ 0,00)</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-white/[0.05]">
+                    <button type="button" onclick="document.getElementById('budget-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" id="btn-submit-budget" class="btn btn-primary text-xs">Confirmar e Aplicar ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Duplicar Campanha / Conjunto / Anúncio -->
+    <div id="duplicate-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📋</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base" id="duplicate-modal-title">Duplicar Objeto</h3>
+                </div>
+                <button onclick="document.getElementById('duplicate-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+            <p class="text-xs text-[#A1A1A6]">Cria uma cópia exata do objeto selecionado na Meta, iniciando pausado por segurança.</p>
+            <form onsubmit="window.dashboard.submitDuplicateModal(event)" class="space-y-4">
+                <input type="hidden" id="duplicate-modal-object-id">
+                <div>
+                    <label class="block text-[10px] text-[#6E6E73] uppercase font-bold mb-1">Nome da Nova Cópia</label>
+                    <input type="text" id="duplicate-modal-input" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+                <div class="flex items-center justify-end space-x-2 pt-2">
+                    <button type="button" onclick="document.getElementById('duplicate-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" id="btn-submit-duplicate" class="btn btn-primary text-xs">Duplicar Agora ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Diagnóstico Radwan -->
+    <div id="radwan-analysis-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-lg p-5 sm:p-6 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="w-6 h-6 rounded bg-[#FF2D2D]/15 text-[#FF2D2D] flex items-center justify-center font-bold text-xs">⌘</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Diagnóstico Radwan</h3>
+                </div>
+                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+            <div id="radwan-analysis-content" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs">
+                <!-- Conteúdo gerado dinamicamente -->
+            </div>
+            <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
+                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
+            </div>
         </div>
     </div>
 

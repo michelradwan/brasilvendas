@@ -124,18 +124,56 @@ class MetaDataProvider {
         return { data: all };
     }
 
-    // Buscar Conjuntos de Anúncios
-    async getAdSets(campaignId) {
-        return this.request(`${campaignId}/adsets`, 'GET', {
-            fields: 'id,name,status,daily_budget,lifetime_budget,optimization_goal,bid_strategy'
-        });
+    // Buscar Conjuntos de Anúncios (Nível de Campanha ou Toda a Conta)
+    async getAdSets(campaignId = null, limit = 50) {
+        const endpoint = campaignId ? `${campaignId}/adsets` : 'act_846780837970771/adsets';
+        let all = [];
+        let params = {
+            fields: 'id,name,status,campaign_id,daily_budget,lifetime_budget,optimization_goal,bid_strategy,created_time',
+            limit: limit
+        };
+
+        do {
+            const res = await this.request(endpoint, 'GET', params);
+            if (res && res.data) {
+                all = all.concat(res.data);
+                if (res.paging && res.paging.cursors && res.paging.cursors.after && res.data.length === limit) {
+                    params.after = res.paging.cursors.after;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        } while (all.length < 5000);
+
+        return { data: all };
     }
 
-    // Buscar Anúncios
-    async getAds(adSetId) {
-        return this.request(`${adSetId}/ads`, 'GET', {
-            fields: 'id,name,status,creative{id,name,title,body,image_url,thumbnail_url}'
-        });
+    // Buscar Anúncios (Nível de Conjunto/Campanha ou Toda a Conta)
+    async getAds(adSetId = null, limit = 50) {
+        const endpoint = adSetId ? `${adSetId}/ads` : 'act_846780837970771/ads';
+        let all = [];
+        let params = {
+            fields: 'id,name,status,campaign_id,adset_id,creative{id,name,title,body,image_url,thumbnail_url},created_time',
+            limit: limit
+        };
+
+        do {
+            const res = await this.request(endpoint, 'GET', params);
+            if (res && res.data) {
+                all = all.concat(res.data);
+                if (res.paging && res.paging.cursors && res.paging.cursors.after && res.data.length === limit) {
+                    params.after = res.paging.cursors.after;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        } while (all.length < 5000);
+
+        return { data: all };
     }
 
     // Buscar Insights (Suporta Presets, Intervalos Customizados e Query Planner de Campos)

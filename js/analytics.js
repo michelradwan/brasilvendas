@@ -386,5 +386,10 @@ class AnalyticsEngine {
     }
 }
 
-// Instância Singleton
-window.analyticsEngine = new AnalyticsEngine();
+// Instância Singleton e Exportação Universal (Browser & Node.js)
+if (typeof window !== 'undefined') {
+    window.analyticsEngine = new AnalyticsEngine();
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = AnalyticsEngine;
+}
