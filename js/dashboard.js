@@ -674,7 +674,7 @@ class DashboardApp {
         
         // Checkbox geral
         html += `
-            <th class="sticky-col-check text-center" style="width: 36px;">
+            <th class="sticky-col-check text-center">
                 <input type="checkbox" id="select-all-campaigns" onchange="window.dashboard.toggleSelectAllCampaigns(this.checked)" class="custom-checkbox" title="Selecionar todas as campanhas visíveis">
             </th>
         `;
@@ -685,7 +685,6 @@ class DashboardApp {
 
             let stickyClass = '';
             if (metricId === 'status_toggle') stickyClass = 'sticky-col-status';
-            else if (metricId === 'name') stickyClass = 'sticky-col-name';
 
             const isSorted = this.sortColumn === metricId;
             const sortClass = metric.sortable ? `sortable-th ${isSorted ? (this.sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : ''}` : '';
@@ -749,11 +748,11 @@ class DashboardApp {
             const safeName = escapeHTML(camp.name);
             const safeId = escapeHTML(camp.id);
 
-            let rowHtml = `<tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] ${isSelected ? 'bg-[#FF2D2D]/[0.03]' : ''}">`;
+            let rowHtml = `<tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] ${isSelected ? 'is-selected bg-[#FF2D2D]/[0.03]' : ''}">`;
 
             // Checkbox da linha (sticky)
             rowHtml += `
-                <td class="sticky-col-check p-3 text-center">
+                <td class="sticky-col-check text-center">
                     <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="window.dashboard.toggleSelectCampaign('${safeId}')" class="custom-checkbox" aria-label="Selecionar ${safeName}">
                 </td>
             `;
@@ -764,7 +763,6 @@ class DashboardApp {
 
                 let stickyClass = '';
                 if (metricId === 'status_toggle') stickyClass = 'sticky-col-status';
-                else if (metricId === 'name') stickyClass = 'sticky-col-name';
 
                 const alignClass = metric.align === 'right' ? 'text-right tabular-nums' : (metric.align === 'center' ? 'text-center' : 'text-left');
                 const rawVal = metric.calculate(ins, camp, this.cachedOrders);

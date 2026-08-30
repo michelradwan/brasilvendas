@@ -35,7 +35,7 @@
             sourceField: 'status',
             format: 'status_toggle',
             align: 'center',
-            minWidth: 60,
+            minWidth: 64,
             sortable: true,
             higherIsBetter: null,
             tooltip: 'Status de veiculação da campanha (Ativa / Pausada com Write-Read-Verify)',

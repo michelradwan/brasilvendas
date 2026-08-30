@@ -532,44 +532,45 @@ body.sidebar-open {
    ============================================================================== */
 
 .data-table-container {
-    background: var(--surface-1);
+    background: #0E0E12;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     width: 100%;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
 }
 
 .data-table {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12.5px;
 }
 
 .data-table th {
-    background: var(--bg-secondary);
+    background: #0E0E12;
     color: var(--text-tertiary);
     font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    padding: 0.8rem 1rem;
+    padding: 0.75rem 0.85rem;
     border-bottom: 1px solid var(--border-subtle);
     white-space: nowrap;
 }
 
 .data-table td {
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 0.85rem;
     border-bottom: 1px solid var(--border-subtle);
     color: var(--text-primary);
     transition: background-color var(--transition-fast);
-}
-
-.data-table tr:last-child td {
-    border-bottom: none;
+    background: #0E0E12;
 }
 
 .data-table tbody tr:hover td {
-    background: var(--surface-elevated);
+    background: #15151A;
 }
 
 /* ==============================================================================
@@ -1025,33 +1026,50 @@ body.sidebar-open {
     width: min(840px, 96vw) !important;
 }
 
-/* Colunas Sticky da Tabela Dinâmica */
+/* Colunas Sticky da Tabela Dinâmica (Controle de Status e Seleção Fixos) */
 .sticky-col-check {
     position: sticky;
     left: 0;
-    z-index: 20;
-    background: #0E0E12;
+    z-index: 25;
+    background: #0E0E12 !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    text-align: center;
+    padding: 0.75rem 0.3rem !important;
+    box-sizing: border-box;
 }
 
 .sticky-col-status {
     position: sticky;
-    left: 36px;
-    z-index: 20;
-    background: #0E0E12;
+    left: 44px;
+    z-index: 25;
+    background: #0E0E12 !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    text-align: center;
+    padding: 0.75rem 0.4rem !important;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 6px 0 14px -2px rgba(0, 0, 0, 0.7);
 }
 
-.sticky-col-name {
-    position: sticky;
-    left: 86px;
-    z-index: 20;
-    background: #0E0E12;
-    box-shadow: 4px 0 12px -2px rgba(0, 0, 0, 0.7);
+thead th.sticky-col-check,
+thead th.sticky-col-status {
+    z-index: 35 !important;
+    background: #0E0E12 !important;
 }
 
 tbody tr:hover .sticky-col-check,
-tbody tr:hover .sticky-col-status,
-tbody tr:hover .sticky-col-name {
+tbody tr:hover .sticky-col-status {
     background: #15151A !important;
+}
+
+tbody tr.is-selected td,
+tbody tr.is-selected .sticky-col-check,
+tbody tr.is-selected .sticky-col-status {
+    background: #1A1215 !important;
 }
 
 /* Tabela Compacta */
