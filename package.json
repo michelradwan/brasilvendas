@@ -20,5 +20,8 @@
   "private": true,
   "engines": {
     "node": "20.x"
+  },
+  "devDependencies": {
+    "vercel": "^59.10.0"
   }
 }

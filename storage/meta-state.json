@@ -221,6 +221,12 @@
       "action": "STATUS_CHANGE",
       "objectName": "Camp A",
       "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
     }
   ],
   "approvals": [],
@@ -378,19 +384,92 @@
         "success": true,
         "budget": 5750
       }
+    },
+    "ORDER_TEST_PREVIEW_TX_001": {
+      "result": {
+        "transaction_id": "TEST_PREVIEW_TX_001",
+        "status": "PAID",
+        "amount": 89.9,
+        "amount_in_cents": 8990,
+        "currency": "BRL",
+        "customer": {
+          "name": "Cliente",
+          "email": "",
+          "phone": "",
+          "document": ""
+        },
+        "address": {
+          "cep": "",
+          "street": "",
+          "city": "",
+          "state": "SP"
+        },
+        "items": [
+          {
+            "title": "Kit Patriota Oficial 2026",
+            "quantity": 1,
+            "price": 89.9
+          }
+        ],
+        "attribution": {
+          "utm_source": null,
+          "utm_medium": null,
+          "utm_campaign": null,
+          "utm_content": null,
+          "utm_term": null,
+          "campaign_id": null,
+          "adset_id": null,
+          "ad_id": null,
+          "src": null,
+          "sck": null,
+          "xcod": null,
+          "subid": null,
+          "gclid": null,
+          "ttclid": null,
+          "kw": null,
+          "fbclid": null,
+          "fbp": null,
+          "fbc": null,
+          "client_ip": null,
+          "client_user_agent": null
+        },
+        "created_at": "2026-08-30T16:24:54.936Z",
+        "paid_at": "2026-08-30T16:26:14.255Z",
+        "meta_capi_sent": true,
+        "utmify_sale_sent": true
+      }
+    },
+    "ORDER_TEST_ISOLATION_99": {
+      "result": {
+        "transaction_id": "TEST_ISOLATION_99",
+        "status": "PENDENTE"
+      }
+    },
+    "ACT_IDEMP_1788107213681": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
     }
   },
   "cooldowns": {
     "999888777": 1788061415617,
     "TEST_CAMP_999": {
-      "timestamp": 1788106557362,
+      "timestamp": 1788107213675,
       "actionType": "BUDGET_CHANGE"
-    }
+    },
+    "120215999999999": 1788107174329
   },
-  "meta_state": {},
+  "meta_state": {
+    "emergency_stop": false
+  },
   "idempotency": {},
   "experiments": [],
   "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
     {
       "actionId": "ACT_SHADOW_1",
       "reason": "Simulação"
@@ -575,12 +654,6 @@
       "zeroBypass": 12
     }
   },
-  "knowledge_base": {
-    "winningHooks": [],
-    "winningCreatives": [],
-    "losingPatterns": [],
-    "checkoutLearnings": []
-  },
   "locks": {},
   "emergency_stop": false,
   "unit_economics_verified": false,
@@ -606,5 +679,11 @@
         "budget": 6000
       }
     }
+  },
+  "knowledge_base": {
+    "winningHooks": [],
+    "winningCreatives": [],
+    "losingPatterns": [],
+    "checkoutLearnings": []
   }
 }

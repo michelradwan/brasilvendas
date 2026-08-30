@@ -9,20 +9,27 @@ const GRAPH_BASE_URL = metaConstants.GRAPH_BASE_URL || metaConstants.META_GRAPH_
 const { ALLOWED_AD_ACCOUNT_ID, RATE_LIMIT_ERROR_CODES } = metaConstants;
 const serverState = require('../lib/meta-state.js');
 
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
-const CRON_SECRET = process.env.CRON_SECRET || process.env.ADMIN_PASSWORD;
+function getMetaToken() {
+    return process.env.META_ACCESS_TOKEN || '';
+}
+
+function getCronSecret() {
+    return process.env.CRON_SECRET || process.env.ADMIN_PASSWORD || '';
+}
 
 function validateEnvironment() {
-    if (!META_ACCESS_TOKEN) {
+    const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.PREVIEW_MODE === 'true';
+    if (!getMetaToken() && !isPreview) {
         throw new Error('CONFIGURATION_ERROR: META_ACCESS_TOKEN obrigatório não configurado no servidor.');
     }
-    if (!CRON_SECRET) {
+    if (!getCronSecret()) {
         throw new Error('CONFIGURATION_ERROR: CRON_SECRET / ADMIN_PASSWORD obrigatório não configurado no servidor.');
     }
 }
 
 async function graphCallWithRetry(endpoint, method = 'GET', params = {}, payload = null, maxRetries = 3) {
-    const query = new URLSearchParams({ ...params, access_token: META_ACCESS_TOKEN }).toString();
+    const token = getMetaToken();
+    const query = new URLSearchParams({ ...params, access_token: token }).toString();
     const cleanEndpoint = endpoint.replace(/^\/+/, '');
     const url = `${GRAPH_BASE_URL}/${cleanEndpoint}?${query}`;
     const parsed = new URL(url);
@@ -136,7 +143,7 @@ module.exports = async (req, res) => {
     const authHeader = req.headers['x-cron-auth'] || req.headers['x-admin-auth'] || req.headers['authorization'];
     const providedToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-    if (providedToken !== CRON_SECRET) {
+    if (providedToken !== getCronSecret()) {
         return res.status(401).json({ error: { message: 'Acesso não autorizado ao Autopilot Worker.', code: 401 } });
     }
 
@@ -180,7 +187,13 @@ module.exports = async (req, res) => {
         }
 
         // 4. Busca Paginada de Todas as Campanhas
-        const campaigns = await fetchAllCampaigns(adAccountId);
+        let campaigns = [];
+        try {
+            campaigns = await fetchAllCampaigns(adAccountId);
+        } catch (fetchErr) {
+            console.warn('[Autopilot Warning] Falha ao consultar campanhas da Meta:', fetchErr.message);
+            report.fetch_warning = fetchErr.message;
+        }
         report.campaigns_analyzed = campaigns.length;
 
         for (const camp of campaigns) {
