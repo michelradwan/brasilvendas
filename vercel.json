@@ -2,11 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/admin-ads.html" },
-    { "source": "/ads", "destination": "/admin-ads.html" },
-    { "source": "/admin-ads", "destination": "/admin-ads.html" },
-    { "source": "/pedidos", "destination": "/admin.html" },
-    { "source": "/admin", "destination": "/admin.html" }
+    { "source": "/admin-ads", "destination": "/index.html" },
+    { "source": "/ads", "destination": "/index.html" }
   ],
   "crons": [
     {
