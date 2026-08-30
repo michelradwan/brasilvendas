@@ -1810,8 +1810,8 @@ class DashboardApp {
 
         const spendSummary = document.getElementById('adsets-summary-spend');
         const purchasesSummary = document.getElementById('adsets-summary-purchases');
-        if (spendSummary) spendSummary.textContent = `R$ ${totalSpend.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        if (purchasesSummary) purchasesSummary.textContent = totalPurchases.toLocaleString('pt-BR');
+        if (spendSummary) spendSummary.textContent = window.analyticsEngine.formatMoney(totalSpend);
+        if (purchasesSummary) purchasesSummary.textContent = `${totalPurchases} un`;
 
         if (list.length === 0) {
             tbody.innerHTML = `
@@ -1833,46 +1833,44 @@ class DashboardApp {
             const safeName = escapeHTML(adset.name || 'Conjunto');
             const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
             const safeId = escapeHTML(adset.id);
-            const isChecked = adset.status === 'ACTIVE';
+            const isActive = adset.status === 'ACTIVE';
 
             return `
-                <tr class="hover:bg-white/[0.02] transition-colors group">
+                <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] group">
                     <td class="sticky-col-status text-center py-3">
-                        <label class="toggle-switch inline-flex cursor-pointer" title="${isChecked ? 'Pausar Conjunto' : 'Ativar Conjunto'}">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)" class="sr-only">
-                            <div class="toggle-track">
-                                <div class="toggle-thumb"></div>
-                            </div>
+                        <label class="toggle-switch" title="${isActive ? 'Conjunto Ativo • Clique para pausar' : 'Conjunto Pausado • Clique para reativar'}">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)">
+                            <span class="toggle-slider"></span>
                         </label>
                     </td>
-                    <td class="font-semibold text-xs text-[#F5F5F7] max-w-[240px]">
-                        <div class="truncate" title="${safeName}">${safeName}</div>
+                    <td class="text-xs text-[#F5F5F7] min-w-[200px] max-w-[280px]">
+                        <div class="font-semibold text-[#F5F5F7] truncate" title="${safeName}">${safeName}</div>
                         <div class="text-[10px] text-[#6E6E73] font-mono truncate">ID: ${safeId}</div>
                     </td>
-                    <td class="text-xs text-[#A1A1A6] max-w-[180px]">
-                        <div class="truncate" title="${safeCampName}">${safeCampName}</div>
+                    <td class="text-xs text-[#A1A1A6] min-w-[160px] max-w-[220px]">
+                        <div class="truncate text-[#A1A1A6] font-medium" title="${safeCampName}">${safeCampName}</div>
                     </td>
                     <td class="text-right text-xs">
                         ${isCBO ? `
-                            <span class="badge badge-paused text-[9.5px]" title="Orçamento gerenciado no nível da campanha (CBO)">CBO Campanha</span>
+                            <span class="badge badge-paused text-[9.5px]" title="Orçamento gerenciado no nível da campanha (CBO)">CBO · Campanha</span>
                         ` : `
-                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center gap-1" title="Clique para editar orçamento do conjunto (ABO)">
-                                <span>R$ ${adsetBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center justify-end gap-1 ml-auto" title="Clique para editar orçamento do conjunto (ABO)">
+                                <span>R$ ${adsetBudget.toFixed(2).replace('.', ',')}</span>
                                 <span class="text-[10px] text-[#6E6E73]">✏️</span>
                             </button>
                         `}
                     </td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adsetIns.spend)}</td>
-                    <td class="text-right text-xs font-mono font-bold ${adsetIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adsetIns.purchases}</td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${adsetIns.cpa ? window.analyticsEngine.formatMoney(adsetIns.cpa) : '–'}</td>
-                    <td class="text-right text-xs font-mono font-bold ${adsetIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adsetIns.roas ? `${adsetIns.roas.toFixed(2)}x` : '–'}</td>
-                    <td class="text-right text-xs font-mono font-semibold ${adsetIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#A1A1A6]'}">${adsetIns.link_ctr ? `${adsetIns.link_ctr.toFixed(2)}%` : '–'}</td>
+                    <td class="text-right text-xs font-mono tabular-nums text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adsetIns.spend)}</td>
+                    <td class="text-right text-xs font-mono tabular-nums font-bold ${adsetIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adsetIns.purchases}</td>
+                    <td class="text-right text-xs font-mono tabular-nums text-[#F5F5F7]">${adsetIns.cpa ? window.analyticsEngine.formatMoney(adsetIns.cpa) : '–'}</td>
+                    <td class="text-right text-xs font-mono tabular-nums font-bold ${adsetIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adsetIns.roas ? `${adsetIns.roas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-right text-xs font-mono tabular-nums font-semibold ${adsetIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#A1A1A6]'}">${adsetIns.link_ctr ? `${adsetIns.link_ctr.toFixed(2).replace('.', ',')}%` : '–'}</td>
                     <td class="text-center py-2">
-                        <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                            <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-secondary btn-sm text-[10.5px] px-2 py-1" title="Ver Anúncios deste conjunto">
+                        <div class="inline-flex items-center gap-1.5 justify-center">
+                            <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-primary btn-sm text-[11px] px-2.5 py-1" title="Ver Anúncios deste conjunto">
                                 <span>Anúncios ➔</span>
                             </button>
-                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[10.5px] px-1.5 py-1" title="Duplicar Conjunto">
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[11px] px-2 py-1" title="Duplicar Conjunto">
                                 <span>📋</span>
                             </button>
                         </div>
@@ -1890,46 +1888,50 @@ class DashboardApp {
                 const safeName = escapeHTML(adset.name || 'Conjunto');
                 const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
                 const safeId = escapeHTML(adset.id);
-                const isChecked = adset.status === 'ACTIVE';
+                const isActive = adset.status === 'ACTIVE';
 
                 return `
-                    <div class="mobile-campaign-card space-y-3">
-                        <div class="flex items-start justify-between gap-2">
+                    <div class="mobile-campaign-card space-y-3 p-3.5 bg-[#0E0E12] border border-white/[0.06] rounded-xl">
+                        <div class="flex items-start justify-between gap-2.5">
                             <div class="min-w-0 flex-1">
-                                <span class="badge ${isChecked ? 'badge-active' : 'badge-paused'} text-[9px] mb-1 inline-block">${adset.status}</span>
-                                <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
-                                <p class="text-[10px] text-[#A1A1A6] truncate">${safeCampName}</p>
-                            </div>
-                            <label class="toggle-switch cursor-pointer flex-shrink-0">
-                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)" class="sr-only">
-                                <div class="toggle-track">
-                                    <div class="toggle-thumb"></div>
+                                <div class="flex items-center gap-1.5 mb-1">
+                                    <span class="badge ${isActive ? 'badge-active' : 'badge-paused'} text-[9px]">${adset.status}</span>
+                                    <span class="badge badge-paused text-[9px] font-mono">${isCBO ? 'CBO · Campanha' : 'ABO'}</span>
                                 </div>
+                                <h4 class="font-bold text-xs text-[#F5F5F7] truncate" title="${safeName}">${safeName}</h4>
+                                <p class="text-[10.5px] text-[#A1A1A6] truncate" title="${safeCampName}">Campanha: ${safeCampName}</p>
+                            </div>
+                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Pausar Conjunto' : 'Ativar Conjunto'}">
+                                <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdSetStatus('${safeId}', '${adset.status}', this)">
+                                <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] text-xs">
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] border border-white/[0.04] text-xs">
                             <div>
-                                <span class="text-[10px] text-[#6E6E73] block">Orçamento</span>
-                                <span class="font-bold text-[#F5F5F7]">${isCBO ? 'CBO' : `R$ ${adsetBudget.toFixed(2)}`}</span>
+                                <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Investido</span>
+                                <span class="font-bold font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adsetIns.spend)}</span>
                             </div>
                             <div>
-                                <span class="text-[10px] text-[#6E6E73] block">Investido</span>
-                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adsetIns.spend)}</span>
+                                <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Vendas</span>
+                                <span class="font-bold font-mono ${adsetIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adsetIns.purchases} un</span>
                             </div>
                             <div>
-                                <span class="text-[10px] text-[#6E6E73] block">Vendas</span>
-                                <span class="font-bold text-[#1FC16B]">${adsetIns.purchases}</span>
+                                <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">ROAS</span>
+                                <span class="font-bold font-mono ${adsetIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adsetIns.roas !== null ? `${adsetIns.roas.toFixed(2)}x` : '–'}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 pt-1 border-t border-white/[0.04]">
-                            <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-secondary btn-sm flex-1 text-[11px] py-1.5">
-                                Ver Anúncios ➔
-                            </button>
-                            ${!isCBO ? `
-                                <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="btn btn-secondary btn-sm text-[11px] py-1.5 px-3">
-                                    💰 Orçamento
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t border-white/[0.04]">
+                            <div class="text-[11px] text-[#A1A1A6]">
+                                ${isCBO ? '<span class="text-[#6E6E73]">Orçamento CBO</span>' : `<span class="font-semibold text-[#F5F5F7]">R$ ${adsetBudget.toFixed(2).replace('.', ',')}/dia</span>`}
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-primary btn-sm text-[11px] py-1 px-2.5">
+                                    Ver Anúncios ➔
                                 </button>
-                            ` : ''}
+                                <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[11px] py-1 px-2" title="Duplicar Conjunto">
+                                    📋
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -2087,8 +2089,8 @@ class DashboardApp {
 
         const spendSummary = document.getElementById('ads-summary-spend');
         const purchasesSummary = document.getElementById('ads-summary-purchases');
-        if (spendSummary) spendSummary.textContent = `R$ ${totalSpend.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        if (purchasesSummary) purchasesSummary.textContent = totalPurchases.toLocaleString('pt-BR');
+        if (spendSummary) spendSummary.textContent = window.analyticsEngine.formatMoney(totalSpend);
+        if (purchasesSummary) purchasesSummary.textContent = `${totalPurchases} un`;
 
         if (list.length === 0) {
             tbody.innerHTML = `
@@ -2110,46 +2112,44 @@ class DashboardApp {
             const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
             const safeAdSetName = escapeHTML(parentAdSet?.name || 'Conjunto');
             const safeId = escapeHTML(ad.id);
-            const isChecked = ad.status === 'ACTIVE';
+            const isActive = ad.status === 'ACTIVE';
 
             const thumb = ad.creative?.thumbnail_url || ad.creative?.image_url;
 
             return `
-                <tr class="hover:bg-white/[0.02] transition-colors group">
+                <tr class="hover:bg-[#15151A] transition-colors text-xs border-b border-white/[0.04] group">
                     <td class="sticky-col-status text-center py-3">
-                        <label class="toggle-switch inline-flex cursor-pointer" title="${isChecked ? 'Pausar Anúncio' : 'Ativar Anúncio'}">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)" class="sr-only">
-                            <div class="toggle-track">
-                                <div class="toggle-thumb"></div>
-                            </div>
+                        <label class="toggle-switch" title="${isActive ? 'Anúncio Ativo • Clique para pausar' : 'Anúncio Pausado • Clique para reativar'}">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)">
+                            <span class="toggle-slider"></span>
                         </label>
                     </td>
-                    <td class="text-xs text-[#F5F5F7] max-w-[260px]">
+                    <td class="text-xs text-[#F5F5F7] min-w-[220px] max-w-[300px]">
                         <div class="flex items-center gap-2.5">
                             ${thumb ? `
-                                <img src="${thumb}" alt="${safeName}" class="w-9 h-9 rounded object-cover border border-white/[0.08] flex-shrink-0">
+                                <img src="${thumb}" alt="${safeName}" class="w-9 h-9 rounded-md object-cover border border-white/[0.08] flex-shrink-0">
                             ` : `
-                                <div class="w-9 h-9 rounded bg-[#1A1A22] border border-white/[0.06] flex items-center justify-center text-xs flex-shrink-0 text-[#6E6E73]">🎨</div>
+                                <div class="w-9 h-9 rounded-md bg-[#18181E] border border-white/[0.06] flex items-center justify-center text-sm flex-shrink-0 text-[#6E6E73]">🎬</div>
                             `}
                             <div class="min-w-0 flex-1">
-                                <div class="font-semibold truncate text-[#F5F5F7]" title="${safeName}">${safeName}</div>
+                                <div class="font-semibold text-[#F5F5F7] truncate" title="${safeName}">${safeName}</div>
                                 <div class="text-[10px] text-[#6E6E73] font-mono truncate">ID: ${safeId}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="text-xs text-[#A1A1A6] max-w-[180px]">
-                        <div class="truncate text-[#F5F5F7]" title="${safeCampName}">${safeCampName}</div>
-                        <div class="text-[10px] text-[#6E6E73] truncate" title="${safeAdSetName}">${safeAdSetName}</div>
+                    <td class="text-xs text-[#A1A1A6] min-w-[160px] max-w-[220px]">
+                        <div class="font-medium text-xs text-[#F5F5F7] truncate" title="${safeCampName}">${safeCampName}</div>
+                        <div class="text-[10.5px] text-[#A1A1A6] truncate" title="${safeAdSetName}">› ${safeAdSetName}</div>
                     </td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adIns.spend)}</td>
-                    <td class="text-right text-xs font-mono font-semibold ${adIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.link_ctr ? `${adIns.link_ctr.toFixed(2)}%` : '–'}</td>
-                    <td class="text-right text-xs font-mono font-bold ${adIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adIns.purchases}</td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${adIns.cpa ? window.analyticsEngine.formatMoney(adIns.cpa) : '–'}</td>
-                    <td class="text-right text-xs font-mono font-bold ${adIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.roas ? `${adIns.roas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-right text-xs font-mono tabular-nums text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adIns.spend)}</td>
+                    <td class="text-right text-xs font-mono tabular-nums font-semibold ${adIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.link_ctr ? `${adIns.link_ctr.toFixed(2).replace('.', ',')}%` : '–'}</td>
+                    <td class="text-right text-xs font-mono tabular-nums font-bold ${adIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adIns.purchases}</td>
+                    <td class="text-right text-xs font-mono tabular-nums text-[#F5F5F7]">${adIns.cpa ? window.analyticsEngine.formatMoney(adIns.cpa) : '–'}</td>
+                    <td class="text-right text-xs font-mono tabular-nums font-bold ${adIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.roas ? `${adIns.roas.toFixed(2)}x` : '–'}</td>
                     <td class="text-center py-2">
-                        <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[10.5px] px-2 py-1" title="Duplicar Anúncio">
-                                <span>📋 Copiar</span>
+                        <div class="inline-flex items-center gap-1.5 justify-center">
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[11px] px-2.5 py-1" title="Duplicar Anúncio">
+                                <span>📋 Duplicar</span>
                             </button>
                         </div>
                     </td>
@@ -2166,44 +2166,47 @@ class DashboardApp {
                 const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
                 const safeAdSetName = escapeHTML(parentAdSet?.name || 'Conjunto');
                 const safeId = escapeHTML(ad.id);
-                const isChecked = ad.status === 'ACTIVE';
+                const isActive = ad.status === 'ACTIVE';
                 const thumb = ad.creative?.thumbnail_url || ad.creative?.image_url;
 
                 return `
-                    <div class="mobile-campaign-card space-y-3">
+                    <div class="mobile-campaign-card space-y-3 p-3.5 bg-[#0E0E12] border border-white/[0.06] rounded-xl">
                         <div class="flex items-start justify-between gap-2.5">
                             <div class="flex items-center gap-2.5 min-w-0 flex-1">
                                 ${thumb ? `
-                                    <img src="${thumb}" alt="${safeName}" class="w-10 h-10 rounded object-cover border border-white/[0.08] flex-shrink-0">
+                                    <img src="${thumb}" alt="${safeName}" class="w-10 h-10 rounded-lg object-cover border border-white/[0.08] flex-shrink-0">
                                 ` : `
-                                    <div class="w-10 h-10 rounded bg-[#1A1A22] border border-white/[0.06] flex items-center justify-center text-xs flex-shrink-0 text-[#6E6E73]">🎨</div>
+                                    <div class="w-10 h-10 rounded-lg bg-[#18181E] border border-white/[0.06] flex items-center justify-center text-sm flex-shrink-0 text-[#6E6E73]">🎬</div>
                                 `}
                                 <div class="min-w-0 flex-1">
-                                    <span class="badge ${isChecked ? 'badge-active' : 'badge-paused'} text-[9px] mb-1 inline-block">${ad.status}</span>
-                                    <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
-                                    <p class="text-[10px] text-[#A1A1A6] truncate">${safeCampName} • ${safeAdSetName}</p>
+                                    <span class="badge ${isActive ? 'badge-active' : 'badge-paused'} text-[9px] mb-1 inline-block">${ad.status}</span>
+                                    <h4 class="font-bold text-xs text-[#F5F5F7] truncate" title="${safeName}">${safeName}</h4>
+                                    <p class="text-[10px] text-[#A1A1A6] truncate" title="${safeCampName} › ${safeAdSetName}">${safeCampName} › ${safeAdSetName}</p>
                                 </div>
                             </div>
-                            <label class="toggle-switch cursor-pointer flex-shrink-0">
-                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)" class="sr-only">
-                                <div class="toggle-track">
-                                    <div class="toggle-thumb"></div>
-                                </div>
+                            <label class="toggle-switch flex-shrink-0" title="${isActive ? 'Pausar Anúncio' : 'Ativar Anúncio'}">
+                                <input type="checkbox" ${isActive ? 'checked' : ''} onchange="window.dashboard.toggleAdStatus('${safeId}', '${ad.status}', this)">
+                                <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] text-xs">
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] border border-white/[0.04] text-xs">
                             <div>
-                                <span class="text-[10px] text-[#6E6E73] block">Investido</span>
-                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adIns.spend)}</span>
+                                <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Investido</span>
+                                <span class="font-bold font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adIns.spend)}</span>
                             </div>
                             <div>
-                                <span class="text-[10px] text-[#6E6E73] block">Vendas</span>
-                                <span class="font-bold text-[#1FC16B]">${adIns.purchases}</span>
+                                <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">CTR Link</span>
+                                <span class="font-bold font-mono ${adIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.link_ctr ? `${adIns.link_ctr.toFixed(2).replace('.', ',')}%` : '–'}</span>
                             </div>
                             <div>
-                                <span class="text-[10px] text-[#6E6E73] block">ROAS</span>
-                                <span class="font-bold ${adIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.roas ? `${adIns.roas.toFixed(2)}x` : '–'}</span>
+                                <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Vendas / ROAS</span>
+                                <span class="font-bold font-mono text-[#1FC16B]">${adIns.purchases} un <span class="text-[10px] font-normal text-[#A1A1A6]">(${adIns.roas !== null ? `${adIns.roas.toFixed(2)}x` : '–'})</span></span>
                             </div>
+                        </div>
+                        <div class="flex items-center justify-end gap-2 pt-1 border-t border-white/[0.04]">
+                            <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[11px] py-1 px-3">
+                                📋 Duplicar
+                            </button>
                         </div>
                     </div>
                 `;

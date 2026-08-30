@@ -1236,6 +1236,12 @@ body.sidebar-open {
     box-shadow: 6px 0 14px -2px rgba(0, 0, 0, 0.7);
 }
 
+/* Quando sticky-col-status for a primeira coluna da tabela (sem checkbox anterior) */
+th.sticky-col-status:first-child,
+td.sticky-col-status:first-child {
+    left: 0 !important;
+}
+
 thead th.sticky-col-check,
 thead th.sticky-col-status {
     z-index: 35 !important;
