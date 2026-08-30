@@ -1170,6 +1170,121 @@
                 </div>
             </section>
 
+            <!-- ===================================================================
+                 SEÇÃO: CONFIGURAÇÕES & NOTIFICAÇÕES DE VENDAS
+                 =================================================================== -->
+            <section id="view-settings" class="view-section hidden space-y-6">
+                <div class="border-b border-white/[0.06] pb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Configurações do RADWAN ADS</h2>
+                        <p class="text-xs text-[#A1A1A6]">Preferências do sistema, notificações sonoras de vendas em tempo real e integrações</p>
+                    </div>
+                </div>
+
+                <!-- Painel: NOTIFICAÇÕES DE VENDAS & PAGAMENTOS -->
+                <div class="panel space-y-5">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-sm">🔔</span>
+                            <div>
+                                <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">Notificações de Vendas & Pagamentos</h3>
+                                <p class="text-[11px] text-[#A1A1A6]">Alertas visuais, efeitos sonoros de conversão e notificações nativas</p>
+                            </div>
+                        </div>
+                        <div id="audio-autoplay-badge" class="badge badge-active text-[10px]">Áudio Ativo</div>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <!-- Master Sound Switch -->
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-[#141418] border border-white/[0.05]">
+                            <div>
+                                <p class="font-semibold text-xs text-[#F5F5F7]">Notificações Sonoras Globais</p>
+                                <p class="text-[11px] text-[#6E6E73]">Habilita feedback acústico quando novas vendas ou PIX forem confirmados</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="setting-sound-master" checked onchange="window.salesNotificationEngine?.updateAudioSetting('soundEnabled', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Pending Sound Switch -->
+                            <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-xs text-[#F5F5F7]">Som: PIX / Venda Pendente</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Micro-tom sutil ao gerar novo PIX</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="setting-sound-pending" checked onchange="window.salesNotificationEngine?.updateAudioSetting('pendingSoundEnabled', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <!-- Approved Sound Switch -->
+                            <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-xs text-[#F5F5F7]">Som: Pagamento Aprovado</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Efeito sonoro moeda ao aprovar pagamento</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="setting-sound-approved" checked onchange="window.salesNotificationEngine?.updateAudioSetting('approvedSoundEnabled', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Volume Slider -->
+                        <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-semibold text-[#F5F5F7]">Volume dos Sons</span>
+                                <span id="setting-volume-label" class="font-mono text-[#A1A1A6] font-bold">60%</span>
+                            </div>
+                            <input type="range" id="setting-sound-volume" min="0" max="100" value="60" 
+                                   class="w-full accent-[#FF2D2D] bg-[#1C1C22] rounded-lg h-1.5 cursor-pointer"
+                                   oninput="window.salesNotificationEngine?.updateVolume(this.value)"
+                                   onchange="window.salesNotificationEngine?.testSound('approved')">
+                        </div>
+
+                        <!-- Browser Notifications Switch -->
+                        <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-xs text-[#F5F5F7]">Notificações do Navegador (Segundo Plano)</p>
+                                <p class="text-[11px] text-[#6E6E73]">Exibe alerta do sistema operacional quando a aba do RADWAN ADS estiver em segundo plano</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="setting-browser-notifications" onchange="window.salesNotificationEngine?.toggleBrowserNotifications(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Sound Preview Buttons -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/[0.04]">
+                            <span class="text-[11px] text-[#6E6E73]">Testes acústicos isolados (não alteram métricas nem criam pedidos):</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="window.salesNotificationEngine?.testSound('pending')" class="btn btn-secondary btn-sm text-xs" title="Tocar som de teste pendente">
+                                    <span>🎵</span> <span>Testar Pendente</span>
+                                </button>
+                                <button type="button" onclick="window.salesNotificationEngine?.testSound('approved')" class="btn btn-primary btn-sm text-xs" title="Tocar som de teste aprovado">
+                                    <span>💰</span> <span>Testar Aprovada</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel: CREDENCIAIS & INTEGRAÇÕES -->
+                <div class="panel space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">🔑</span>
+                            <h3 class="text-sm font-bold text-[#F5F5F7]">Conexão Meta Marketing API</h3>
+                        </div>
+                        <button onclick="window.dashboard.openTokenModal()" class="btn btn-secondary btn-sm text-xs">Atualizar Token</button>
+                    </div>
+                    <p class="text-xs text-[#A1A1A6]">Gerencie o token de acesso à Graph API da Meta para atualização autônoma e leitura de métricas da conta.</p>
+                </div>
+            </section>
+
             </div>
         </main>
     </div>
@@ -1799,6 +1914,7 @@
     <script src="js/execution.js?v=7.3-hardened"></script>
     <script src="js/audit.js?v=7.3-hardened"></script>
     <script src="js/autopilot.js?v=7.3-hardened"></script>
+    <script src="js/sales-notification-engine.js?v=7.4-sales"></script>
     <script src="js/dashboard.js?v=7.3-hardened"></script>
 </body>
 

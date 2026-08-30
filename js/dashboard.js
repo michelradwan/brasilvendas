@@ -2725,6 +2725,11 @@ class DashboardApp {
             this.updateOrdersMetrics();
             this.renderOrdersTable();
 
+            // Notifica o Real-Time Sales Notification Engine (Deduplicado e Filtrado)
+            if (window.salesNotificationEngine && typeof window.salesNotificationEngine.processOrders === 'function') {
+                window.salesNotificationEngine.processOrders(this.cachedOrders);
+            }
+
         } catch (err) {
             console.error('[Orders Error]', err);
         }

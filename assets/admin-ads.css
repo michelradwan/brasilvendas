@@ -1869,3 +1869,80 @@ tr:hover .row-quick-actions {
     }
 }
 
+/* ==============================================================================
+   7. TOAST NOTIFICATIONS & REAL-TIME SALES ALERTS
+   ============================================================================== */
+
+#toast-container {
+    position: fixed;
+    bottom: max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom)));
+    right: 1.25rem;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+    max-width: 380px;
+    width: calc(100vw - 2.5rem);
+}
+
+@media (max-width: 767px) {
+    #toast-container {
+        bottom: calc(4.5rem + env(safe-area-inset-bottom));
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        max-width: none;
+    }
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #111116;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    pointer-events: auto;
+    animation: toast-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: transform var(--motion-fast), opacity var(--motion-fast);
+}
+
+@keyframes toast-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Toast: PIX / Venda Pendente */
+.toast-sale-pending {
+    border-left: 3.5px solid #F5A524;
+    background: linear-gradient(90deg, rgba(245, 165, 36, 0.08) 0%, #111116 35%);
+}
+
+/* Toast: Venda Aprovada (Dark Luxury Positive Highlight) */
+.toast-sale-approved {
+    border-left: 3.5px solid #1FC16B;
+    background: linear-gradient(90deg, rgba(31, 193, 107, 0.12) 0%, #111116 40%);
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.85), 0 0 20px rgba(31, 193, 107, 0.15);
+}
+
+.toast-sale-approved .sale-check-icon {
+    animation: check-pop 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes check-pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
