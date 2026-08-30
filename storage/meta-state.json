@@ -1,28 +1,47 @@
 {
-  "settings": {
-    "targetCPA": 35,
-    "maxSpendDaily": 500,
-    "maxBudgetChangePct": 15,
-    "cooldownHours": 12,
-    "autonomyMode": "ASSISTED",
-    "emergencyStopGlobal": false,
-    "emergencyStopAccounts": {},
-    "main": {
-      "emergencyStopGlobal": false
+  "locks": {},
+  "cooldowns": {
+    "999888777": 1788061415617,
+    "TEST_CAMP_999": {
+      "timestamp": 1788108061305,
+      "actionType": "BUDGET_CHANGE"
+    },
+    "120215999999999": 1788108063673
+  },
+  "emergency_stop": false,
+  "unit_economics_verified": false,
+  "idempotency_keys": {
+    "ACT_TEST_1787522002128": {
+      "executedAt": "2026-08-23T21:53:22.153Z",
+      "result": {
+        "success": true,
+        "budget": 6000
+      }
+    },
+    "ACT_TEST_1788060757420": {
+      "executedAt": "2026-08-30T03:32:37.422Z",
+      "result": {
+        "success": true,
+        "budget": 6000
+      }
+    },
+    "ACT_TEST_1788061415611": {
+      "executedAt": "2026-08-30T03:43:35.614Z",
+      "result": {
+        "success": true,
+        "budget": 6000
+      }
     }
   },
-  "unit_economics": {
-    "productPrice": 89.9,
-    "cogs": 38,
-    "shippingCost": 15,
-    "gatewayFeePercent": 0.0399,
-    "taxPercent": 0.04,
-    "refundRatePercent": 0.015,
-    "verifiedByOperator": false,
-    "main": {
-      "verifiedByOperator": false
+  "snapshots": {
+    "CAMP_100": {
+      "before": {
+        "status": "ACTIVE",
+        "daily_budget": "5000"
+      }
     }
   },
+  "approvals": [],
   "audit_logs": [
     {
       "actionId": "ACT_AUDIT_1",
@@ -227,15 +246,188 @@
       "action": "STATUS_CHANGE",
       "objectName": "Camp A",
       "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
     }
   ],
-  "approvals": [],
-  "snapshots": {
-    "CAMP_100": {
-      "before": {
-        "status": "ACTIVE",
-        "daily_budget": "5000"
-      }
+  "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    }
+  ],
+  "settings": {
+    "targetCPA": 35,
+    "maxSpendDaily": 500,
+    "maxBudgetChangePct": 15,
+    "cooldownHours": 12,
+    "autonomyMode": "ASSISTED",
+    "emergencyStopGlobal": false,
+    "emergencyStopAccounts": {},
+    "main": {
+      "emergencyStopGlobal": false
+    }
+  },
+  "unit_economics": {
+    "productPrice": 89.9,
+    "cogs": 38,
+    "shippingCost": 15,
+    "gatewayFeePercent": 0.0399,
+    "taxPercent": 0.04,
+    "refundRatePercent": 0.015,
+    "verifiedByOperator": false,
+    "main": {
+      "verifiedByOperator": false
     }
   },
   "actions": {
@@ -434,7 +626,7 @@
           "client_user_agent": null
         },
         "created_at": "2026-08-30T16:24:54.936Z",
-        "paid_at": "2026-08-30T16:26:14.255Z",
+        "paid_at": "2026-08-30T16:41:03.625Z",
         "meta_capi_sent": true,
         "utmify_sale_sent": true
       }
@@ -450,159 +642,25 @@
         "success": true,
         "budget": 5750
       }
-    }
-  },
-  "cooldowns": {
-    "999888777": 1788061415617,
-    "TEST_CAMP_999": {
-      "timestamp": 1788107213675,
-      "actionType": "BUDGET_CHANGE"
     },
-    "120215999999999": 1788107174329
+    "ACT_IDEMP_1788107970707": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1788108061328": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    }
   },
   "meta_state": {
     "emergency_stop": false
   },
   "idempotency": {},
   "experiments": [],
-  "shadow_decisions": [
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    },
-    {
-      "actionId": "ACT_SHADOW_1",
-      "reason": "Simulação"
-    }
-  ],
   "campaign_intelligence": {},
   "gamification": {
     "level": 1,
@@ -652,32 +710,6 @@
       "tracking": 7,
       "review": 4,
       "zeroBypass": 12
-    }
-  },
-  "locks": {},
-  "emergency_stop": false,
-  "unit_economics_verified": false,
-  "idempotency_keys": {
-    "ACT_TEST_1787522002128": {
-      "executedAt": "2026-08-23T21:53:22.153Z",
-      "result": {
-        "success": true,
-        "budget": 6000
-      }
-    },
-    "ACT_TEST_1788060757420": {
-      "executedAt": "2026-08-30T03:32:37.422Z",
-      "result": {
-        "success": true,
-        "budget": 6000
-      }
-    },
-    "ACT_TEST_1788061415611": {
-      "executedAt": "2026-08-30T03:43:35.614Z",
-      "result": {
-        "success": true,
-        "budget": 6000
-      }
     }
   },
   "knowledge_base": {
