@@ -179,10 +179,12 @@ module.exports = async (req, res) => {
     if (req.query.action === 'emergency_stop') {
         if (req.method === 'POST') {
             const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-            serverState.setEmergencyStop(!!body.enabled);
-            return res.status(200).json({ success: true, emergency_stop: serverState.isEmergencyStopped() });
+            await serverState.setEmergencyStop(!!body.enabled);
+            const isStopped = await serverState.isEmergencyStoppedAsync();
+            return res.status(200).json({ success: true, emergency_stop: isStopped });
         }
-        return res.status(200).json({ success: true, emergency_stop: serverState.isEmergencyStopped() });
+        const isStopped = await serverState.isEmergencyStoppedAsync();
+        return res.status(200).json({ success: true, emergency_stop: isStopped });
     }
 
     // 2. Extração e Sanitização de Parâmetros
@@ -221,15 +223,18 @@ module.exports = async (req, res) => {
         });
     }
 
-    // 4. Bloqueio por Emergency Stop no Servidor para qualquer mutação
-    if ((method === 'POST' || method === 'PUT' || method === 'DELETE') && serverState.isEmergencyStopped()) {
-        return res.status(403).json({
-            error: {
-                message: 'ESCRITA BLOQUEADA: O Emergency Stop (Kill Switch) está ativado no servidor.',
-                type: 'EMERGENCY_STOP_ACTIVE',
-                code: 403
-            }
-        });
+    // 4. Bloqueio por Governança & Fail-Closed Mutation Safety no Servidor
+    if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+        const mutationGov = await serverState.isMutationAllowed();
+        if (!mutationGov.allowed) {
+            return res.status(mutationGov.code || 403).json({
+                error: {
+                    message: `ESCRITA BLOQUEADA: ${mutationGov.reason}`,
+                    type: mutationGov.reason,
+                    code: mutationGov.code || 403
+                }
+            });
+        }
     }
 
     // 4.1 Bloqueio de Mutações no Ambiente Preview (Defense-in-Depth Read-Only Guard)
@@ -249,7 +254,7 @@ module.exports = async (req, res) => {
 
     // 5. Verificação de Idempotência no Servidor
     if (actionId) {
-        const idempCheck = serverState.checkIdempotency(actionId);
+        const idempCheck = await serverState.checkIdempotency(actionId);
         if (idempCheck.isDuplicate) {
             return res.status(200).json({
                 ...idempCheck.cachedResult,
@@ -262,7 +267,7 @@ module.exports = async (req, res) => {
     // 6. Verificação de Cooldown no Servidor para edições de orçamento
     if (allowCheck.operation === 'BUDGET_UPDATE' && payload && (payload.daily_budget || payload.lifetime_budget)) {
         const campaignId = endpoint.split('/')[0];
-        const cooldown = serverState.isUnderCooldown(campaignId);
+        const cooldown = await serverState.isUnderCooldown(campaignId);
         if (cooldown.underCooldown) {
             return res.status(429).json({
                 error: {

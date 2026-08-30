@@ -143,14 +143,15 @@ module.exports = async (req, res) => {
     const adAccountId = ALLOWED_AD_ACCOUNT_ID;
 
     // 2. Bloqueio por Emergency Stop no Servidor
-    if (serverState.isEmergencyStopped()) {
+    const isEmergency = await serverState.isEmergencyStoppedAsync();
+    if (isEmergency) {
         return res.status(403).json({
             error: { message: 'EXECUÇÃO BLOQUEADA: Emergency Stop ativo no servidor.', code: 403 }
         });
     }
 
     // 3. Aquisição de Distributed Lock para Evitar Concorrência
-    const lockResult = serverState.acquireLock(adAccountId, 300); // 5 min TTL
+    const lockResult = await serverState.acquireLock(adAccountId, 300); // 5 min TTL
     if (!lockResult.acquired) {
         return res.status(409).json({
             error: { message: `CONCORRÊNCIA BLOQUEADA: ${lockResult.reason}`, type: 'LOCK_ACQUISITION_FAILED', code: 409 }
@@ -172,7 +173,7 @@ module.exports = async (req, res) => {
         const isPreviewEnvironment = process.env.VERCEL_ENV === 'preview' || process.env.PREVIEW_MODE === 'true';
         const { target_cpa = 35.00, mode = 'AUTOPILOT', dry_run = false } = req.body || {};
         const effectiveDryRun = dry_run || isPreviewEnvironment;
-        const isUnitEconomicsVerified = serverState.isUnitEconomicsVerified();
+        const isUnitEconomicsVerified = await serverState.isUnitEconomicsVerified();
 
         if (isPreviewEnvironment) {
             report.preview_safety_guard = 'Ativo: Execução restrita a simulação (dry-run) no ambiente Preview.';
@@ -210,14 +211,14 @@ module.exports = async (req, res) => {
                 // REGRA 1: Stop-Loss Inteligente
                 if (purchases === 0 && spend >= target_cpa * 1.15) {
                     const actionId = `ACT_STOPLOSS_${camp.id}_${new Date().toISOString().split('T')[0]}`;
-                    const idemp = serverState.checkIdempotency(actionId);
+                    const idemp = await serverState.checkIdempotency(actionId);
 
                     if (!idemp.isDuplicate) {
                         if (mode === 'AUTOPILOT' && !effectiveDryRun) {
                             // Salva snapshot persistente antes de pausar
-                            serverState.saveSnapshot(camp.id, { status: 'ACTIVE', beforeSpend: spend });
+                            await serverState.saveSnapshot(camp.id, { status: 'ACTIVE', beforeSpend: spend });
                             await graphCallWithRetry(camp.id, 'POST', {}, { status: 'PAUSED' });
-                            serverState.recordIdempotency(actionId, { action: 'PAUSED', spend });
+                            await serverState.recordIdempotency(actionId, { action: 'PAUSED', spend });
                             report.actions_taken.push(`[PAUSED] Campanha "${camp.name}" pausada por Stop-Loss (Gasto: R$ ${spend.toFixed(2)} sem compras).`);
                         } else {
                             report.shadow_recommendations.push(`Pausar campanha "${camp.name}" por Stop-Loss.`);
@@ -235,7 +236,7 @@ module.exports = async (req, res) => {
                         }
 
                         // Verificação de Cooldown no Servidor
-                        const cooldown = serverState.isUnderCooldown(camp.id);
+                        const cooldown = await serverState.isUnderCooldown(camp.id);
                         if (cooldown.underCooldown) {
                             report.actions_blocked.push(`Escala de "${camp.name}" ignorada: Em cooldown (restam ${cooldown.remainingHours}h).`);
                             continue;
@@ -246,10 +247,10 @@ module.exports = async (req, res) => {
                         const actionId = `ACT_SCALE_${camp.id}_${Date.now()}`;
 
                         if (mode === 'AUTOPILOT' && !effectiveDryRun) {
-                            serverState.saveSnapshot(camp.id, { daily_budget: curBudget });
+                            await serverState.saveSnapshot(camp.id, { daily_budget: curBudget });
                             await graphCallWithRetry(camp.id, 'POST', {}, { daily_budget: newBudget });
-                            serverState.setCooldown(camp.id);
-                            serverState.recordIdempotency(actionId, { before: curBudget, after: newBudget });
+                            await serverState.setCooldown(camp.id);
+                            await serverState.recordIdempotency(actionId, { before: curBudget, after: newBudget });
                             report.actions_taken.push(`[SCALE] Orçamento de "${camp.name}" aumentado em 15% (R$ ${(curBudget/100).toFixed(2)} -> R$ ${(newBudget/100).toFixed(2)}).`);
                         } else {
                             report.shadow_recommendations.push(`Escalar orçamento de "${camp.name}" de R$ ${(curBudget/100).toFixed(2)} para R$ ${(newBudget/100).toFixed(2)}.`);
@@ -265,6 +266,6 @@ module.exports = async (req, res) => {
         return res.status(500).json({ success: false, error: err.message, report });
     } finally {
         // Libera o lock no servidor
-        serverState.releaseLock(adAccountId);
+        await serverState.releaseLock(adAccountId);
     }
 };

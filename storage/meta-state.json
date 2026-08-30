@@ -203,6 +203,18 @@
       "action": "STATUS_CHANGE",
       "objectName": "Camp A",
       "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
     }
   ],
   "approvals": [],
@@ -342,23 +354,39 @@
         "success": true,
         "budget": 5750
       }
+    },
+    "ACT_IDEMP_1788106320769": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
+    },
+    "ACT_IDEMP_1788106428565": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
     }
   },
   "cooldowns": {
     "999888777": 1788061415617,
     "TEST_CAMP_999": {
-      "timestamp": 1788105990770,
+      "timestamp": 1788106428560,
       "actionType": "BUDGET_CHANGE"
     }
   },
+  "meta_state": {},
+  "idempotency": {},
   "experiments": [],
-  "knowledge_base": {
-    "winningHooks": [],
-    "winningCreatives": [],
-    "losingPatterns": [],
-    "checkoutLearnings": []
-  },
   "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
     {
       "actionId": "ACT_SHADOW_1",
       "reason": "Simulação"
@@ -530,6 +558,12 @@
       "review": 4,
       "zeroBypass": 12
     }
+  },
+  "knowledge_base": {
+    "winningHooks": [],
+    "winningCreatives": [],
+    "losingPatterns": [],
+    "checkoutLearnings": []
   },
   "locks": {},
   "emergency_stop": false,

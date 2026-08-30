@@ -17,5 +17,8 @@
   ],
   "author": "Brasil Vendas Engineering",
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  }
 }
