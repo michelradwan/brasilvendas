@@ -578,21 +578,87 @@ body.sidebar-open {
 }
 
 /* ==============================================================================
-   FILTER CHIPS SYSTEM (RESPONSIVE SCROLL ROW)
+   CAMPAIGN TABS & TOOLBAR SYSTEM (CALIBRADO PARA 320px - 1920px)
    ============================================================================== */
 
+.campaign-tabs-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.05fr) minmax(0, 1.0fr);
+    gap: 3px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .campaign-tabs-grid {
+        display: flex;
+        width: auto;
+        gap: 6px;
+    }
+}
+
+.campaign-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 4px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 0;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+@media (min-width: 640px) {
+    .campaign-tab-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        gap: 6px;
+    }
+}
+
+.campaign-tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.campaign-tab-btn.active {
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+    font-weight: 700;
+    box-shadow: var(--shadow-subtle);
+}
+
+.campaign-tab-btn .tab-label {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.campaign-tab-btn .badge {
+    flex-shrink: 0;
+}
+
+/* ─── FILTER CHIPS SYSTEM (RESPONSIVE SCROLL ROW) ─────────────────────────── */
 .filter-chips-row {
     display: flex;
     align-items: center;
     gap: 6px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 2px;
+    padding: 2px 0 4px 0;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
 }
 
 .filter-chips-row::-webkit-scrollbar {
@@ -631,12 +697,58 @@ body.sidebar-open {
     font-weight: 700;
 }
 
-/* Presets & Colunas Mobile Layout Guard */
-.controls-action-row {
+/* ─── TOOLBAR & CONTROLES DE VISÃO/COLUNAS ─────────────────────────────────── */
+.campaigns-toolbar-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
     width: 100%;
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    align-items: center;
+}
+
+@media (min-width: 640px) {
+    .campaigns-toolbar-row {
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+.preset-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #15151A;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .preset-select-wrap {
+        width: auto;
+        min-width: 200px;
+    }
+}
+
+.preset-select-element {
+    background: transparent;
+    font-size: 11.5px;
+    color: #F5F5F7;
+    font-weight: 600;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .preset-select-wrap {

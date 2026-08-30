@@ -536,24 +536,24 @@
                  =================================================================== -->
             <section id="view-campaigns" class="view-section hidden space-y-4">
                 <!-- Barra de Abas Unificada [ Campanhas ] [ Conjuntos ] [ Anúncios ] -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-3 sm:p-4 rounded-xl">
-                    <div class="grid grid-cols-3 w-full sm:w-auto sm:flex items-center gap-1 sm:gap-1.5 bg-[#15151A] border border-white/[0.08] p-1 rounded-lg">
-                        <button onclick="window.dashboard.switchCampaignTab('campaigns')" id="tab-nav-campaigns" class="segmented-btn active w-full sm:w-auto px-1.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold rounded-md flex items-center justify-center gap-1 sm:gap-1.5 min-w-0" title="Ver Nível de Campanhas">
-                            <span class="tab-label whitespace-nowrap">Campanhas</span>
-                            <span id="tab-count-campaigns" class="badge badge-active text-[9px] sm:text-[9.5px] px-1 sm:px-1.5 py-0.2 flex-shrink-0">0</span>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-2.5 sm:p-4 rounded-xl">
+                    <div class="campaign-tabs-grid w-full sm:w-auto bg-[#15151A] border border-white/[0.08] p-1 rounded-lg">
+                        <button onclick="window.dashboard.switchCampaignTab('campaigns')" id="tab-nav-campaigns" class="campaign-tab-btn active" title="Ver Nível de Campanhas">
+                            <span class="tab-label">Campanhas</span>
+                            <span id="tab-count-campaigns" class="badge badge-active text-[9px] px-1 py-0.2">0</span>
                         </button>
-                        <button onclick="window.dashboard.switchCampaignTab('adsets')" id="tab-nav-adsets" class="segmented-btn w-full sm:w-auto px-1.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold rounded-md flex items-center justify-center gap-1 sm:gap-1.5 min-w-0" title="Ver Nível de Conjuntos de Anúncios">
-                            <span class="tab-label whitespace-nowrap">Conjuntos</span>
-                            <span id="tab-count-adsets" class="badge badge-paused text-[9px] sm:text-[9.5px] px-1 sm:px-1.5 py-0.2 flex-shrink-0">0</span>
+                        <button onclick="window.dashboard.switchCampaignTab('adsets')" id="tab-nav-adsets" class="campaign-tab-btn" title="Ver Nível de Conjuntos de Anúncios">
+                            <span class="tab-label">Conjuntos</span>
+                            <span id="tab-count-adsets" class="badge badge-paused text-[9px] px-1 py-0.2">0</span>
                         </button>
-                        <button onclick="window.dashboard.switchCampaignTab('ads')" id="tab-nav-ads" class="segmented-btn w-full sm:w-auto px-1.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold rounded-md flex items-center justify-center gap-1 sm:gap-1.5 min-w-0" title="Ver Nível de Anúncios Individuais">
-                            <span class="tab-label whitespace-nowrap">Anúncios</span>
-                            <span id="tab-count-ads" class="badge badge-paused text-[9px] sm:text-[9.5px] px-1 sm:px-1.5 py-0.2 flex-shrink-0">0</span>
+                        <button onclick="window.dashboard.switchCampaignTab('ads')" id="tab-nav-ads" class="campaign-tab-btn" title="Ver Nível de Anúncios Individuais">
+                            <span class="tab-label">Anúncios</span>
+                            <span id="tab-count-ads" class="badge badge-paused text-[9px] px-1 py-0.2">0</span>
                         </button>
                     </div>
 
                     <!-- Resumo Rápido Superior -->
-                    <div class="flex items-center gap-3 text-xs">
+                    <div class="hidden sm:flex items-center gap-3 text-xs">
                         <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
                             <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Investimento</span>
                             <span class="font-bold text-[#F5F5F7]" id="camp-summary-spend">R$ 0,00</span>
@@ -574,9 +574,9 @@
                     <!-- Barra de Controle: Filtros, Presets de Colunas e Busca -->
                     <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
                         <!-- Linha Superior: Status & Presets Rápidos -->
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
-                            <!-- Filter Chips Container -->
-                            <div class="filter-chips-row flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                        <div class="flex flex-col gap-2.5">
+                            <!-- Filter Chips Container com Scroll Suave -->
+                            <div class="filter-chips-row">
                                 <button onclick="window.dashboard.setCampaignFilter('all')" data-camp-filter="all" class="filter-chip active">Todas</button>
                                 <button onclick="window.dashboard.setCampaignFilter('active')" data-camp-filter="active" class="filter-chip">Ativas</button>
                                 <button onclick="window.dashboard.setCampaignFilter('paused')" data-camp-filter="paused" class="filter-chip">Pausadas</button>
@@ -586,12 +586,12 @@
                                 <button onclick="window.dashboard.setCampaignFilter('attention')" data-camp-filter="attention" class="filter-chip">Requer Atenção</button>
                             </div>
 
-                            <!-- Controles de Métricas & Colunas -->
-                            <div class="controls-action-row flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                            <!-- Controles de Métricas & Colunas perfeitamente contidos -->
+                            <div class="campaigns-toolbar-row">
                                 <!-- Dropdown de Presets Nativos -->
-                                <div class="preset-select-wrap flex items-center gap-1 bg-[#15151A] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs flex-1 min-w-0">
+                                <div class="preset-select-wrap">
                                     <span class="text-[11px] text-[#6E6E73] flex-shrink-0">Visão:</span>
-                                    <select id="select-metric-preset" onchange="window.dashboard.changeMetricPreset(this.value)" class="bg-transparent text-xs text-[#F5F5F7] font-semibold focus:outline-none cursor-pointer w-full truncate">
+                                    <select id="select-metric-preset" onchange="window.dashboard.changeMetricPreset(this.value)" class="preset-select-element">
                                         <option value="PADRAO_GESTOR">⭐ Padrão do Gestor</option>
                                         <option value="ESSENCIAL">⚡ Essencial</option>
                                         <option value="TRAFEGO">🔗 Tráfego & Cliques</option>
@@ -612,8 +612,8 @@
                                     <span id="active-columns-badge" class="badge badge-active text-[9.5px] px-1.5 py-0.2">17</span>
                                 </button>
 
-                                <!-- Alternador de Densidade (Confortável / Compacta) -->
-                                <button id="btn-toggle-density" onclick="window.dashboard.toggleTableDensity()" class="btn btn-tertiary btn-sm text-[11px] border border-white/[0.07] flex-shrink-0" title="Alternar densidade da tabela">
+                                <!-- Alternador de Densidade (Desktop Only para não poluir mobile) -->
+                                <button id="btn-toggle-density" onclick="window.dashboard.toggleTableDensity()" class="btn btn-tertiary btn-sm text-[11px] border border-white/[0.07] hidden sm:inline-flex flex-shrink-0" title="Alternar densidade da tabela">
                                     <span id="density-icon">📐</span>
                                 </button>
                             </div>
