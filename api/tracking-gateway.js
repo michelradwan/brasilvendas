@@ -162,6 +162,12 @@ class TrackingGateway {
 
     // 5. Envio do Evento Purchase para o Meta Conversions API
     async sendMetaCapiPurchase(order) {
+        const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.PREVIEW_MODE === 'true';
+        if (isPreview) {
+            console.log('[CAPI Preview Guard] Disparo CAPI suprimido no ambiente Preview para evitar poluição de dados reais.');
+            return { skipped: true, preview_mode: true, reason: 'PREVIEW_ENVIRONMENT_CAPI_BLOCKED' };
+        }
+
         const token = process.env.META_ACCESS_TOKEN || META_ACCESS_TOKEN;
         if (!token) {
             console.warn('[CAPI Warning] META_ACCESS_TOKEN não configurado. CAPI ignorado.');

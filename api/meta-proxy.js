@@ -232,6 +232,21 @@ module.exports = async (req, res) => {
         });
     }
 
+    // 4.1 Bloqueio de Mutações no Ambiente Preview (Defense-in-Depth Read-Only Guard)
+    const isPreviewEnv = process.env.VERCEL_ENV === 'preview' || process.env.PREVIEW_MODE === 'true';
+    if ((method === 'POST' || method === 'PUT' || method === 'DELETE') && isPreviewEnv) {
+        console.log(`[Preview Guard] Mutação interceptada e simulada em ambiente Preview (${method} ${endpoint})`);
+        return res.status(200).json({
+            success: true,
+            preview_mode: true,
+            dry_run: true,
+            simulated: true,
+            message: 'Ambiente Preview: Mutação simulada com sucesso sem impacto na conta de produção real da Meta.',
+            endpoint,
+            payload
+        });
+    }
+
     // 5. Verificação de Idempotência no Servidor
     if (actionId) {
         const idempCheck = serverState.checkIdempotency(actionId);
