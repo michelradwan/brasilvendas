@@ -6,6 +6,9 @@ const url = require('url');
 const PORT = 3333;
 const ROOT = path.resolve(__dirname, '..');
 
+process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-suite-admin-secret-2026';
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-suite-session-secret-2026';
+
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
