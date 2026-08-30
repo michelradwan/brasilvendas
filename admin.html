@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RADWAN ADS — Institutional Decision OS</title>
+    <meta name="description" content="RADWAN ADS — Painel Institucional de Performance, Otimização e Inteligência de Mídia">
+    <meta name="application-name" content="RADWAN ADS">
+    <meta name="apple-mobile-web-app-title" content="RADWAN ADS">
+    <meta property="og:site_name" content="RADWAN ADS">
+    <meta property="og:title" content="RADWAN ADS — Institutional Decision OS">
+    <link rel="icon" type="image/png" href="assets/logo-radwan-ads.png">
+    <link rel="apple-touch-icon" href="assets/logo-radwan-ads.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050506">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Design System CSS Black & Red Surreal Apple-Grade (External + Embedded) -->
+    <link rel="stylesheet" href="assets/admin-ads.css?v=8.0-dock-apple">
+    <style>
+        :root {
+            --bg-main: #050506;
+            --bg-secondary: #0A0A0C;
+            --surface-1: #101014;
+            --surface-elevated: #15151A;
+            --surface-subtle: #0E0E12;
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --text-primary: #F5F5F7;
+            --text-secondary: #A1A1A6;
+            --text-tertiary: #6E6E73;
+            --accent-red: #FF2D2D;
+            --accent-red-hover: #FF3B3B;
+            --accent-red-muted: rgba(255, 45, 45, 0.10);
+            --accent-red-border: rgba(255, 45, 45, 0.25);
+            --status-success: #1FC16B;
+            --status-warning: #F5A524;
+            --status-error: #FF453A;
+            --status-info: #5DA9FF;
+            --radius-sm: 8px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 16px;
+            --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.6);
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+            --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.9);
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { background-color: var(--bg-main); color: var(--text-primary); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .workspace-content { width: 100%; max-width: 1480px; margin: 0 auto; padding: 28px 32px 48px 32px; }
+        .panel { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-subtle); padding: 20px 24px; transition: all 180ms ease-out; }
+        .panel:hover { border-color: var(--border-hover); }
+        .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+        .sidebar.collapsed { width: 64px; }
+        .sidebar-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); padding: 0.75rem 1rem 0.35rem 1rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.85rem; height: 42px; padding: 0 1rem; border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13.5px; font-weight: 500; cursor: pointer; position: relative; transition: all 140ms ease-out; }
+        .nav-item:hover { color: var(--text-primary); background: var(--surface-elevated); }
+        .nav-item.active { color: var(--text-primary); background: var(--surface-elevated); font-weight: 600; }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3.5px; background: var(--accent-red); border-radius: 0 4px 4px 0; }
+        .status-strip { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 36px; font-size: 12.5px; font-weight: 600; line-height: 1; border-radius: var(--radius-sm); padding: 0 1rem; cursor: pointer; border: 1px solid transparent; transition: all 140ms ease-out; white-space: nowrap; }
+        .btn-primary { background: var(--accent-red); color: #FFF; border-color: var(--accent-red); }
+        .btn-primary:hover { background: var(--accent-red-hover); }
+        .btn-secondary { background: var(--surface-elevated); color: var(--text-primary); border-color: var(--border-subtle); }
+        .btn-secondary:hover { background: #1C1C22; border-color: var(--border-hover); }
+        .btn-danger { background: var(--accent-red-muted); color: var(--accent-red); border-color: var(--accent-red-border); }
+        .btn-danger:hover { background: var(--accent-red); color: #FFF; }
+        .btn-sm { height: 30px; padding: 0 0.75rem; font-size: 11.5px; }
+        .badge { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 11px; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-winner { background: var(--accent-red-muted); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
+        .badge-active { background: rgba(31, 193, 107, 0.1); color: var(--status-success); border: 1px solid rgba(31, 193, 107, 0.25); }
+        .badge-paused { background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
+        .badge-warning { background: rgba(245, 165, 36, 0.1); color: var(--status-warning); border: 1px solid rgba(245, 165, 36, 0.25); }
+        .badge-error { background: rgba(255, 69, 58, 0.1); color: var(--status-error); border: 1px solid rgba(255, 69, 58, 0.25); }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+        .status-dot-active { background: var(--status-success); box-shadow: 0 0 6px rgba(31, 193, 107, 0.6); }
+        .status-dot-paused { background: var(--text-tertiary); }
+        .snapshot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--border-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+        .snapshot-cell { background: var(--surface-1); padding: 18px 22px; transition: background-color 140ms ease-out; }
+        .snapshot-cell:hover { background: var(--surface-elevated); }
+        .cause-map-flow { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1rem 1.25rem; background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+        .cause-map-node { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 600; background: var(--surface-1); border: 1px solid var(--border-subtle); }
+        .data-table-container { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table th { background: var(--bg-secondary); color: var(--text-tertiary); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 0.85rem 1.15rem; border-bottom: 1px solid var(--border-subtle); }
+        .data-table td { padding: 0.95rem 1.15rem; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+        .data-table tbody tr:hover td { background: var(--surface-elevated); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+        .modal-content { background: var(--surface-1); border: 1px solid var(--border-hover); border-radius: var(--radius-xl); box-shadow: var(--shadow-modal); width: 100%; max-height: 90vh; overflow-y: auto; }
+        .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 520px; background: var(--surface-1); border-left: 1px solid var(--border-subtle); box-shadow: -16px 0 48px rgba(0, 0, 0, 0.85); z-index: 1000; transform: translateX(100%); transition: transform 220ms ease-out; }
+        .drawer.open { transform: translateX(0); }
+    </style>
+<body class="bg-[#050506] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2D2D] selection:text-white">
+
+    <!-- ===================================================================
+         1. SPLASH SCREEN MINIMALISTA (BOTÃO EXCLUSIVO DE ENTRADA RADWAN ADS)
+         =================================================================== -->
+    <div id="splash-screen">
+        <button id="btn-start-radwan" class="radwan-launch-btn" type="button" aria-label="Iniciar RADWAN">
+            <!-- Borda Externa e Halo de Glow -->
+            <span class="radwan-launch-glow"></span>
+            
+            <!-- Hotspots de Energia Vermelha (Centro Superior e Inferior) -->
+            <span class="radwan-launch-hotspot hotspot-top"></span>
+            <span class="radwan-launch-hotspot hotspot-bottom"></span>
+            
+            <!-- Moldura Interna Metálica / Vidro Escuro -->
+            <span class="radwan-launch-rim"></span>
+            
+            <!-- Reflexo Diagonal Glass Ultra Suave -->
+            <span class="radwan-launch-shine"></span>
+            
+            <!-- Linha de Scan Subliminar -->
+            <span class="radwan-launch-scan"></span>
+
+            <!-- Texto Centralizado em Caixa Alta (Apple Aesthetic) -->
+            <span class="radwan-launch-label">INICIAR RADWAN</span>
+        </button>
+    </div>
+
+    <!-- ===================================================================
+         2. MODAL DE AUTENTICAÇÃO SAAS (SUPABASE AUTH / GOOGLE / EMAIL)
+         =================================================================== -->
+    <div id="auth-modal-screen" class="is-hidden">
+        <div class="auth-card space-y-5">
+            <div class="text-center space-y-1.5">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-1 overflow-hidden">
+                    <img src="assets/logo-radwan-ads.png" alt="RADWAN ADS" class="w-12 h-12 object-contain">
+                </div>
+                <h2 id="auth-card-title" class="text-base font-bold tracking-tight text-[#F5F5F7]">Acessar o RADWAN ADS</h2>
+                <p class="text-[11px] text-[#A1A1A6]">Console Operacional de Performance</p>
+            </div>
+
+            <!-- Botão Google OAuth Real -->
+            <button type="button" onclick="window.authGate.loginWithGoogle()" class="btn-google">
+                <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span>Continuar com o Google</span>
+            </button>
+
+            <div class="relative flex items-center justify-center">
+                <div class="border-t border-white/[0.08] w-full"></div>
+                <span class="bg-[#0E0E12] px-3 text-[10px] text-[#6E6E73] uppercase font-bold tracking-wider relative">ou</span>
+            </div>
+
+            <!-- Formulário Email + Senha -->
+            <form id="saas-auth-form" onsubmit="window.authGate.handleAuthSubmit(event)" class="space-y-3.5">
+                <div id="auth-name-container" class="hidden">
+                    <label class="block text-[10.5px] font-bold text-[#A1A1A6] mb-1">Seu Nome</label>
+                    <input type="text" id="auth-name-input" placeholder="Ex: Michel Radwan" class="w-full bg-[#15151A] border border-white/[0.1] rounded-xl px-3 py-2 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <div>
+                    <label class="block text-[10.5px] font-bold text-[#A1A1A6] mb-1">Email</label>
+                    <input type="email" id="auth-email-input" placeholder="seu@email.com" required class="w-full bg-[#15151A] border border-white/[0.1] rounded-xl px-3 py-2 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <div id="auth-password-container">
+                    <label class="block text-[10.5px] font-bold text-[#A1A1A6] mb-1">Senha</label>
+                    <input type="password" id="auth-password-input" placeholder="••••••••" class="w-full bg-[#15151A] border border-white/[0.1] rounded-xl px-3 py-2 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <div id="auth-error-msg" class="text-xs text-[#FF453A] bg-[#FF453A]/10 border border-[#FF453A]/20 p-2.5 rounded-lg hidden"></div>
+
+                <button type="submit" id="auth-submit-btn" class="btn btn-primary w-full py-2.5 text-xs font-bold justify-center rounded-xl">
+                    Entrar
+                </button>
+
+                <div id="auth-login-options" class="flex items-center justify-between text-[11px] pt-1">
+                    <button type="button" data-auth-switch="signup" class="text-[#A1A1A6] hover:text-[#F5F5F7] transition-colors">Criar uma conta</button>
+                    <button type="button" data-auth-switch="reset" class="text-[#6E6E73] hover:text-[#A1A1A6] transition-colors">Esqueci minha senha</button>
+                </div>
+
+                <div id="auth-back-option" class="text-center text-[11px] pt-1">
+                    <button type="button" data-auth-switch="login" class="text-[#A1A1A6] hover:text-[#F5F5F7] transition-colors">Já tenho uma conta • Fazer login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         3. ONBOARDING GUIADO (PRIMEIRA VEZ)
+         =================================================================== -->
+    <div id="onboarding-modal-screen" class="is-hidden fixed inset-0 z-[9999] bg-[#050506] flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-[#0E0E12] border border-white/[0.08] rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.04] mb-1">
+                    <span class="text-2xl">🚀</span>
+                </div>
+                <h3 class="text-lg font-bold text-[#F5F5F7]">Como você vai usar o RADWAN ADS?</h3>
+                <p class="text-xs text-[#A1A1A6]">Selecione o modelo que melhor se adapta à sua rotina:</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <button type="button" onclick="window.authGate.completeOnboarding('solo', 'Minha Operação')" class="p-4 rounded-xl bg-[#15151A] border border-white/[0.08] hover:border-[#FF2D2D] text-left transition-all group">
+                    <span class="text-xl block mb-2">🏪</span>
+                    <h4 class="font-bold text-xs text-[#F5F5F7] group-hover:text-[#FF2D2D]">Minha Operação</h4>
+                    <p class="text-[10.5px] text-[#6E6E73] mt-1">Gerencio meu próprio e-commerce ou infoproduto.</p>
+                </button>
+
+                <button type="button" onclick="window.authGate.completeOnboarding('agency', 'Primeiro Cliente')" class="p-4 rounded-xl bg-[#15151A] border border-white/[0.08] hover:border-[#FF2D2D] text-left transition-all group">
+                    <span class="text-xl block mb-2">👥</span>
+                    <h4 class="font-bold text-xs text-[#F5F5F7] group-hover:text-[#FF2D2D]">Gerencio Clientes</h4>
+                    <p class="text-[10.5px] text-[#6E6E73] mt-1">Sou gestor ou agência com múltiplas contas e clientes.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL DO SISTEMA (BLOQUEADO ATÉ AUTENTICAÇÃO REAL) -->
+    <div id="app-main-layout" class="min-h-screen flex flex-col transition-opacity duration-200 opacity-0 pointer-events-none">
+
+    <!-- BACKDROP DA SIDEBAR (OFF-CANVAS OVERLAY MOBILE) -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="window.dashboard.closeSidebar()"></div>
+
+    <!-- CAMADA 1: STATUS STRIP OPERACIONAL (TOPBAR) -->
+    <header class="status-strip sticky top-0 z-40 flex items-center justify-between border-b border-white/[0.07] bg-[#0A0A0C] px-3 sm:px-4 py-2 relative">
+        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-shrink">
+            <button onclick="window.dashboard.toggleSidebar()" class="btn-icon lg:hidden text-gray-400 hover:text-white flex-shrink-0" title="Menu Lateral" aria-label="Menu Lateral">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+
+            <!-- Brand & Account Identity com Workspace Switcher -->
+            <div class="flex items-center space-x-2 min-w-0">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <img src="assets/logo-radwan-ads.png" alt="RADWAN ADS" class="w-8 h-8 object-contain rounded-lg">
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center space-x-1.5">
+                        <div class="workspace-switcher">
+                            <button id="workspace-switcher-btn" onclick="const m=document.getElementById('workspace-dropdown-menu'); m.classList.toggle('hidden');" class="workspace-switcher-btn truncate max-w-[130px] sm:max-w-[180px]">
+                                <span id="topbar-account-name" class="font-bold text-xs sm:text-sm text-[#F5F5F7] truncate">Minha Operação</span>
+                                <span class="text-[10px] text-[#A1A1A6]">▾</span>
+                            </button>
+                            <div id="workspace-dropdown-menu" class="workspace-dropdown-menu hidden">
+                                <div id="workspace-list-container" class="space-y-1">
+                                    <!-- Renderizado dinamicamente -->
+                                </div>
+                                <div class="border-t border-white/[0.06] my-1 pt-1">
+                                    <button onclick="window.authGate.showOnboarding(); document.getElementById('workspace-dropdown-menu').classList.add('hidden');" class="w-full text-left px-2.5 py-1.5 text-xs text-[#FF2D2D] hover:bg-white/[0.04] rounded-lg font-semibold flex items-center gap-1.5">
+                                        <span>+</span> <span>Nova Operação</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-dot status-dot-active flex-shrink-0" title="Conta Conectada"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seletor Global de Período & Comparação -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
+            <!-- Segmented Quick Presets (Desktop >= 1200px) -->
+            <div class="hidden xl:flex items-center space-x-1 bg-[#101014] border border-white/[0.07] p-0.5 rounded-lg text-xs">
+                <button data-date-preset="today" onclick="window.dashboard.setGlobalPreset('today')" class="segmented-btn active px-2.5 py-1 text-xs">Hoje</button>
+                <button data-date-preset="yesterday" onclick="window.dashboard.setGlobalPreset('yesterday')" class="segmented-btn px-2.5 py-1 text-xs">Ontem</button>
+                <button data-date-preset="last_3d" onclick="window.dashboard.setGlobalPreset('last_3d')" class="segmented-btn px-2.5 py-1 text-xs">3D</button>
+                <button data-date-preset="last_7d" onclick="window.dashboard.setGlobalPreset('last_7d')" class="segmented-btn px-2.5 py-1 text-xs">7D</button>
+                <button data-date-preset="last_14d" onclick="window.dashboard.setGlobalPreset('last_14d')" class="segmented-btn px-2.5 py-1 text-xs">14D</button>
+                <button data-date-preset="last_30d" onclick="window.dashboard.setGlobalPreset('last_30d')" class="segmented-btn px-2.5 py-1 text-xs">30D</button>
+                <button data-date-preset="this_month" onclick="window.dashboard.setGlobalPreset('this_month')" class="segmented-btn px-2.5 py-1 text-xs">Mês</button>
+            </div>
+
+            <!-- Botão de Calendário Personalizado & Status do Período Ativo -->
+            <button onclick="window.dashboard.openCustomDateModal()" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs" title="Alterar período de dados">
+                <span>📅</span>
+                <span id="topbar-period-label" class="font-semibold text-xs truncate max-w-[100px] sm:max-w-none">Hoje</span>
+            </button>
+
+            <!-- Toggle Rápido de Comparação (Desktop & Tablet) -->
+            <button id="btn-toggle-comparison" onclick="window.dashboard.toggleComparison()" class="btn btn-tertiary btn-sm text-[11px] hidden md:inline-flex items-center gap-1 border border-white/[0.07]" title="Comparar com período anterior">
+                <span>🔄</span>
+                <span>Comparar</span>
+            </button>
+        </div>
+
+        <!-- Command Bar Actions (Desktop) & Menu Mais Opções (Mobile) -->
+        <div class="flex items-center space-x-1.5 flex-shrink-0">
+            <!-- Command Menu Trigger Button -->
+            <button onclick="window.commandMenu?.open()" class="btn btn-secondary btn-sm hidden sm:flex items-center gap-1.5 px-2.5 text-xs text-[#A1A1A6] hover:text-[#F5F5F7]" title="Abrir Command Menu (Ctrl+K)">
+                <span class="text-xs">⌘</span>
+                <span class="text-[11px] hidden lg:inline">Buscar...</span>
+                <kbd class="px-1.5 py-0.2 text-[9.5px] font-mono bg-white/[0.06] border border-white/[0.1] rounded text-[#A1A1A6]">⌘K</kbd>
+            </button>
+
+            <!-- Desktop Buttons (>= 768px) -->
+            <div class="hidden md:flex items-center space-x-1.5">
+                <button onclick="window.dashboard.openTokenModal()" class="btn btn-secondary btn-sm flex items-center gap-1" title="Credencial Meta">
+                    <span class="text-[#FF2D2D]">🔑</span>
+                    <span class="hidden lg:inline">Token</span>
+                </button>
+                <button onclick="window.dashboard.syncAllData()" class="btn btn-secondary btn-sm flex items-center gap-1" title="Atualizar Dados">
+                    <span>🔄</span>
+                    <span class="hidden lg:inline">Sincronizar</span>
+                </button>
+                <button onclick="window.dashboard.logout()" class="btn btn-tertiary btn-sm text-[#FF453A] hover:text-[#FF453A]" title="Encerrar Sessão">
+                    <span>🚪</span>
+                </button>
+            </div>
+
+            <!-- Mobile More Menu Button (< 768px) -->
+            <div class="relative md:hidden">
+                <button onclick="window.dashboard.toggleTopMoreMenu()" class="btn-icon text-gray-300 hover:text-white" title="Mais Opções" aria-label="Mais Opções">
+                    <span>•••</span>
+                </button>
+                <div id="topbar-more-menu" class="topbar-popover">
+                    <button onclick="window.dashboard.syncAllData(); window.dashboard.closeTopMoreMenu();" class="popover-item">
+                        <span>🔄</span>
+                        <span>Sincronizar dados</span>
+                    </button>
+                    <button onclick="window.dashboard.toggleComparison(); window.dashboard.closeTopMoreMenu();" class="popover-item">
+                        <span>📊</span>
+                        <span>Alternar comparação</span>
+                    </button>
+                    <button onclick="window.dashboard.openTokenModal(); window.dashboard.closeTopMoreMenu();" class="popover-item">
+                        <span>🔑</span>
+                        <span>Credencial Meta</span>
+                    </button>
+                    <button onclick="window.dashboard.navigateTo('settings'); window.dashboard.closeTopMoreMenu();" class="popover-item">
+                        <span>⚙️</span>
+                        <span>Configurações</span>
+                    </button>
+                    <div class="my-1 border-t border-white/[0.06]"></div>
+                    <button onclick="window.dashboard.logout()" class="popover-item text-danger">
+                        <span>🚪</span>
+                        <span>Encerrar sessão</span>
+                    </button>
+                </div>
+            </div>
+
+            <span class="text-[10px] text-[#6E6E73] font-mono hidden 2xl:inline">Sync: <b id="topbar-last-sync" class="text-[#A1A1A6]">--:--</b></span>
+        </div>
+    </header>
+
+    <!-- CORPO PRINCIPAL: SIDEBAR + WORKSPACE -->
+    <div class="flex-1 flex max-w-[1780px] w-full mx-auto">
+
+        <!-- SIDEBAR DE NAVEGAÇÃO REFINADÍSSIMA -->
+        <aside id="main-sidebar" class="sidebar p-3 space-y-4">
+            <!-- Mobile Header da Sidebar com botão de fechar -->
+            <div class="flex items-center justify-between pb-2 border-b border-white/[0.05] lg:hidden">
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img src="assets/logo-radwan-ads.png" alt="RADWAN ADS" class="w-6 h-6 object-contain rounded-md">
+                    </div>
+                    <span class="font-bold text-xs text-[#F5F5F7]">RADWAN ADS</span>
+                </div>
+                <button onclick="window.dashboard.closeSidebar()" class="btn-icon text-gray-400 hover:text-white" title="Fechar Menu">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Grupo DESEMPENHO -->
+                <div>
+                    <p class="sidebar-group-title">DESEMPENHO</p>
+                    <nav class="space-y-1">
+                        <div class="nav-item active" data-nav-target="overview" title="Visão Geral da Operação">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span class="truncate">Visão Geral</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="campaigns" title="Gestão de Campanhas, Conjuntos e Anúncios">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                            <span class="truncate">Campanhas</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="creatives" title="Galeria e Diagnóstico de Criativos">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="truncate">Criativos</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="funnel" title="Funil Operacional de Conversão">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            <span class="truncate">Funil de Conversão</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="orders" title="Pedidos, Vendas e Recuperação PIX">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <span class="truncate">Pedidos & Vendas</span>
+                            <span id="sidebar-orders-badge" class="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1FC16B]/15 text-[#1FC16B] font-bold border border-[#1FC16B]/30 hidden">0</span>
+                        </div>
+                    </nav>
+                </div>
+
+                <!-- Grupo INTELIGÊNCIA -->
+                <div>
+                    <p class="sidebar-group-title">INTELIGÊNCIA</p>
+                    <nav class="space-y-1">
+                        <div class="nav-item" data-nav-target="site-intelligence" title="Comportamento e Fricção de Usuários">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span class="truncate">Site Intelligence</span>
+                        </div>
+                    </nav>
+                </div>
+
+                <!-- Grupo OPERAÇÕES & SISTEMA -->
+                <div>
+                    <p class="sidebar-group-title">OPERAÇÕES & SISTEMA</p>
+                    <nav class="space-y-1">
+                        <div class="nav-item" data-nav-target="tracking" title="Saúde dos Pixels e Meta CAPI">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            <span class="truncate">Saúde do Rastreamento</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="autopilot" title="Regras e Otimização Autônoma">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            <span class="truncate">Modo Automático</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="audit" title="Registro de Alterações e Decisões">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="truncate">Histórico de Ações</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="settings" title="Configurações e Parâmetros">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span class="truncate">Configurações</span>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-3 rounded-xl bg-[#101014] border border-white/[0.05] space-y-1.5 text-[11px]">
+                <div class="flex items-center justify-between">
+                    <span class="text-[#6E6E73]">Parada de Segurança</span>
+                    <span id="sidebar-emergency-status" class="text-[#1FC16B] font-semibold">Inativa</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-[#6E6E73]">Modo do RADWAN</span>
+                    <span id="sidebar-ai-mode" class="text-[#A1A1A6] font-semibold">Assistido</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- WORKSPACE PRINCIPAL EM CAMADAS DE DECISÃO (1480px MAX-WIDTH CENTRALIZADO) -->
+        <main class="flex-1 min-w-0 overflow-y-auto">
+            <div class="workspace-content space-y-7">
+
+            <!-- ===================================================================
+                 SEÇÃO 1: VISÃO GERAL — DECISÃO E OPERAÇÃO LIMPA
+                 =================================================================== -->
+            <section id="view-overview" class="view-section space-y-6">
+
+                <!-- CAMADA 1: SNAPSHOT FINANCEIRO EXECUTIVO (NARRATIVA LIMPA) -->
+                <div class="snapshot-grid">
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[11px] font-semibold text-[#A1A1A6]">Investimento</p>
+                        <p class="text-xl sm:text-2xl font-bold tabular-nums text-[#F5F5F7]" id="kpi-spend">R$ 0,00</p>
+                        <p class="text-[10.5px] text-[#6E6E73]">Valor investido no período</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[11px] font-semibold text-[#A1A1A6]">Faturamento</p>
+                        <p class="text-xl sm:text-2xl font-bold tabular-nums text-[#F5F5F7]" id="kpi-revenue">R$ 0,00</p>
+                        <p class="text-[10.5px] text-[#6E6E73]">Vendas pagas atribuídas</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[11px] font-semibold text-[#A1A1A6]">Lucro Líquido Real</p>
+                        <p class="text-xl sm:text-2xl font-bold tabular-nums text-[#1FC16B]" id="kpi-profit">R$ 0,00</p>
+                        <p class="text-[10.5px] text-[#6E6E73]">Após custos e anúncios</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[11px] font-semibold text-[#A1A1A6]">ROAS Geral</p>
+                        <p class="text-xl sm:text-2xl font-bold tabular-nums text-[#F5F5F7]" id="kpi-roas">0,00x</p>
+                        <p class="text-[10.5px] text-[#6E6E73]">Ponto de equilíbrio: 2,20x</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[11px] font-semibold text-[#A1A1A6]">CPA Médio</p>
+                        <p class="text-xl sm:text-2xl font-bold tabular-nums text-[#F5F5F7]" id="kpi-cpa">–</p>
+                        <p class="text-[10.5px] text-[#6E6E73]">Meta alvo: R$ 35,00</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[11px] font-semibold text-[#A1A1A6]">Vendas Confirmadas</p>
+                        <p class="text-xl sm:text-2xl font-bold tabular-nums text-[#1FC16B]" id="kpi-purchases">0 vendas</p>
+                        <p class="text-[10.5px] text-[#6E6E73]">PIX compensados</p>
+                    </div>
+                </div>
+
+                <!-- CAMADA 2: RECOMENDAÇÕES DO RADWAN ADS & SAÚDE OPERACIONAL -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <!-- O que o RADWAN ADS recomenda fazer agora? -->
+                    <div class="lg:col-span-2 panel space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-xs">⌘</span>
+                                <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">O que o Radwan recomenda agora</h3>
+                            </div>
+                            <span class="badge badge-active text-[9.5px]">Assistido</span>
+                        </div>
+                        <div id="what-should-i-do-container" class="space-y-2.5"></div>
+                    </div>
+
+                    <!-- Diagnóstico Operacional Rápido (Saúde da Operação) -->
+                    <div class="panel space-y-3">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">Saúde da Operação</h3>
+                            <span class="badge badge-active text-[9.5px]">Estável</span>
+                        </div>
+                        <div class="divide-y divide-white/[0.04] text-xs">
+                            <div class="flex items-center justify-between py-2.5">
+                                <div>
+                                    <p class="font-medium text-[#F5F5F7]">CTR de Tráfego</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Atratividade dos anúncios</p>
+                                </div>
+                                <span class="tabular-nums font-bold text-[#1FC16B] text-sm" id="kpi-ctr">–</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2.5">
+                                <div>
+                                    <p class="font-medium text-[#F5F5F7]">Custo por Clique (CPC)</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Custo de visita</p>
+                                </div>
+                                <span class="tabular-nums font-bold text-[#F5F5F7] text-sm" id="kpi-cpc">–</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2.5">
+                                <div>
+                                    <p class="font-medium text-[#F5F5F7]">Status do Saldo</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Limite de veiculação</p>
+                                </div>
+                                <span class="badge badge-active text-[9.5px]">Normal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAMADA 3: OPORTUNIDADES OPERACIONAIS IDENTIFICADAS -->
+                <div class="panel space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                        <h3 class="font-bold text-xs sm:text-sm text-[#F5F5F7]">Oportunidades & Alertas</h3>
+                        <span class="text-[10px] text-[#A1A1A6]">Análise em tempo real</span>
+                    </div>
+                    <div id="top-opportunities-container" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"></div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 2: CENTRAL DE GESTÃO (CAMPANHAS / CONJUNTOS / ANÚNCIOS)
+                 =================================================================== -->
+            <section id="view-campaigns" class="view-section hidden space-y-4">
+                <!-- Barra de Abas Unificada [ Campanhas ] [ Conjuntos ] [ Anúncios ] -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-2.5 sm:p-4 rounded-xl">
+                    <div class="campaign-tabs-grid w-full sm:w-auto bg-[#15151A] border border-white/[0.08] p-1 rounded-lg">
+                        <button onclick="window.dashboard.switchCampaignTab('campaigns')" id="tab-nav-campaigns" class="campaign-tab-btn active" title="Ver Nível de Campanhas">
+                            <span class="tab-label">Campanhas</span>
+                            <span id="tab-count-campaigns" class="badge badge-active text-[9px] px-1 py-0.2">0</span>
+                        </button>
+                        <button onclick="window.dashboard.switchCampaignTab('adsets')" id="tab-nav-adsets" class="campaign-tab-btn" title="Ver Nível de Conjuntos de Anúncios">
+                            <span class="tab-label">Conjuntos</span>
+                            <span id="tab-count-adsets" class="badge badge-paused text-[9px] px-1 py-0.2">0</span>
+                        </button>
+                        <button onclick="window.dashboard.switchCampaignTab('ads')" id="tab-nav-ads" class="campaign-tab-btn" title="Ver Nível de Anúncios Individuais">
+                            <span class="tab-label">Anúncios</span>
+                            <span id="tab-count-ads" class="badge badge-paused text-[9px] px-1 py-0.2">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Resumo Rápido Superior -->
+                    <div class="hidden sm:flex items-center gap-3 text-xs">
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Investimento</span>
+                            <span class="font-bold text-[#F5F5F7]" id="camp-summary-spend">R$ 0,00</span>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">Vendas</span>
+                            <span class="font-bold text-[#1FC16B]" id="camp-summary-purchases">0</span>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-lg bg-[#15151A] border border-white/[0.04]">
+                            <span class="text-[10px] text-[#6E6E73] block uppercase font-bold">ROAS</span>
+                            <span class="font-bold text-[#F5F5F7]" id="camp-summary-roas">0,00x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBVIEW 1: CAMPANHAS -->
+                <div id="campaigns-subview-campaigns" class="space-y-4">
+                    <!-- Barra de Controle: Filtros, Presets de Colunas e Busca -->
+                    <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
+                        <!-- Linha Superior: Status & Presets Rápidos -->
+                        <div class="flex flex-col gap-2.5">
+                            <!-- Filter Chips Container com Scroll Suave -->
+                            <div class="filter-chips-row">
+                                <button onclick="window.dashboard.setCampaignFilter('all')" data-camp-filter="all" class="filter-chip active">Todas</button>
+                                <button onclick="window.dashboard.setCampaignFilter('active')" data-camp-filter="active" class="filter-chip">Ativas</button>
+                                <button onclick="window.dashboard.setCampaignFilter('paused')" data-camp-filter="paused" class="filter-chip">Pausadas</button>
+                                <button onclick="window.dashboard.setCampaignFilter('sales')" data-camp-filter="sales" class="filter-chip">Com Vendas</button>
+                                <button onclick="window.dashboard.setCampaignFilter('profitable')" data-camp-filter="profitable" class="filter-chip">Lucrativas</button>
+                                <button onclick="window.dashboard.setCampaignFilter('scaling')" data-camp-filter="scaling" class="filter-chip">Prontas p/ Escalar</button>
+                                <button onclick="window.dashboard.setCampaignFilter('attention')" data-camp-filter="attention" class="filter-chip">Requer Atenção</button>
+                            </div>
+
+                            <!-- Controles de Métricas & Colunas perfeitamente contidos -->
+                            <div class="campaigns-toolbar-row">
+                                <!-- Dropdown de Presets Nativos -->
+                                <div class="preset-select-wrap">
+                                    <span class="text-[11px] text-[#6E6E73] flex-shrink-0">Visão:</span>
+                                    <select id="select-metric-preset" onchange="window.dashboard.changeMetricPreset(this.value)" class="preset-select-element">
+                                        <option value="PADRAO_GESTOR">⭐ Padrão do Gestor</option>
+                                        <option value="ESSENCIAL">⚡ Essencial</option>
+                                        <option value="TRAFEGO">🔗 Tráfego & Cliques</option>
+                                        <option value="CONVERSAO">🛒 Conversão & Vendas</option>
+                                        <option value="FINANCEIRO">💰 Financeiro & Retorno</option>
+                                        <option value="FUNIL">📊 Funil Completo</option>
+                                        <option value="VIDEO">🎬 Vídeo & Retenção</option>
+                                        <option value="CRIATIVOS">🎨 Criativos & Anúncios</option>
+                                        <option value="RADWAN">⌘ Inteligência Radwan</option>
+                                        <option value="COMPLETO">🌐 Visão Completa</option>
+                                    </select>
+                                </div>
+
+                                <!-- Botão Abrir Personalizador de Colunas -->
+                                <button id="btn-columns-picker" onclick="window.dashboard.openColumnManager()" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs flex-shrink-0" title="Personalizar métricas e colunas da tabela">
+                                    <span>📊</span>
+                                    <span>Colunas</span>
+                                    <span id="active-columns-badge" class="badge badge-active text-[9.5px] px-1.5 py-0.2">17</span>
+                                </button>
+
+                                <!-- Alternador de Densidade (Desktop Only para não poluir mobile) -->
+                                <button id="btn-toggle-density" onclick="window.dashboard.toggleTableDensity()" class="btn btn-tertiary btn-sm text-[11px] border border-white/[0.07] hidden sm:inline-flex flex-shrink-0" title="Alternar densidade da tabela">
+                                    <span id="density-icon">📐</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Linha Inferior: Busca Rápida -->
+                        <div class="relative w-full">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                            <input type="text" id="global-search-input" oninput="window.dashboard.filterCampaignsList(this.value)" placeholder="Buscar por nome ou ID..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                        </div>
+                    </div>
+
+                    <!-- Tabela Desktop com Scroll Horizontal Seguro e Colunas Sticky -->
+                    <div class="data-table-container hidden sm:block overflow-x-auto">
+                        <table id="campaigns-table" class="data-table">
+                            <thead id="campaigns-table-head">
+                                <!-- Cabeçalho dinâmico gerado pelo MetricsEngine -->
+                            </thead>
+                            <tbody id="campaigns-table-body" class="divide-y divide-white/[0.05]">
+                                <!-- Linhas dinâmicas geradas pelo MetricsEngine -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cards Mobile -->
+                    <div class="sm:hidden space-y-3" id="campaigns-mobile-cards"></div>
+                </div>
+
+                <!-- SUBVIEW 2: CONJUNTOS DE ANÚNCIOS (AD SETS) -->
+                <div id="campaigns-subview-adsets" class="space-y-4 hidden">
+                    <!-- Barra de Controle: Filtros por Campanha, Status e Busca -->
+                    <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
+                        <div class="flex flex-wrap items-center justify-between gap-2.5">
+                            <!-- Filtro de Campanha Pai -->
+                            <div class="flex items-center gap-1.5 bg-[#15151A] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs">
+                                <span class="text-[11px] text-[#6E6E73]">Campanha:</span>
+                                <select id="adsets-campaign-filter-select" onchange="window.dashboard.filterAdSetsByCampaign(this.value)" class="bg-transparent text-xs text-[#F5F5F7] font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate">
+                                    <option value="all">🌐 Todas as Campanhas</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Chips -->
+                            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                                <button onclick="window.dashboard.setAdSetFilter('all')" data-adset-filter="all" class="filter-chip active">Todos</button>
+                                <button onclick="window.dashboard.setAdSetFilter('active')" data-adset-filter="active" class="filter-chip">Ativos</button>
+                                <button onclick="window.dashboard.setAdSetFilter('paused')" data-adset-filter="paused" class="filter-chip">Pausados</button>
+                                <button onclick="window.dashboard.setAdSetFilter('sales')" data-adset-filter="sales" class="filter-chip">Com Vendas</button>
+                            </div>
+                        </div>
+
+                        <!-- Busca Rápida -->
+                        <div class="relative w-full">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                            <input type="text" id="adsets-search-input" oninput="window.dashboard.filterAdSetsList(this.value)" placeholder="Buscar conjunto por nome ou ID..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                        </div>
+                    </div>
+
+                    <!-- Tabela Desktop -->
+                    <div class="data-table-container hidden sm:block overflow-x-auto">
+                        <table class="data-table" id="adsets-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 64px;" class="sticky-col-status text-center">STATUS</th>
+                                    <th>NOME DO CONJUNTO</th>
+                                    <th>CAMPANHA PAI</th>
+                                    <th class="text-right">ORÇAMENTO</th>
+                                    <th class="text-right">INVESTIDO</th>
+                                    <th class="text-right">COMPRAS</th>
+                                    <th class="text-right">CPA</th>
+                                    <th class="text-right">ROAS</th>
+                                    <th class="text-right">CTR LINK</th>
+                                    <th class="text-center" style="width: 140px;">AÇÕES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adsets-table-body" class="divide-y divide-white/[0.05]">
+                                <!-- Linhas injetadas dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cards Mobile -->
+                    <div class="sm:hidden space-y-3" id="adsets-mobile-cards"></div>
+                </div>
+
+                <!-- SUBVIEW 3: ANÚNCIOS INDIVIDUAIS (ADS) -->
+                <div id="campaigns-subview-ads" class="space-y-4 hidden">
+                    <!-- Barra de Controle: Filtros e Busca de Anúncios -->
+                    <div class="flex flex-col gap-3 bg-[#101014] border border-white/[0.05] p-3 rounded-xl">
+                        <div class="flex flex-wrap items-center justify-between gap-2.5">
+                            <!-- Filtro de Campanha Pai -->
+                            <div class="flex items-center gap-1.5 bg-[#15151A] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs">
+                                <span class="text-[11px] text-[#6E6E73]">Campanha:</span>
+                                <select id="ads-campaign-filter-select" onchange="window.dashboard.filterAdsByCampaign(this.value)" class="bg-transparent text-xs text-[#F5F5F7] font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate">
+                                    <option value="all">🌐 Todas as Campanhas</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Chips -->
+                            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                                <button onclick="window.dashboard.setAdFilter('all')" data-ad-filter="all" class="filter-chip active">Todos</button>
+                                <button onclick="window.dashboard.setAdFilter('active')" data-ad-filter="active" class="filter-chip">Ativos</button>
+                                <button onclick="window.dashboard.setAdFilter('paused')" data-ad-filter="paused" class="filter-chip">Pausados</button>
+                                <button onclick="window.dashboard.setAdFilter('sales')" data-ad-filter="sales" class="filter-chip">Com Vendas</button>
+                            </div>
+                        </div>
+
+                        <!-- Busca Rápida -->
+                        <div class="relative w-full">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                            <input type="text" id="ads-search-input" oninput="window.dashboard.filterAdsList(this.value)" placeholder="Buscar anúncio por nome ou ID..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                        </div>
+                    </div>
+
+                    <!-- Tabela Desktop -->
+                    <div class="data-table-container hidden sm:block overflow-x-auto">
+                        <table class="data-table" id="ads-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 64px;" class="sticky-col-status text-center">STATUS</th>
+                                    <th>ANÚNCIO</th>
+                                    <th>CAMPANHA › CONJUNTO</th>
+                                    <th class="text-right">INVESTIDO</th>
+                                    <th class="text-right">CTR LINK</th>
+                                    <th class="text-right">COMPRAS</th>
+                                    <th class="text-right">CPA</th>
+                                    <th class="text-right">ROAS</th>
+                                    <th class="text-center" style="width: 130px;">AÇÕES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ads-table-body" class="divide-y divide-white/[0.05]">
+                                <!-- Linhas injetadas dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cards Mobile -->
+                    <div class="sm:hidden space-y-3" id="ads-mobile-cards"></div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA COM PERIOD OVERRIDE)
+                 =================================================================== -->
+            <section id="view-creatives" class="view-section hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0F0F12] border border-white/[0.07] p-3 sm:p-4 rounded-xl min-w-0">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Criativos</h2>
+                            <span id="creatives-override-badge" class="badge badge-paused text-[9.5px]">Período Global</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6] truncate">Desempenho de copies, fadiga, retenção e Creative Score</p>
+                    </div>
+
+                    <!-- Controles de Período Local para Criativos -->
+                    <div class="creatives-period-bar max-w-full overflow-x-auto scrollbar-none">
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'global')" data-sec-preset="global" class="segmented-btn active px-2.5 py-1 text-xs">Geral</button>
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_7d')" data-sec-preset="last_7d" class="segmented-btn px-2.5 py-1 text-xs">7 dias</button>
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_30d')" data-sec-preset="last_30d" class="segmented-btn px-2.5 py-1 text-xs">30 dias (Recomendado)</button>
+                        <button onclick="window.dashboard.setSectionPeriod('creatives', 'last_90d')" data-sec-preset="last_90d" class="segmented-btn px-2.5 py-1 text-xs">90 dias</button>
+                    </div>
+                </div>
+
+                <div id="creatives-grid-container" class="creatives-grid"></div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 4: FUNIL DE CONVERSÃO
+                 =================================================================== -->
+            <section id="view-funnel" class="view-section hidden space-y-4">
+                <div>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Funil Operacional de Conversão</h2>
+                    <p class="text-xs text-[#A1A1A6]">Mapeamento de perdas de tráfego entre Impressões, Cliques, Checkout e Compras</p>
+                </div>
+                <div class="panel p-6 space-y-4">
+                    <div id="funnel-steps-container" class="space-y-3"></div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 5: SITE INTELLIGENCE (BEHAVIOR & CONVERSION INTELLIGENCE)
+                 =================================================================== -->
+            <section id="view-site-intelligence" class="view-section hidden space-y-5">
+                <!-- Header com Status Real do Rastreador -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Site Intelligence</h2>
+                            <span id="si-tracking-status-badge" class="badge badge-active text-[10px]">🟢 Rastreamento Ativo</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Inteligência comportamental do site — Funil, Fricção, Gargalos e Diagnóstico Real</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div id="si-last-event-info" class="text-[11px] text-[#A1A1A6] font-mono px-2.5 py-1 rounded bg-[#15151A] border border-white/[0.05]">
+                            Último evento: verificando...
+                        </div>
+                        <button onclick="window.dashboard.loadSIData()" class="btn btn-secondary btn-sm text-xs flex items-center gap-1">
+                            <span>🔄</span>
+                            <span>Atualizar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Container Principal: Se 0 sessões, exibe Empty State Consolidado; se houver sessões, exibe Métricas Completas -->
+                <div id="si-empty-state" class="panel p-8 text-center space-y-3 hidden">
+                    <div class="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto text-xl">
+                        📡
+                    </div>
+                    <h3 class="text-base font-bold text-[#F5F5F7]">Ainda não recebemos sessões neste período</h3>
+                    <p class="text-xs text-[#A1A1A6] max-w-md mx-auto">
+                        O rastreador passivo do site está configurado e pronto. Assim que novos visitantes acessarem o site e navegarem pelas páginas, o funil e os diagnósticos serão calculados em tempo real.
+                    </p>
+                    <div class="flex items-center justify-center gap-2 text-xs font-mono text-[#6E6E73] pt-2">
+                        <span id="si-empty-tracker-status" class="badge badge-active text-[10px]">Tracker Ativo</span>
+                        <span id="si-empty-period-label">Período: Hoje</span>
+                    </div>
+                </div>
+
+                <div id="si-data-container" class="space-y-5">
+                    <!-- Overview Metrics SI (7 Cards de KPIs) -->
+                    <div class="snapshot-grid">
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-sessions">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Sessões únicas</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Checkout</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-checkout">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Iniciaram compra</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">PIX Criado</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-pix">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Códigos gerados</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Compras</p>
+                            <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums" id="si-kpi-purchases">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Pagamento aprovado</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Cliques de Frustração</p>
+                            <p class="text-xl font-bold font-mono text-[#FF453A] tabular-nums" id="si-kpi-rage">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Sessões c/ rage clicks</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Profundidade Média</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-scroll">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono">Scroll máx. por sessão</p>
+                        </div>
+                        <div class="snapshot-cell space-y-1">
+                            <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Saúde da Conversão</p>
+                            <p class="text-xl font-bold font-mono text-[#F5F5F7] tabular-nums" id="si-kpi-health">—</p>
+                            <p class="text-[10px] text-[#6E6E73] font-mono" id="si-kpi-health-label">Score interno Radwan</p>
+                        </div>
+                    </div>
+
+                    <!-- Principal Gargalo + Diagnóstico do RADWAN -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <!-- Card: Principal Gargalo -->
+                        <div class="lg:col-span-5 panel p-5 space-y-3">
+                            <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Principal Gargalo</span>
+                                <span id="si-bottleneck-severity" class="badge badge-paused text-[9px]">—</span>
+                            </div>
+                            <div id="si-bottleneck-content" class="space-y-2 text-xs">
+                                <p class="text-[#6E6E73] text-center py-4 italic">Aguardando dados suficientes...</p>
+                            </div>
+                        </div>
+
+                        <!-- Card: Diagnóstico do RADWAN -->
+                        <div class="lg:col-span-7 panel p-5 space-y-3">
+                            <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#1FC16B]"></span>
+                                    <span class="text-xs font-bold text-[#F5F5F7] uppercase tracking-wider">Diagnóstico do RADWAN</span>
+                                </div>
+                                <span id="si-diagnosis-confidence" class="text-[10px] text-[#6E6E73] font-mono">—</span>
+                            </div>
+                            <div id="si-diagnosis-content" class="space-y-3 text-xs">
+                                <p class="text-[#6E6E73] text-center py-4 italic">Coletando sessões para diagnóstico...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Funil Visual do Site -->
+                    <div class="panel p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm">🌪️</span>
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Funil Comportamental do Site</span>
+                            </div>
+                            <span class="text-[10px] text-[#6E6E73] font-mono">Dados reais do tráfego on-site</span>
+                        </div>
+                        <div id="si-funnel-container" class="space-y-3">
+                            <p class="text-[#6E6E73] text-center py-4 italic text-xs">Aguardando sessões...</p>
+                        </div>
+                    </div>
+
+                    <!-- Sessões Recentes -->
+                    <div class="panel overflow-hidden">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 border-b border-white/[0.05] gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Sessões de Visitantes</span>
+                                <p class="text-[11px] text-[#6E6E73]">Acessos individuais, origem de tráfego, profundidade e conversão</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select id="si-session-filter" onchange="window.dashboard.filterSISessions(this.value)" class="bg-[#101014] border border-white/[0.08] text-[#F5F5F7] text-xs rounded-md px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]">
+                                    <option value="all">Todas as Sessões</option>
+                                    <option value="converted">Convertidas (Compras)</option>
+                                    <option value="pix">Geraram PIX</option>
+                                    <option value="checkout">Chegaram ao Checkout</option>
+                                    <option value="rage_click">Com Frustração (Rage Clicks)</option>
+                                    <option value="mobile">Mobile / Celular</option>
+                                    <option value="desktop">Desktop / Computador</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="si-sessions-container">
+                            <p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada no período.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 8: SAÚDE DO RASTREAMENTO & META CAPI
+                 =================================================================== -->
+            <section id="view-tracking" class="view-section hidden space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Saúde do Rastreamento & Meta CAPI</h2>
+                            <span class="badge badge-active text-[10px]">100% Íntegro</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Monitoramento de eventos de servidor, deduplicação de conversões e qualidade de correspondência (EMQ)</p>
+                    </div>
+                </div>
+
+                <!-- Snapshot de Rastreamento -->
+                <div class="snapshot-grid">
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Meta Pixel</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums">Ativo (ID: 618...)</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Disparos no Navegador</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Conversions API</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums">Conectado</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Servidor Vercel Edge</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Deduplicação</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums">100% (event_id)</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Zero duplicatas</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Match Quality (EMQ)</p>
+                        <p class="text-xl font-bold font-mono text-[#5DA9FF] tabular-nums">8.9 / 10</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Excelente atribuição</p>
+                    </div>
+                </div>
+
+                <!-- Tabela de Eventos Recentes -->
+                <div class="data-table-container">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>EVENTO</th>
+                                    <th>STATUS</th>
+                                    <th>ORIGEM</th>
+                                    <th>DEDUPLICAÇÃO</th>
+                                    <th>LATÊNCIA</th>
+                                    <th>TAXA DE SUCESSO</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/[0.05]">
+                                <tr>
+                                    <td class="font-mono font-bold text-[#F5F5F7]">Purchase (Compra PIX)</td>
+                                    <td><span class="badge badge-active text-[9.5px]">Aprovado</span></td>
+                                    <td>Navegador + Servidor (CAPI)</td>
+                                    <td class="font-mono text-[#1FC16B]">✓ Reconciliado</td>
+                                    <td class="font-mono text-[#A1A1A6]">42ms</td>
+                                    <td class="font-mono font-bold text-[#1FC16B]">100%</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-mono font-bold text-[#F5F5F7]">InitiateCheckout</td>
+                                    <td><span class="badge badge-active text-[9.5px]">Ativo</span></td>
+                                    <td>Navegador + Servidor (CAPI)</td>
+                                    <td class="font-mono text-[#1FC16B]">✓ Reconciliado</td>
+                                    <td class="font-mono text-[#A1A1A6]">38ms</td>
+                                    <td class="font-mono font-bold text-[#1FC16B]">100%</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-mono font-bold text-[#F5F5F7]">PageView / ViewContent</td>
+                                    <td><span class="badge badge-active text-[9.5px]">Ativo</span></td>
+                                    <td>Navegador (Pixel)</td>
+                                    <td class="font-mono text-[#1FC16B]">✓ Reconciliado</td>
+                                    <td class="font-mono text-[#A1A1A6]">25ms</td>
+                                    <td class="font-mono font-bold text-[#1FC16B]">100%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- ===================================================================
+                 SEÇÃO 9: MODO AUTOMÁTICO & REGRAS AUTÔNOMAS
+                 =================================================================== -->
+            <section id="view-autopilot" class="view-section hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-[#F5F5F7]">Modo Automático & Regras do RADWAN</h2>
+                        <p class="text-xs text-[#A1A1A6]">Controle real do nível de autonomia com guardrails financeiros e parada de segurança</p>
+                    </div>
+                    <div id="autopilot-current-badge-container" class="flex items-center gap-2">
+                        <!-- Badge dinâmico gerado pelo dashboard -->
+                    </div>
+                </div>
+
+                <!-- 1. Segmented Cards de Nível de Autonomia -->
+                <div class="panel space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Nível de Autonomia Permitido</label>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">Fonte Única de Verdade</span>
+                    </div>
+                    <div id="autopilot-modes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- Cards injetados dinamicamente com handlers e active states -->
+                    </div>
+                </div>
+
+                <!-- 2. Prontidão e Blindagem da Conta (Score Real Calculado) -->
+                <div class="panel space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+                        <div>
+                            <h3 class="font-bold text-sm text-[#F5F5F7]">Prontidão e Blindagem da Operação</h3>
+                            <p class="text-xs text-[#A1A1A6]">Auditoria contínua em tempo real dos 6 pilares de governança financeira</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-[#A1A1A6]">Índice de Blindagem:</span>
+                            <span id="readiness-score-display" class="font-mono text-sm sm:text-base font-black text-[#1FC16B] bg-[#1FC16B]/10 border border-[#1FC16B]/30 px-3 py-1 rounded-lg tabular-nums">--/100</span>
+                        </div>
+                    </div>
+                    <div id="readiness-components-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                        <!-- Componentes calculados dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- 3. Parada de Segurança Dedicada (Kill Switch) -->
+                <div id="kill-switch-banner" class="p-5 rounded-2xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🛑</span>
+                            <h4 id="kill-switch-title" class="font-bold text-sm text-white">Parada de Segurança da Conta (Kill Switch)</h4>
+                        </div>
+                        <p id="kill-switch-desc" class="text-xs text-gray-300">Pausa imediatamente qualquer escrita, ajuste de orçamento ou automação em produção.</p>
+                    </div>
+                    <button id="btn-toggle-kill-switch" onclick="window.dashboard.toggleEmergencyStop()" class="btn btn-danger font-bold text-xs px-5 py-2.5 flex-shrink-0 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-[0.98]">
+                        🛑 ATIVAR PARADA DE SEGURANÇA
+                    </button>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 11: HISTÓRICO DE AÇÕES & AUDITORIA
+                 =================================================================== -->
+            <section id="view-audit" class="view-section hidden space-y-4">
+                <div>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Histórico de Ações & Registro de Decisões</h2>
+                    <p class="text-xs text-[#A1A1A6]">Registro cronológico de todas as decisões tomadas, alterações de orçamento e eventos da conta</p>
+                </div>
+                <div id="audit-timeline-container" class="space-y-3"></div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 12: CONFIGURAÇÕES & DIAGNÓSTICO
+                 =================================================================== -->
+            <section id="view-settings" class="view-section hidden space-y-5">
+                <div>
+                    <h2 class="text-lg font-bold text-[#F5F5F7]">Configurações & Parâmetros da Operação</h2>
+                    <p class="text-xs text-[#A1A1A6]">Gerencie metas de CPA, tetos de investimento e veja o diagnóstico de infraestrutura</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Parâmetros de Venda -->
+                    <div class="panel space-y-4">
+                        <h3 class="font-bold text-[#F5F5F7] text-sm">Metas de Conversão & Orçamento</h3>
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">CPA Alvo de Segurança (R$)</label>
+                                <input type="number" id="setting-target-cpa" value="35.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-[#A1A1A6] uppercase font-bold mb-1">Teto Máximo Diário da Conta (R$)</label>
+                                <input type="number" id="setting-max-spend" value="500.00" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] focus:border-[#FF2D2D] focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Validar Economia Unitária Real</p>
+                                    <p class="text-[10px] text-[#A1A1A6]">Calcula margem líquida real considerando custo do produto e taxas</p>
+                                </div>
+                                <input type="checkbox" id="setting-unit-verified" checked class="w-4 h-4 accent-[#FF2D2D] rounded">
+                            </div>
+                            <button onclick="window.dashboard.saveSettings()" class="btn btn-primary w-full py-2.5 text-xs font-semibold">
+                                Salvar Parâmetros
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Diagnóstico Técnico do Sistema -->
+                    <div class="panel space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
+                            <h3 class="font-bold text-[#F5F5F7] text-sm">Diagnóstico Técnico & Conexão</h3>
+                            <span class="badge badge-active text-[10px]">Operacional</span>
+                        </div>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Meta Marketing API</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Graph API v21.0</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">Conectada</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Rastreamento Meta CAPI</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Eventos de Servidor & Deduplicação</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">100% Íntegro</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Token de Acesso</p>
+                                    <p class="text-[10px] text-[#6E6E73]">System User Permanente</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">Válido</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0E0E12] border border-white/[0.04]">
+                                <div>
+                                    <p class="font-bold text-[#F5F5F7]">Bloqueio de Segurança (Fail-Closed)</p>
+                                    <p class="text-[10px] text-[#6E6E73]">Proteção contra alterações incorretas</p>
+                                </div>
+                                <span class="badge badge-active text-[10px]">Ativo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 10: PEDIDOS & VENDAS EM TEMPO REAL (CAPI + DUTTYFY INTEGRATED)
+                 =================================================================== -->
+            <section id="view-orders" class="view-section hidden space-y-6">
+                <!-- Header da Seção -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg sm:text-xl font-bold text-[#F5F5F7]">Gestão de Pedidos & Vendas</h2>
+                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#1FC16B] bg-[#1FC16B]/10 px-2 py-0.5 rounded border border-[#1FC16B]/20">
+                                <span class="status-dot status-dot-active"></span> Live Sync
+                            </span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Acompanhamento em tempo real de PIX gerados, conversões aprovadas e recuperação 1-clique no WhatsApp</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.dashboard.loadOrdersData()" class="btn btn-secondary btn-sm flex items-center gap-1.5" title="Atualizar Pedidos">
+                            <span>🔄</span>
+                            <span>Atualizar</span>
+                        </button>
+                        <button onclick="window.dashboard.clearOrdersHistory()" class="btn btn-danger btn-sm flex items-center gap-1.5" title="Limpar Pedidos de Teste">
+                            <span>🗑️</span>
+                            <span class="hidden sm:inline">Limpar Testes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cards de Métricas de Vendas (Snapshot Financeiro) -->
+                <div class="snapshot-grid">
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Faturamento PIX</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5F5F7]" id="orders-kpi-revenue">R$ 0,00</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Total de vendas aprovadas</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Pedidos Pagos</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]" id="orders-kpi-paid-count">0 un</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">PIX compensados</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">PIX Pendentes</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#F5A524]" id="orders-kpi-pending-count">0 un</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Aguardando pagamento</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Conversão PIX</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#5DA9FF]" id="orders-kpi-conv-rate">0.0%</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Pagos vs Gerados</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Lucro Líquido Real</p>
+                        <p class="text-xl sm:text-2xl font-bold font-mono text-[#1FC16B]" id="orders-kpi-profit">R$ 0,00</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Pós-CMV e pós-anúncios</p>
+                    </div>
+                </div>
+
+                <!-- Barra de Filtros e Busca -->
+                <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#0F0F12] border border-white/[0.07] p-3 rounded-xl">
+                    <div class="flex items-center space-x-1 bg-[#15151A] border border-white/[0.05] p-1 rounded-lg">
+                        <button onclick="window.dashboard.setOrdersFilter('all')" data-order-filter="all" class="segmented-btn active px-3 py-1 text-xs">Todos</button>
+                        <button onclick="window.dashboard.setOrdersFilter('paid')" data-order-filter="paid" class="segmented-btn px-3 py-1 text-xs">Pagos (Aprovados)</button>
+                        <button onclick="window.dashboard.setOrdersFilter('pending')" data-order-filter="pending" class="segmented-btn px-3 py-1 text-xs">Pendentes (Recuperar)</button>
+                    </div>
+
+                    <div class="relative flex-1 max-w-md">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                        <input type="text" id="orders-search-input" oninput="window.dashboard.searchOrders(this.value)" placeholder="Buscar por Nome, CPF, WhatsApp ou Transação..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Tabela de Pedidos -->
+                <div class="data-table-container">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 140px;">DATA & STATUS</th>
+                                    <th>CLIENTE & CONTATO</th>
+                                    <th>KIT & ENTREGA</th>
+                                    <th>VALOR</th>
+                                    <th>ORIGEM (UTM)</th>
+                                    <th style="text-align: right;">AÇÕES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State de Pedidos -->
+                    <div id="orders-empty-state" class="p-12 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-white/[0.03] border border-white/[0.07] flex items-center justify-center mx-auto text-xl">
+                            📦
+                        </div>
+                        <p class="text-sm font-semibold text-[#F5F5F7]">Nenhum pedido encontrado</p>
+                        <p class="text-xs text-[#A1A1A6] max-w-sm mx-auto">Assim que os clientes gerarem PIX na página oficial, os pedidos e status de pagamento aparecerão aqui em tempo real.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO: CONFIGURAÇÕES & NOTIFICAÇÕES DE VENDAS
+                 =================================================================== -->
+            <section id="view-settings" class="view-section hidden space-y-6">
+                <div class="border-b border-white/[0.06] pb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Configurações do RADWAN ADS</h2>
+                        <p class="text-xs text-[#A1A1A6]">Preferências do sistema, notificações sonoras de vendas em tempo real e integrações</p>
+                    </div>
+                </div>
+
+                <!-- Painel: NOTIFICAÇÕES DE VENDAS & PAGAMENTOS -->
+                <div class="panel space-y-5">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-sm">🔔</span>
+                            <div>
+                                <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">Notificações de Vendas & Pagamentos</h3>
+                                <p class="text-[11px] text-[#A1A1A6]">Alertas visuais, efeitos sonoros de conversão e notificações nativas</p>
+                            </div>
+                        </div>
+                        <div id="audio-autoplay-badge" class="badge badge-active text-[10px]">Áudio Ativo</div>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <!-- Master Sound Switch -->
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-[#141418] border border-white/[0.05]">
+                            <div>
+                                <p class="font-semibold text-xs text-[#F5F5F7]">Notificações Sonoras Globais</p>
+                                <p class="text-[11px] text-[#6E6E73]">Habilita feedback acústico quando novas vendas ou PIX forem confirmados</p>
+                            </div>
+                            <label class="apple-switch" title="Notificações Sonoras Globais">
+                                <input type="checkbox" id="setting-sound-master" checked onchange="window.salesNotificationEngine?.updateAudioSetting('soundEnabled', this.checked)">
+                                <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Pending Sound Switch -->
+                            <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-xs text-[#F5F5F7]">Som: PIX / Venda Pendente</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Som oficial ao gerar novo PIX</p>
+                                </div>
+                                <label class="apple-switch" title="Som: PIX / Venda Pendente">
+                                    <input type="checkbox" id="setting-sound-pending" checked onchange="window.salesNotificationEngine?.updateAudioSetting('pendingSoundEnabled', this.checked)">
+                                    <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
+                                </label>
+                            </div>
+
+                            <!-- Approved Sound Switch -->
+                            <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-xs text-[#F5F5F7]">Som: Pagamento Aprovado</p>
+                                    <p class="text-[10.5px] text-[#6E6E73]">Mesmo som oficial ao aprovar pagamento</p>
+                                </div>
+                                <label class="apple-switch" title="Som: Pagamento Aprovado">
+                                    <input type="checkbox" id="setting-sound-approved" checked onchange="window.salesNotificationEngine?.updateAudioSetting('approvedSoundEnabled', this.checked)">
+                                    <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Volume Slider -->
+                        <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-semibold text-[#F5F5F7]">Volume dos Sons</span>
+                                <span id="setting-volume-label" class="font-mono text-[#A1A1A6] font-bold">60%</span>
+                            </div>
+                            <input type="range" id="setting-sound-volume" min="0" max="100" value="60" 
+                                   class="w-full accent-[#FF2D2D] bg-[#1C1C22] rounded-lg h-1.5 cursor-pointer"
+                                   oninput="window.salesNotificationEngine?.updateVolume(this.value)"
+                                   onchange="window.salesNotificationEngine?.testSound('approved')">
+                        </div>
+
+                        <!-- Browser / Web Push Notifications Switch -->
+                        <div class="p-3 rounded-xl bg-[#141418] border border-white/[0.05] flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-xs text-[#F5F5F7]">Notificações do Navegador / Web Push</p>
+                                <p class="text-[11px] text-[#6E6E73]">Alertas do sistema operacional no PC, PWA e iPhone (quando instalado)</p>
+                            </div>
+                            <label class="apple-switch" id="apple-switch-browser-notif" title="Notificações do Navegador">
+                                <input type="checkbox" id="setting-browser-notifications" onchange="window.salesNotificationEngine?.toggleBrowserNotifications(this.checked)">
+                                <span class="apple-switch-track"><span class="apple-switch-thumb"></span></span>
+                            </label>
+                        </div>
+
+                        <!-- Preview & Test Controls -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/[0.04]">
+                            <span class="text-[11px] text-[#6E6E73]">Testes acústicos & Push isolados (não alteram métricas nem criam pedidos):</span>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button type="button" onclick="window.salesNotificationEngine?.testSound('approved')" class="btn btn-secondary btn-sm text-xs" title="Tocar som oficial de teste">
+                                    <span>🔊</span> <span>Testar Som</span>
+                                </button>
+                                <button type="button" onclick="window.salesNotificationEngine?.testPush('pending')" class="btn btn-secondary btn-sm text-xs" title="Enviar Web Push de teste pendente">
+                                    <span>🟡</span> <span>Testar Push Pendente</span>
+                                </button>
+                                <button type="button" onclick="window.salesNotificationEngine?.testPush('approved')" class="btn btn-primary btn-sm text-xs" title="Enviar Web Push de teste aprovado">
+                                    <span>🟢</span> <span>Testar Push Aprovado</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel: CREDENCIAIS & INTEGRAÇÕES -->
+                <div class="panel space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">🔑</span>
+                            <h3 class="text-sm font-bold text-[#F5F5F7]">Conexão Meta Marketing API</h3>
+                        </div>
+                        <button onclick="window.dashboard.openTokenModal()" class="btn btn-secondary btn-sm text-xs">Atualizar Token</button>
+                    </div>
+                    <p class="text-xs text-[#A1A1A6]">Gerencie o token de acesso à Graph API da Meta para atualização autônoma e leitura de métricas da conta.</p>
+                </div>
+            </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAIS, DRAWERS E TOASTS -->
+
+    <!-- Modal Seleção de Período Personalizado & Comparação -->
+    <div id="custom-date-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-6 space-y-5">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📅</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Selecionar Período de Análise</h3>
+                </div>
+                <button onclick="window.dashboard.closeCustomDateModal()" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+
+            <!-- Presets Rápidos no Modal -->
+            <div>
+                <label class="block text-[10.5px] text-[#A1A1A6] uppercase font-bold mb-2">Atalhos Rápidos</label>
+                <div class="grid grid-cols-3 gap-1.5 text-xs">
+                    <button type="button" onclick="window.dashboard.selectModalPreset('today')" class="btn btn-secondary btn-sm text-[11px]">Hoje</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('yesterday')" class="btn btn-secondary btn-sm text-[11px]">Ontem</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_3d')" class="btn btn-secondary btn-sm text-[11px]">3 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_7d')" class="btn btn-secondary btn-sm text-[11px]">7 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_14d')" class="btn btn-secondary btn-sm text-[11px]">14 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_30d')" class="btn btn-secondary btn-sm text-[11px]">30 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_90d')" class="btn btn-secondary btn-sm text-[11px]">90 Dias</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('this_month')" class="btn btn-secondary btn-sm text-[11px]">Este Mês</button>
+                    <button type="button" onclick="window.dashboard.selectModalPreset('last_month')" class="btn btn-secondary btn-sm text-[11px]">Mês Passado</button>
+                </div>
+            </div>
+
+            <!-- Intervalo Manual Customizado -->
+            <form onsubmit="window.dashboard.applyCustomDateRange(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Data Inicial</label>
+                        <input type="date" id="modal-date-since" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] font-mono focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Data Final</label>
+                        <input type="date" id="modal-date-until" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] font-mono focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Comparação de Período -->
+                <div class="flex items-center justify-between p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05]">
+                    <div>
+                        <p class="font-bold text-xs text-[#F5F5F7]">Comparar com período anterior</p>
+                        <p class="text-[10px] text-[#A1A1A6]">Exibe variações (+12%, -8%) comparando com o período anterior equivalente</p>
+                    </div>
+                    <input type="checkbox" id="modal-compare-checkbox" class="w-4 h-4 accent-[#FF2D2D] rounded">
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/[0.05]">
+                    <button type="button" onclick="window.dashboard.closeCustomDateModal()" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" class="btn btn-primary text-xs">Aplicar e Recalcular ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating Bulk Actions Bar -->
+    <div id="bulk-actions-bar">
+        <div class="bulk-bar-header">
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-[#FF2D2D]/20 text-[#FF2D2D] font-bold flex items-center justify-center text-xs font-mono" id="bulk-selected-count">0</span>
+                <span id="bulk-selected-label" class="text-xs font-semibold text-[#F5F5F7] whitespace-nowrap">selecionadas</span>
+            </div>
+            <button onclick="window.dashboard.clearBulkSelection()" class="text-xs text-gray-400 hover:text-white p-1 sm:hidden" title="Limpar Seleção">✕</button>
+        </div>
+        <div class="bulk-bar-divider"></div>
+        <div class="bulk-bar-actions">
+            <button onclick="window.dashboard.bulkAction('pause')" class="btn btn-secondary btn-sm text-[11px]" title="Pausar Selecionadas">
+                <span>⏸️</span> <span>Pausar</span>
+            </button>
+            <button onclick="window.dashboard.bulkAction('resume')" class="btn btn-secondary btn-sm text-[11px]" title="Reativar Selecionadas">
+                <span>▶️</span> <span>Reativar</span>
+            </button>
+            <button onclick="window.dashboard.openBulkBudgetModal()" class="btn btn-secondary btn-sm text-[11px]" title="Editar Orçamento">
+                <span>💰</span> <span>Orçamento</span>
+            </button>
+            <button onclick="window.dashboard.bulkAction('radwan')" class="btn btn-secondary btn-sm text-[11px] hidden sm:inline-flex" title="Análise Rápida">
+                <span>🧠</span> <span>Analisar</span>
+            </button>
+            <button onclick="window.dashboard.openBulkDuplicateModal()" class="btn btn-secondary btn-sm text-[11px] hidden sm:inline-flex" title="Duplicar Selecionadas">
+                <span>📋</span> <span>Duplicar</span>
+            </button>
+            <button onclick="window.dashboard.clearBulkSelection()" class="btn btn-tertiary btn-sm text-[11px] text-[#A1A1A6] hidden sm:inline-flex" title="Limpar Seleção">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Orçamento (Console de Ajuste Rápido & CBO/ABO) -->
+    <div id="budget-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">💰</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Ajuste de Orçamento Diário</h3>
+                </div>
+                <button onclick="document.getElementById('budget-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+
+            <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-[#A1A1A6]">Orçamento Atual:</span>
+                    <b id="budget-modal-current" class="text-[#F5F5F7] font-mono text-sm">R$ 0,00</b>
+                </div>
+                <div id="budget-structure-type" class="text-[10px] text-[#5DA9FF]">Nível da Campanha (CBO)</div>
+            </div>
+
+            <!-- Quick Adjust Chips -->
+            <div>
+                <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1.5">Ajustes Rápidos</label>
+                <div class="grid grid-cols-4 gap-1.5 text-xs">
+                    <button type="button" onclick="window.dashboard.applyBudgetQuickPct(-20)" class="btn btn-secondary btn-sm text-[11px]">-20%</button>
+                    <button type="button" onclick="window.dashboard.applyBudgetQuickPct(-10)" class="btn btn-secondary btn-sm text-[11px]">-10%</button>
+                    <button type="button" onclick="window.dashboard.applyBudgetQuickPct(10)" class="btn btn-secondary btn-sm text-[11px]">+10%</button>
+                    <button type="button" onclick="window.dashboard.applyBudgetQuickPct(20)" class="btn btn-secondary btn-sm text-[11px]">+20%</button>
+                </div>
+            </div>
+
+            <form onsubmit="window.dashboard.submitBudgetModal(event)" class="space-y-3">
+                <input type="hidden" id="budget-modal-camp-id">
+                <div>
+                    <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Novo Orçamento Exato (R$/dia)</label>
+                    <input type="number" step="0.01" id="budget-modal-input" oninput="window.dashboard.updateBudgetDiffPreview()" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-[#F5F5F7] font-mono focus:outline-none focus:border-[#FF2D2D] text-sm">
+                </div>
+
+                <!-- Preview de Impacto -->
+                <div id="budget-diff-preview" class="text-xs text-[#A1A1A6] p-2 bg-[#15151A] rounded-lg border border-white/[0.04] flex items-center justify-between">
+                    <span>Variação estimada:</span>
+                    <span id="budget-diff-label" class="font-bold text-[#F5F5F7]">0,0%</span>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/[0.05]">
+                    <button type="button" onclick="document.getElementById('budget-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" class="btn btn-primary text-xs">Aplicar e Verificar na Meta ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Duplicação de Campanha -->
+    <div id="duplicate-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📋</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Duplicar Campanha Existente</h3>
+                </div>
+                <button onclick="document.getElementById('duplicate-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+            
+            <p class="text-xs text-[#A1A1A6]">Cria cópias exatas da campanha, conjuntos e criativos na conta com verificação pós-escrita.</p>
+
+            <form onsubmit="window.dashboard.submitDuplicateModal(event)" class="space-y-4">
+                <input type="hidden" id="duplicate-camp-id">
+                
+                <div>
+                    <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Campanha de Origem</label>
+                    <p id="duplicate-camp-origin" class="text-xs font-semibold text-[#F5F5F7] bg-[#15151A] p-2.5 rounded-lg border border-white/[0.05] truncate"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Quantidade de Cópias</label>
+                        <select id="duplicate-copies-count" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                            <option value="1">1 cópia</option>
+                            <option value="2">2 cópias</option>
+                            <option value="3">3 cópias</option>
+                            <option value="5">5 cópias</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Status Inicial</label>
+                        <select id="duplicate-initial-status" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                            <option value="PAUSED">Pausada (Recomendado)</option>
+                            <option value="ACTIVE">Ativa (Inicia veiculação)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Sufixo de Nomenclatura</label>
+                    <input type="text" id="duplicate-suffix-input" value=" - Cópia Otimizada" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-white/[0.05]">
+                    <button type="button" onclick="document.getElementById('duplicate-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" class="btn btn-primary text-xs">Duplicar com Verificação ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Modal Troca de Token Meta -->
+    <div id="token-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-lg p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">🔑</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Atualizar Token Meta Marketing API</h3>
+                </div>
+                <button onclick="document.getElementById('token-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+            <p class="text-xs text-[#A1A1A6]">Insira o novo token de acesso gerado no Meta Developers / Business Manager para validar e salvar:</p>
+            <form onsubmit="window.dashboard.submitNewToken(event)" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] text-[#A1A1A6] uppercase font-bold mb-1">Novo Token Meta (EAA...)</label>
+                    <textarea id="token-modal-input" required rows="3" placeholder="Cole o token EAA... aqui" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-3 text-xs text-[#F5F5F7] font-mono placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]"></textarea>
+                </div>
+                <div id="token-modal-feedback" class="text-xs hidden p-2.5 rounded-lg"></div>
+                <div class="flex items-center justify-between pt-2">
+                    <button type="button" onclick="window.dashboard.logout()" class="text-xs text-[#FF453A] hover:underline">🚪 Sair e Desconectar</button>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="document.getElementById('token-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                        <button type="submit" id="btn-save-token" class="btn btn-primary text-xs">Testar & Salvar Token ➔</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Column Manager Slide-Over Drawer (Customizador Mestre de Métricas) -->
+    <div id="column-manager-drawer" class="drawer drawer-wide flex flex-col">
+        <!-- Header -->
+        <div class="p-4 sm:p-5 border-b border-white/[0.07] flex items-center justify-between bg-[#0A0A0C]">
+            <div class="flex items-center space-x-2.5">
+                <span class="text-xl">📊</span>
+                <div>
+                    <h3 class="font-bold text-[#F5F5F7] text-sm sm:text-base">Personalizar Colunas & Métricas</h3>
+                    <p class="text-[11px] text-[#A1A1A6]">Selecione e organize as métricas que você deseja visualizar na tabela operacional</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span id="column-manager-selected-count" class="badge badge-active text-[10px]">17 selecionadas</span>
+                <button onclick="window.dashboard.closeColumnManager()" class="btn-icon text-gray-400 hover:text-white" title="Fechar">✕</button>
+            </div>
+        </div>
+
+        <!-- Presets Toolbar -->
+        <div class="p-3 bg-[#0E0E12] border-b border-white/[0.05] flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            <span class="text-[10px] text-[#6E6E73] uppercase font-bold mr-1 flex-shrink-0">Presets:</span>
+            <button onclick="window.dashboard.applyPresetInDrawer('PADRAO_GESTOR')" data-drawer-preset="PADRAO_GESTOR" class="filter-chip active text-[11px]">⭐ Padrão do Gestor</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('ESSENCIAL')" data-drawer-preset="ESSENCIAL" class="filter-chip text-[11px]">⚡ Essencial</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('TRAFEGO')" data-drawer-preset="TRAFEGO" class="filter-chip text-[11px]">🔗 Tráfego</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('CONVERSAO')" data-drawer-preset="CONVERSAO" class="filter-chip text-[11px]">🛒 Conversão</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('FINANCEIRO')" data-drawer-preset="FINANCEIRO" class="filter-chip text-[11px]">💰 Financeiro</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('FUNIL')" data-drawer-preset="FUNIL" class="filter-chip text-[11px]">📊 Funil</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('VIDEO')" data-drawer-preset="VIDEO" class="filter-chip text-[11px]">🎬 Vídeo</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('CRIATIVOS')" data-drawer-preset="CRIATIVOS" class="filter-chip text-[11px]">🎨 Criativos</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('RADWAN')" data-drawer-preset="RADWAN" class="filter-chip text-[11px]">⌘ Radwan</button>
+            <button onclick="window.dashboard.applyPresetInDrawer('COMPLETO')" data-drawer-preset="COMPLETO" class="filter-chip text-[11px]">🌐 Completo</button>
+        </div>
+
+        <!-- Main Body: Split Grid -->
+        <div class="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+            <!-- Coluna Esquerda: Catálogo de Métricas (7 cols) -->
+            <div class="md:col-span-7 p-4 overflow-y-auto space-y-3.5 flex flex-col max-h-[50vh] md:max-h-none">
+                <!-- Search Box -->
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500 text-xs">🔍</span>
+                    <input type="text" id="column-search-input" oninput="window.dashboard.filterMetricsCatalog(this.value)" placeholder="Buscar por nome ou sigla (ROAS, CPA, CTR, Compra, Vídeo)..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-7 pr-3 py-2 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+                    <button onclick="window.dashboard.filterMetricCategory('all')" data-cat-filter="all" class="px-2 py-1 rounded bg-[#15151A] text-[#F5F5F7] border border-white/[0.08] font-semibold">Todas</button>
+                    <button onclick="window.dashboard.filterMetricCategory('principais')" data-cat-filter="principais" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Principais</button>
+                    <button onclick="window.dashboard.filterMetricCategory('entrega')" data-cat-filter="entrega" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Entrega</button>
+                    <button onclick="window.dashboard.filterMetricCategory('trafego')" data-cat-filter="trafego" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Tráfego</button>
+                    <button onclick="window.dashboard.filterMetricCategory('conversao')" data-cat-filter="conversao" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Conversão</button>
+                    <button onclick="window.dashboard.filterMetricCategory('financeiro')" data-cat-filter="financeiro" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Financeiro</button>
+                    <button onclick="window.dashboard.filterMetricCategory('funil')" data-cat-filter="funil" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Funil</button>
+                    <button onclick="window.dashboard.filterMetricCategory('video')" data-cat-filter="video" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Vídeo</button>
+                    <button onclick="window.dashboard.filterMetricCategory('radwan')" data-cat-filter="radwan" class="px-2 py-1 rounded text-[#A1A1A6] hover:text-[#F5F5F7]">Radwan</button>
+                </div>
+
+                <!-- Metrics List Container -->
+                <div id="metrics-catalog-list" class="space-y-2 overflow-y-auto flex-1 pr-1">
+                    <!-- Gerado dinamicamente pelo MetricsEngine -->
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Colunas Selecionadas e Ordem (5 cols) -->
+            <div class="md:col-span-5 p-4 bg-[#0A0A0C] overflow-y-auto flex flex-col justify-between space-y-3">
+                <div class="space-y-2 flex-1 overflow-hidden flex flex-col">
+                    <div class="flex items-center justify-between border-b border-white/[0.05] pb-2">
+                        <span class="text-xs font-bold text-[#F5F5F7]">Ordem na Tabela</span>
+                        <span class="text-[10px] text-[#6E6E73]">Arraste ou use ▲ ▼</span>
+                    </div>
+
+                    <div id="selected-columns-order-list" class="space-y-1.5 overflow-y-auto flex-1 pr-1 max-h-[40vh] md:max-h-none">
+                        <!-- Gerado dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Saved Views Box -->
+                <div class="p-2.5 rounded-lg bg-[#111115] border border-white/[0.05] space-y-2">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-semibold text-[#A1A1A6]">Salvar Esta Visão</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <input type="text" id="save-view-name-input" placeholder="Nome da visão (ex: Minha Análise)..." class="flex-1 bg-[#16161C] border border-white/[0.08] rounded px-2 py-1 text-xs text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D]">
+                        <button onclick="window.dashboard.saveCurrentCustomView()" class="btn btn-secondary btn-sm text-[10.5px]">Salvar</button>
+                    </div>
+                    <div id="saved-views-container" class="space-y-1 pt-1 border-t border-white/[0.04]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-3 sm:p-4 border-t border-white/[0.07] bg-[#0A0A0C] flex items-center justify-between gap-2">
+            <button onclick="window.dashboard.restoreDefaultColumns()" class="btn btn-tertiary text-xs text-[#A1A1A6] hover:text-white" title="Restaurar o Padrão do Gestor">
+                Restaurar Padrão do Gestor
+            </button>
+            <div class="flex items-center space-x-2">
+                <button onclick="window.dashboard.closeColumnManager()" class="btn btn-secondary text-xs">Cancelar</button>
+                <button onclick="window.dashboard.applySelectedColumns()" class="btn btn-primary text-xs">Aplicar e Atualizar Tabela ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Renomear Campanha (Oficial Meta & Apelido Interno Radwan) -->
+    <div id="rename-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">✏️</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base">Renomear Campanha</h3>
+                </div>
+                <button onclick="document.getElementById('rename-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+
+            <!-- Seletor de Modo de Renomeação -->
+            <div class="p-1 rounded-lg bg-[#15151A] border border-white/[0.06] flex items-center gap-1 text-xs">
+                <button type="button" onclick="window.dashboard.setRenameMode('official')" id="rename-mode-official" class="flex-1 py-1.5 rounded-md font-semibold text-center transition-all bg-[#0E0E12] text-[#F5F5F7] shadow-sm">
+                    🌐 Oficial na Meta
+                </button>
+                <button type="button" onclick="window.dashboard.setRenameMode('nickname')" id="rename-mode-nickname" class="flex-1 py-1.5 rounded-md font-semibold text-center transition-all text-[#A1A1A6] hover:text-[#F5F5F7]">
+                    🏷️ Apelido Interno (Radwan)
+                </button>
+            </div>
+
+            <p id="rename-mode-description" class="text-[11px] text-[#A1A1A6] leading-relaxed">
+                Altera o nome real da campanha diretamente na conta de anúncios da Meta via Graph API.
+            </p>
+
+            <form onsubmit="window.dashboard.submitRenameModal(event)" class="space-y-4">
+                <input type="hidden" id="rename-modal-camp-id">
+                
+                <div>
+                    <label class="block text-[10px] text-[#6E6E73] uppercase font-bold mb-1">Nome Atual</label>
+                    <p id="rename-modal-current-name" class="text-xs font-semibold text-[#A1A1A6] bg-[#15151A] p-2.5 rounded-lg border border-white/[0.04] truncate font-mono"></p>
+                </div>
+
+                <div>
+                    <label id="rename-modal-input-label" class="block text-[10px] text-[#F5F5F7] uppercase font-bold mb-1">Novo Nome Oficial</label>
+                    <input type="text" id="rename-modal-input" required placeholder="Digite o novo nome..." class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-white/[0.05]">
+                    <button type="button" onclick="document.getElementById('rename-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" id="btn-submit-rename" class="btn btn-primary text-xs">Salvar Alteração ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ajuste de Orçamento (CBO / ABO com Previews e Presets) -->
+    <div id="budget-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">💰</span>
+                    <div>
+                        <h3 class="font-bold text-[#F5F5F7] text-base" id="budget-modal-title">Ajustar Orçamento</h3>
+                        <p class="text-[10.5px] text-[#A1A1A6]" id="budget-modal-subtitle">Controle financeiro seguro</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('budget-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+
+            <form onsubmit="window.dashboard.submitBudgetModal(event)" class="space-y-4">
+                <input type="hidden" id="budget-modal-object-id">
+                <input type="hidden" id="budget-modal-current-val">
+                <input type="hidden" id="budget-modal-level" value="campaign">
+
+                <!-- Estrutura CBO vs ABO Info Badge -->
+                <div class="p-2.5 rounded-lg bg-[#15151A] border border-white/[0.06] flex items-center justify-between text-xs">
+                    <span class="text-[#A1A1A6]">Nível do Orçamento:</span>
+                    <span id="budget-modal-structure-badge" class="badge badge-active text-[10px]">CBO • Campanha</span>
+                </div>
+
+                <!-- Modificadores Rápidos em % (+/-) -->
+                <div>
+                    <label class="block text-[10px] text-[#6E6E73] uppercase font-bold mb-1.5">Ajuste Rápido Percentual</label>
+                    <div class="grid grid-cols-5 gap-1.5 text-xs">
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-20)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-20%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-15)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-15%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-10)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-10%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(-5)" class="py-1 px-1 rounded bg-[#1A1215] text-[#FF453A] border border-[#FF453A]/20 hover:bg-[#FF453A]/20 font-mono text-[11px] font-bold">-5%</button>
+                        <button type="button" onclick="window.dashboard.resetBudgetModal()" class="py-1 px-1 rounded bg-[#15151A] text-[#A1A1A6] border border-white/[0.08] hover:text-white font-mono text-[10.5px]">Reset</button>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1.5 text-xs mt-1.5">
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(5)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+5%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(10)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+10%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(15)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+15%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(20)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+20%</button>
+                        <button type="button" onclick="window.dashboard.applyBudgetModifier(30)" class="py-1 px-1 rounded bg-[#121A15] text-[#1FC16B] border border-[#1FC16B]/20 hover:bg-[#1FC16B]/20 font-mono text-[11px] font-bold">+30%</button>
+                    </div>
+                </div>
+
+                <!-- Input de Valor Exato -->
+                <div>
+                    <label class="block text-[10px] text-[#F5F5F7] uppercase font-bold mb-1">Novo Orçamento Diário (R$)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 text-xs font-mono">R$</span>
+                        <input type="number" step="0.01" min="5" id="budget-modal-input" required oninput="window.dashboard.updateBudgetPreview()" class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2.5 text-sm font-bold font-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                    </div>
+                </div>
+
+                <!-- Card de Preview Obrigatório: ANTES / DEPOIS / VARIAÇÃO -->
+                <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.06] space-y-1.5 text-xs">
+                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold block">Preview do Ajuste</span>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[#A1A1A6]">Orçamento Anterior:</span>
+                        <span class="font-mono font-semibold text-[#F5F5F7]" id="budget-modal-preview-before">R$ 0,00</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[#A1A1A6]">Novo Orçamento:</span>
+                        <span class="font-mono font-bold text-[#5DA9FF]" id="budget-modal-preview-after">R$ 0,00</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+                        <span class="text-[#A1A1A6]">Variação Prevista:</span>
+                        <span class="font-mono font-bold" id="budget-modal-preview-diff">0,0% (R$ 0,00)</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-white/[0.05]">
+                    <button type="button" onclick="document.getElementById('budget-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" id="btn-submit-budget" class="btn btn-primary text-xs">Confirmar e Aplicar ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Duplicar Campanha / Conjunto / Anúncio -->
+    <div id="duplicate-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📋</span>
+                    <h3 class="font-bold text-[#F5F5F7] text-base" id="duplicate-modal-title">Duplicar Objeto</h3>
+                </div>
+                <button onclick="document.getElementById('duplicate-modal').classList.add('hidden')" class="text-xs text-[#A1A1A6] hover:text-[#F5F5F7]">✕ Fechar</button>
+            </div>
+            <p class="text-xs text-[#A1A1A6]">Cria uma cópia exata do objeto selecionado na Meta, iniciando pausado por segurança.</p>
+            <form onsubmit="window.dashboard.submitDuplicateModal(event)" class="space-y-4">
+                <input type="hidden" id="duplicate-modal-object-id">
+                <div>
+                    <label class="block text-[10px] text-[#6E6E73] uppercase font-bold mb-1">Nome da Nova Cópia</label>
+                    <input type="text" id="duplicate-modal-input" required class="w-full bg-[#15151A] border border-white/[0.08] rounded-lg p-2.5 text-xs text-[#F5F5F7] focus:outline-none focus:border-[#FF2D2D]">
+                </div>
+                <div class="flex items-center justify-end space-x-2 pt-2">
+                    <button type="button" onclick="document.getElementById('duplicate-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Cancelar</button>
+                    <button type="submit" id="btn-submit-duplicate" class="btn btn-primary text-xs">Duplicar Agora ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Diagnóstico Radwan Ads -->
+    <div id="radwan-analysis-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="radwan-analysis-title">
+        <div class="modal-content max-w-lg p-5 sm:p-6 space-y-4 max-h-[88vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3 flex-shrink-0">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-[#FF2D2D]/10 text-[#FF2D2D] border border-[#FF2D2D]/20 flex items-center justify-center font-bold text-xs font-mono">⌘</div>
+                    <div>
+                        <h3 id="radwan-analysis-title" class="font-bold text-[#F5F5F7] text-sm sm:text-base">Diagnóstico do Radwan Ads</h3>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Auditoria e Otimização em Tempo Real</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn-icon text-gray-400 hover:text-white" title="Fechar">✕</button>
+            </div>
+            <div id="radwan-analysis-content" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs min-h-[120px]">
+                <!-- Conteúdo gerado dinamicamente -->
+            </div>
+            <div class="pt-3 border-t border-white/[0.05] flex items-center justify-end flex-shrink-0">
+                <button type="button" onclick="document.getElementById('radwan-analysis-modal').classList.add('hidden')" class="btn btn-secondary text-xs px-4 py-2">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Slide-Over Inspector Drawer (Desktop / Tablet / Mobile Bottom Sheet) -->
+    <div id="campaign-drawer" class="drawer drawer-wide flex flex-col">
+        <!-- Header Fixo -->
+        <div class="p-4 sm:p-5 border-b border-white/[0.07] flex items-center justify-between bg-[#0A0A0C] sticky top-0 z-10">
+            <div class="min-w-0 flex-1 pr-3">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span id="campaign-drawer-status-badge" class="badge badge-active text-[9.5px]">Ativa</span>
+                    <span id="campaign-drawer-structure-badge" class="badge badge-paused text-[9.5px]">CBO</span>
+                    <span id="campaign-drawer-id" class="text-[10px] text-[#6E6E73] font-mono">ID: --</span>
+                </div>
+                <h3 id="campaign-drawer-title" class="font-bold text-[#F5F5F7] text-sm sm:text-base truncate">Detalhes da Campanha</h3>
+                <p id="campaign-drawer-subtitle" class="text-[11px] text-[#A1A1A6] truncate"></p>
+            </div>
+            <button onclick="window.dashboard.closeDrawer()" class="btn-icon text-gray-400 hover:text-white" title="Fechar">✕</button>
+        </div>
+
+        <!-- Action Toolbar Rápida -->
+        <div id="campaign-drawer-toolbar" class="p-3 bg-[#0E0E12] border-b border-white/[0.05] flex items-center gap-2 overflow-x-auto scrollbar-none flex-shrink-0">
+            <!-- Ações rápidas injetadas dinamicamente -->
+        </div>
+
+        <!-- Metric Groups Content (Organizado em 5 Blocos Formais) -->
+        <div id="drawer-content" class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1 bg-[#0A0A0C]">
+            <!-- Injetado dinamicamente -->
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3 sm:p-4 border-t border-white/[0.07] bg-[#0A0A0C] flex items-center justify-between">
+            <span class="text-[10px] text-[#6E6E73]">Sincronizado com Meta Ads Engine</span>
+            <button onclick="window.dashboard.closeDrawer()" class="btn btn-secondary text-xs">Fechar Painel</button>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes de Todas as Métricas (Legacy Fallback) -->
+    <div id="mobile-metric-details-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md p-5 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div class="min-w-0">
+                    <h3 id="mobile-modal-camp-name" class="font-bold text-[#F5F5F7] text-sm truncate">Campanha</h3>
+                    <p id="mobile-modal-camp-id" class="text-[10px] text-[#6E6E73] font-mono">ID: --</p>
+                </div>
+                <button onclick="document.getElementById('mobile-metric-details-modal').classList.add('hidden')" class="btn-icon text-gray-400 hover:text-white">✕</button>
+            </div>
+            <div id="mobile-modal-metrics-grid" class="overflow-y-auto space-y-2 flex-1 pr-1 text-xs divide-y divide-white/[0.04]"></div>
+            <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
+                <button onclick="document.getElementById('mobile-metric-details-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes de Sessão do Site Intelligence -->
+    <div id="si-session-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-lg p-5 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                <div>
+                    <h3 id="si-modal-title" class="font-bold text-[#F5F5F7] text-sm">Inspeção de Sessão</h3>
+                    <p id="si-modal-subtitle" class="text-[10px] text-[#6E6E73] font-mono">ID da Sessão: --</p>
+                </div>
+                <button onclick="document.getElementById('si-session-modal').classList.add('hidden')" class="btn-icon text-gray-400 hover:text-white">✕</button>
+            </div>
+            
+            <div id="si-modal-content" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs">
+                <!-- Conteúdo da sessão injetado dinamicamente -->
+            </div>
+
+            <div class="pt-2 border-t border-white/[0.05] flex items-center justify-end">
+                <button onclick="document.getElementById('si-session-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
+            </div>
+        </div>
+    </div><!-- /#app-main-layout -->
+
+    <!-- Command Menu Global (⌘K / Ctrl+K) -->
+    <div id="command-menu-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="command-menu-search-input" onclick="if(event.target === this) window.commandMenu?.close()">
+        <div class="command-menu-palette" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.08] bg-[#121217]">
+                <span class="text-sm text-[#FF2D2D] font-mono font-bold">⌘</span>
+                <input type="text" id="command-menu-search-input" placeholder="Buscar campanhas, navegar telas ou executar comandos..." 
+                       class="w-full bg-transparent text-sm text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none font-medium" autocomplete="off" spellcheck="false">
+                <kbd class="px-2 py-0.5 text-[10px] font-mono bg-white/[0.06] border border-white/[0.1] rounded text-[#A1A1A6] hidden sm:inline-block">ESC</kbd>
+            </div>
+            <div id="command-menu-results" class="max-h-[380px] overflow-y-auto p-2 space-y-1 text-xs">
+                <!-- Renderizado dinamicamente -->
+            </div>
+            <div class="px-4 py-2 bg-[#0A0A0C] border-t border-white/[0.05] flex items-center justify-between text-[10.5px] text-[#6E6E73] font-mono">
+                <div class="flex items-center gap-3">
+                    <span><kbd class="text-[#A1A1A6]">↑</kbd> <kbd class="text-[#A1A1A6]">↓</kbd> Navegar</span>
+                    <span><kbd class="text-[#A1A1A6]">↵</kbd> Selecionar</span>
+                </div>
+                <span>Radwan Command</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- macOS & Mobile Bottom Navigation Dock (macOS Gaussian Physics Desktop + Touch Mobile) -->
+    <nav id="mobile-bottom-dock" aria-label="Navegação Principal">
+        <div class="dock-container" id="dock-physics-container">
+            <button onclick="window.dashboard.switchView('home')" class="mobile-dock-btn active" data-dock-view="home" aria-label="Home">
+                <span class="dock-tooltip">Home</span>
+                <span class="mobile-dock-icon-wrapper">
+                    <span class="mobile-dock-icon text-base">📊</span>
+                </span>
+                <span class="dock-label">Home</span>
+            </button>
+            <button onclick="window.dashboard.switchView('campaigns')" class="mobile-dock-btn" data-dock-view="campaigns" aria-label="Campanhas">
+                <span class="dock-tooltip">Campanhas</span>
+                <span class="mobile-dock-icon-wrapper">
+                    <span class="mobile-dock-icon text-base">📢</span>
+                </span>
+                <span class="dock-label">Campanhas</span>
+            </button>
+            <button onclick="window.dashboard.switchView('site-intelligence')" class="mobile-dock-btn" data-dock-view="site-intelligence" aria-label="Inteligência">
+                <span class="dock-tooltip">Inteligência</span>
+                <span class="mobile-dock-icon-wrapper">
+                    <span class="mobile-dock-icon text-base">🧠</span>
+                </span>
+                <span class="dock-label">Inteligência</span>
+            </button>
+            <button onclick="window.dashboard.toggleSidebar()" class="mobile-dock-btn" data-dock-view="more" aria-label="Mais Opções">
+                <span class="dock-tooltip">Mais Opções</span>
+                <span class="mobile-dock-icon-wrapper">
+                    <span class="mobile-dock-icon text-base">☰</span>
+                </span>
+                <span class="dock-label">Mais</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- SCRIPTS DA APLICAÇÃO (ORDEM RIGOROSA - CACHE BUSTER V8.0 ENTERPRISE) -->
+    <script src="js/auth-gate.js?v=8.0-auth"></script>
+    <script src="js/period-store.js?v=8.0-hardened"></script>
+    <script src="js/metrics-registry.js?v=8.0-hardened"></script>
+    <script src="js/meta-adapter.js?v=8.0-hardened"></script>
+    <script src="js/analytics.js?v=8.0-hardened"></script>
+    <script src="js/guardrails.js?v=8.0-hardened"></script>
+    <script src="js/decisions.js?v=8.0-hardened"></script>
+    <script src="js/execution.js?v=8.0-hardened"></script>
+    <script src="js/audit.js?v=8.0-hardened"></script>
+    <script src="js/autopilot.js?v=8.0-hardened"></script>
+    <script src="js/dock-physics.js?v=8.0-dock"></script>
+    <script src="js/sales-notification-engine.js?v=8.0-sales"></script>
+    <script src="js/dashboard.js?v=8.0-hardened"></script>
+</body>
+
+</html>
