@@ -70,6 +70,23 @@ class DashboardApp {
             if (!e.target.closest('#topbar-more-menu') && !e.target.closest('button[title="Mais Opções"]')) {
                 this.closeTopMoreMenu();
             }
+            if (!e.target.closest('#hourly-chart-container') && !e.target.closest('.segmented-btn')) {
+                this.hideHourlyTooltip();
+            }
+        });
+
+        // Fechar tooltip em resize
+        window.addEventListener('resize', () => this.hideHourlyTooltip());
+
+        // Acessibilidade por teclado para navegação no gráfico
+        document.addEventListener('keydown', (e) => {
+            if (this.currentView === 'overview' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                const chartEl = document.getElementById('hourly-chart-container');
+                if (!chartEl) return;
+                const cur = (this.activeHourlyIndex !== null && this.activeHourlyIndex !== undefined) ? this.activeHourlyIndex : 12;
+                const next = e.key === 'ArrowLeft' ? Math.max(0, cur - 1) : Math.min(23, cur + 1);
+                this.handleHourlyHover(null, next);
+            }
         });
 
         // Verifica autenticação
@@ -579,6 +596,11 @@ class DashboardApp {
         if (titleEl) titleEl.textContent = titles[this.hourlyChartMetric] || 'Desempenho por Faixa Horária';
 
         this.renderHourlyVisualIntelligence();
+
+        // Se havia um tooltip ativo, atualiza imediatamente com a nova métrica protagonista
+        if (this.activeHourlyIndex !== null && this.activeHourlyIndex !== undefined) {
+            this.handleHourlyHover(null, this.activeHourlyIndex);
+        }
     }
 
     calculateHourlyData() {
@@ -794,7 +816,7 @@ class DashboardApp {
         const barW = Math.max(8, slotW * 0.65);
 
         let svg = `
-            <svg viewBox="0 0 ${width} ${height}" class="w-full h-full overflow-visible" style="max-height: 220px;">
+            <svg viewBox="0 0 ${width} ${height}" class="w-full h-full overflow-visible" onmouseleave="window.dashboard.hideHourlyTooltip()">
                 <defs>
                     <linearGradient id="profitGradPos" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stop-color="#1FC16B" stop-opacity="0.95"/>
@@ -810,24 +832,29 @@ class DashboardApp {
                     </linearGradient>
                 </defs>
 
+                <!-- Linhas de Apoio e Linha Zero -->
                 <line x1="${padLeft}" y1="${padTop}" x2="${width - padRight}" y2="${padTop}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
                 <line x1="${padLeft}" y1="${padTop + chartH / 2}" x2="${width - padRight}" y2="${padTop + chartH / 2}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
-                <line x1="${padLeft}" y1="${yZero}" x2="${width - padRight}" y2="${yZero}" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+                <line x1="${padLeft}" y1="${yZero}" x2="${width - padRight}" y2="${yZero}" stroke="rgba(255,255,255,0.22)" stroke-width="1.2"/>
                 
                 <text x="${padLeft - 6}" y="${padTop + 4}" fill="#6E6E73" font-size="9" font-family="monospace" text-anchor="end">${metricKey === 'sales' ? Math.round(maxVal) : 'R$' + Math.round(maxVal)}</text>
                 <text x="${padLeft - 6}" y="${yZero + 3}" fill="#A1A1A6" font-size="9" font-family="monospace" font-weight="bold" text-anchor="end">0</text>
                 ${minVal < 0 ? `<text x="${padLeft - 6}" y="${padTop + chartH}" fill="#FF453A" font-size="9" font-family="monospace" text-anchor="end">-${Math.round(Math.abs(minVal))}</text>` : ''}
+
+                <!-- Linha Vertical Crosshair Dinâmica -->
+                <line id="hourly-crosshair" class="hourly-crosshair" x1="0" y1="${padTop - 4}" x2="0" y2="${height - padBottom + 4}"/>
         `;
 
+        // 1. Barras e Marcadores por Hora
         hours.forEach((slot, i) => {
             const x = padLeft + (i * slotW) + (slotW - barW) / 2;
             const val = values[i];
 
             if (slot.isFuture) {
                 svg += `
-                    <g class="cursor-pointer group" onclick="window.dashboard.showHourlyTooltip(${i}, ${x}, ${yZero})">
-                        <circle cx="${x + barW / 2}" cy="${yZero}" r="2" fill="rgba(255,255,255,0.15)"/>
-                        <text x="${x + barW / 2}" y="${height - 12}" fill="#48484A" font-size="8.5" font-family="monospace" text-anchor="middle">${i % 3 === 0 ? slot.hourLabel : ''}</text>
+                    <g id="hourly-bar-${i}" class="hourly-bar-group">
+                        <circle cx="${x + barW / 2}" cy="${yZero}" r="2.5" fill="rgba(255,255,255,0.18)"/>
+                        <text id="hourly-axis-${i}" x="${x + barW / 2}" y="${height - 12}" fill="#48484A" font-size="8.5" font-family="monospace" class="hourly-axis-label" text-anchor="middle">${i % 3 === 0 ? slot.hourLabel : ''}</text>
                     </g>
                 `;
             } else {
@@ -848,9 +875,9 @@ class DashboardApp {
                 }
 
                 svg += `
-                    <g class="cursor-pointer transition-transform hover:scale-105 origin-bottom" onclick="window.dashboard.showHourlyTooltip(${i}, ${x}, ${barY})" onmouseenter="window.dashboard.showHourlyTooltip(${i}, ${x}, ${barY})">
-                        <rect x="${x}" y="${barY}" width="${barW}" height="${barH}" rx="2" ry="2" fill="${fillStyle}" ${strokeStyle}/>
-                        <text x="${x + barW / 2}" y="${height - 12}" fill="${slot.isCurrent ? '#5DA9FF' : '#8E8E93'}" font-size="8.5" font-family="monospace" font-weight="${slot.isCurrent ? 'bold' : 'normal'}" text-anchor="middle">
+                    <g id="hourly-bar-${i}" class="hourly-bar-group">
+                        <rect x="${x}" y="${barY}" width="${barW}" height="${barH}" rx="2.5" ry="2.5" fill="${fillStyle}" ${strokeStyle}/>
+                        <text id="hourly-axis-${i}" x="${x + barW / 2}" y="${height - 12}" fill="${slot.isCurrent ? '#5DA9FF' : '#8E8E93'}" font-size="8.5" font-family="monospace" font-weight="${slot.isCurrent ? 'bold' : 'normal'}" class="hourly-axis-label" text-anchor="middle">
                             ${i % 2 === 0 || slot.isCurrent ? slot.hourLabel : ''}
                         </text>
                     </g>
@@ -858,45 +885,253 @@ class DashboardApp {
             }
         });
 
+        // 2. Colunas Transparentes de Interação (Hit-Areas amplas para Desktop e Touch)
+        hours.forEach((slot, i) => {
+            const hitX = padLeft + (i * slotW);
+            svg += `
+                <rect class="cursor-pointer" x="${hitX}" y="0" width="${slotW}" height="${height}" fill="transparent" 
+                      onmousemove="window.dashboard.handleHourlyHover(event, ${i})" 
+                      onmouseenter="window.dashboard.handleHourlyHover(event, ${i})" 
+                      ontouchstart="window.dashboard.handleHourlyTouch(event, ${i})" 
+                      ontouchmove="window.dashboard.handleHourlyTouch(event, ${i})" />
+            `;
+        });
+
         svg += `</svg>`;
+
+        // Tooltip Flutuante Conectado
+        svg += `<div id="hourly-chart-tooltip" class="hourly-chart-tooltip"></div>`;
+
         container.innerHTML = svg;
     }
 
-    showHourlyTooltip(hourIndex) {
+    buildHourlyTooltipViewModel(hourIndex, metricKey = 'profit') {
         const data = this.calculateHourlyData();
         const slot = data.hours[hourIndex];
-        if (!slot) return;
+        if (!slot) return null;
 
-        let statusText = slot.isCurrent ? '⚡ Em Andamento (Parcial)' : (slot.isFuture ? '⏳ Hora Futura' : '✓ Horário Concluído');
+        const isToday = data.isToday;
+        const isFuture = slot.isFuture;
+        const isCurrent = slot.isCurrent;
 
-        const toastContent = `
-            <div class="space-y-1">
-                <div class="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-1">
-                    <span class="font-bold text-xs text-[#F5F5F7]">⏰ ${slot.timeRangeLabel}</span>
-                    <span class="text-[9.5px] ${slot.isCurrent ? 'text-[#5DA9FF]' : 'text-[#6E6E73]'}">${statusText}</span>
+        let statusLabel = 'Concluído';
+        let statusBadgeClass = 'badge-active text-[9px]';
+
+        if (isFuture) {
+            statusLabel = 'Futuro';
+            statusBadgeClass = 'badge-paused text-[9px]';
+        } else if (isCurrent) {
+            statusLabel = '⚡ Em andamento';
+            statusBadgeClass = 'badge-warning text-[9px]';
+        }
+
+        // Métrica Principal Protagonista
+        let primaryLabel = 'Lucro Líquido Real';
+        let primaryValue = slot.profit;
+        let primaryFormatted = `${slot.profit > 0 ? '+' : ''}${window.analyticsEngine.formatMoney(slot.profit)}`;
+        let primaryColorClass = slot.profit > 0 ? 'text-[#1FC16B]' : (slot.profit < 0 ? 'text-[#FF453A]' : 'text-[#F5F5F7]');
+
+        if (metricKey === 'revenue') {
+            primaryLabel = 'Faturamento';
+            primaryValue = slot.revenue;
+            primaryFormatted = window.analyticsEngine.formatMoney(slot.revenue);
+            primaryColorClass = slot.revenue > 0 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]';
+        } else if (metricKey === 'spend') {
+            primaryLabel = 'Investimento';
+            primaryValue = slot.spend;
+            primaryFormatted = window.analyticsEngine.formatMoney(slot.spend);
+            primaryColorClass = 'text-[#F5F5F7]';
+        } else if (metricKey === 'sales') {
+            primaryLabel = 'Vendas Confirmadas';
+            primaryValue = slot.sales;
+            primaryFormatted = `${slot.sales} ${slot.sales === 1 ? 'venda' : 'vendas'}`;
+            primaryColorClass = slot.sales > 0 ? 'text-[#5DA9FF]' : 'text-[#6E6E73]';
+        }
+
+        // Contexto Secundário Limpo e Organizado
+        const secondary = [];
+        if (metricKey !== 'profit') {
+            secondary.push({
+                label: 'Lucro Líquido',
+                value: `${slot.profit > 0 ? '+' : ''}${window.analyticsEngine.formatMoney(slot.profit)}`,
+                isProfit: true,
+                raw: slot.profit
+            });
+        }
+        if (metricKey !== 'revenue') {
+            secondary.push({
+                label: 'Faturamento',
+                value: window.analyticsEngine.formatMoney(slot.revenue),
+                isProfit: false,
+                raw: slot.revenue
+            });
+        }
+        if (metricKey !== 'spend') {
+            secondary.push({
+                label: 'Investimento',
+                value: window.analyticsEngine.formatMoney(slot.spend),
+                isProfit: false,
+                raw: slot.spend
+            });
+        }
+        if (metricKey !== 'sales') {
+            secondary.push({
+                label: 'Vendas',
+                value: `${slot.sales} un`,
+                isProfit: false,
+                raw: slot.sales
+            });
+        }
+
+        return {
+            hourIndex,
+            timeRangeLabel: slot.timeRangeLabel,
+            statusLabel,
+            statusBadgeClass,
+            isFuture,
+            isCurrent,
+            primaryLabel,
+            primaryFormatted,
+            primaryColorClass,
+            secondary
+        };
+    }
+
+    handleHourlyHover(event, hourIndex) {
+        this.activeHourlyIndex = hourIndex;
+        const container = document.getElementById('hourly-chart-container');
+        if (!container) return;
+
+        const metricKey = this.hourlyChartMetric || 'profit';
+        const vm = this.buildHourlyTooltipViewModel(hourIndex, metricKey);
+        if (!vm) return;
+
+        // 1. Crosshair & Bar Highlight
+        const width = 760;
+        const padLeft = 45;
+        const padRight = 15;
+        const chartW = width - padLeft - padRight;
+        const slotW = chartW / 24;
+        const slotCenterX = padLeft + (hourIndex * slotW) + (slotW / 2);
+
+        const crosshair = document.getElementById('hourly-crosshair');
+        if (crosshair) {
+            crosshair.setAttribute('x1', slotCenterX);
+            crosshair.setAttribute('x2', slotCenterX);
+            crosshair.classList.add('is-visible');
+        }
+
+        // Highlight/Dim barras
+        document.querySelectorAll('.hourly-bar-group').forEach((bar, idx) => {
+            if (idx === hourIndex) {
+                bar.classList.add('is-hovered');
+                bar.classList.remove('is-dimmed');
+            } else {
+                bar.classList.remove('is-hovered');
+                bar.classList.add('is-dimmed');
+            }
+        });
+
+        // Highlight no label do eixo X
+        document.querySelectorAll('.hourly-axis-label').forEach((lbl, idx) => {
+            if (idx === hourIndex) lbl.classList.add('is-highlighted');
+            else lbl.classList.remove('is-highlighted');
+        });
+
+        // 2. Renderizar Conteúdo Estruturado no Tooltip
+        const tooltip = document.getElementById('hourly-chart-tooltip');
+        if (!tooltip) return;
+
+        tooltip.innerHTML = `
+            <div class="space-y-2 text-xs">
+                <div class="flex items-center justify-between border-b border-white/[0.08] pb-1.5 gap-2">
+                    <span class="font-bold text-[#F5F5F7] tracking-tight">⏰ ${vm.timeRangeLabel}</span>
+                    <span class="badge ${vm.statusBadgeClass} font-medium">${vm.statusLabel}</span>
                 </div>
-                <div class="text-xs space-y-0.5 pt-0.5">
-                    <div class="flex justify-between gap-3 font-mono">
-                        <span class="text-[#A1A1A6]">Lucro Líquido:</span>
-                        <b class="${slot.profit >= 0 ? 'text-[#1FC16B]' : 'text-[#FF453A]'}">${window.analyticsEngine.formatMoney(slot.profit)}</b>
-                    </div>
-                    <div class="flex justify-between gap-3 font-mono">
-                        <span class="text-[#A1A1A6]">Faturamento:</span>
-                        <span class="text-[#F5F5F7]">${window.analyticsEngine.formatMoney(slot.revenue)}</span>
-                    </div>
-                    <div class="flex justify-between gap-3 font-mono">
-                        <span class="text-[#A1A1A6]">Investimento:</span>
-                        <span class="text-[#A1A1A6]">${window.analyticsEngine.formatMoney(slot.spend)}</span>
-                    </div>
-                    <div class="flex justify-between gap-3 font-mono">
-                        <span class="text-[#A1A1A6]">Vendas:</span>
-                        <span class="text-[#5DA9FF]">${slot.sales} un</span>
-                    </div>
+                <div class="py-0.5">
+                    <span class="text-[9.5px] uppercase font-bold tracking-wider text-[#A1A1A6] block">${escapeHTML(vm.primaryLabel)}</span>
+                    <span class="text-base font-bold font-mono ${vm.primaryColorClass} leading-tight block">${escapeHTML(vm.primaryFormatted)}</span>
                 </div>
+                ${!vm.isFuture ? `
+                    <div class="pt-1.5 border-t border-white/[0.06] space-y-1 text-[11px] font-mono">
+                        ${vm.secondary.map(sec => `
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-[#8E8E93] font-sans">${escapeHTML(sec.label)}:</span>
+                                <span class="${sec.isProfit ? (sec.raw >= 0 ? 'text-[#1FC16B] font-semibold' : 'text-[#FF453A] font-semibold') : 'text-[#F5F5F7]'}">${escapeHTML(sec.value)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : `
+                    <div class="pt-1 border-t border-white/[0.06] text-[10px] text-[#6E6E73] italic">
+                        Horário futuro (não apurado)
+                    </div>
+                `}
             </div>
         `;
 
-        this.showToast(toastContent, 'info', 4000);
+        // 3. Posicionamento Inteligente (Flip lateral para nunca sair do container)
+        const slotPct = (slotCenterX / width) * 100;
+
+        if (slotPct > 55) {
+            const rightPct = Math.max(2, 100 - slotPct + 3);
+            tooltip.style.left = 'auto';
+            tooltip.style.right = `${rightPct}%`;
+        } else {
+            const leftPct = Math.max(2, slotPct + 3);
+            tooltip.style.right = 'auto';
+            tooltip.style.left = `${leftPct}%`;
+        }
+
+        tooltip.style.top = '10px';
+        tooltip.classList.add('is-active');
+    }
+
+    hideHourlyTooltip() {
+        this.activeHourlyIndex = null;
+        const tooltip = document.getElementById('hourly-chart-tooltip');
+        if (tooltip) tooltip.classList.remove('is-active');
+
+        const crosshair = document.getElementById('hourly-crosshair');
+        if (crosshair) crosshair.classList.remove('is-visible');
+
+        document.querySelectorAll('.hourly-bar-group').forEach(b => {
+            b.classList.remove('is-hovered', 'is-dimmed');
+        });
+
+        document.querySelectorAll('.hourly-axis-label').forEach(l => {
+            l.classList.remove('is-highlighted');
+        });
+    }
+
+    handleHourlyTouch(event, explicitIndex = null) {
+        if (event && event.cancelable) event.preventDefault();
+        const touch = (event && event.touches && event.touches.length > 0) ? event.touches[0] : event;
+        const container = document.getElementById('hourly-chart-container');
+        if (!container) return;
+
+        if (explicitIndex !== null && explicitIndex !== undefined) {
+            this.handleHourlyHover(event, explicitIndex);
+            return;
+        }
+
+        if (!touch) return;
+
+        const rect = container.getBoundingClientRect();
+        const relX = touch.clientX - rect.left;
+        const width = rect.width;
+        const padLeft = (45 / 760) * width;
+        const padRight = (15 / 760) * width;
+        const chartW = width - padLeft - padRight;
+        const slotW = chartW / 24;
+
+        let index = Math.floor((relX - padLeft) / slotW);
+        index = Math.max(0, Math.min(23, index));
+
+        this.handleHourlyHover(event, index);
+    }
+
+    showHourlyTooltip(hourIndex) {
+        this.handleHourlyHover(null, hourIndex);
     }
 
     // ─── CONSOLE OPERACIONAL DE CAMPANHAS COM METRICS & COLUMNS MASTER ───────
