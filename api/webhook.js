@@ -44,6 +44,21 @@ module.exports = async (req, res) => {
         // Verifica se o evento é de pagamento aprovado
         const isPaid = ['paid', 'approved', 'pago', 'completed', 'transaction.paid', 'payment.approved'].some(s => rawStatus.includes(s));
 
+        // Preview Guard: Em Preview, webhooks reais são suprimidos para evitar contaminação
+        const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.PREVIEW_MODE === 'true';
+        const isTestEvent = Boolean(body.sandbox || body.is_test || String(txId).startsWith('TEST_') || String(txId).startsWith('preview_'));
+
+        if (isPreview && !isTestEvent && isPaid) {
+            console.log(`[Webhook Preview Guard] Evento de produção real (${txId}) ignorado no ambiente Preview para evitar poluição.`);
+            return res.status(200).json({
+                success: true,
+                preview_mode: true,
+                skipped: true,
+                message: 'Ambiente Preview: Webhook de produção real ignorado com segurança.',
+                transaction_id: txId
+            });
+        }
+
         if (isPaid) {
             console.log(`[Webhook] Processando pagamento confirmado para transação: ${txId}`);
             const result = await trackingGateway.processPaymentConfirmed(txId, amount);
