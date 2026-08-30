@@ -167,6 +167,12 @@
       "action": "STATUS_CHANGE",
       "objectName": "Camp A",
       "verification": "VERIFIED_SUCCESS"
+    },
+    {
+      "actionId": "ACT_AUDIT_1",
+      "action": "STATUS_CHANGE",
+      "objectName": "Camp A",
+      "verification": "VERIFIED_SUCCESS"
     }
   ],
   "approvals": [],
@@ -270,12 +276,18 @@
         "success": true,
         "budget": 5750
       }
+    },
+    "ACT_IDEMP_1788104025389": {
+      "result": {
+        "success": true,
+        "budget": 5750
+      }
     }
   },
   "cooldowns": {
     "999888777": 1788061415617,
     "TEST_CAMP_999": {
-      "timestamp": 1788100215169,
+      "timestamp": 1788104025386,
       "actionType": "BUDGET_CHANGE"
     }
   },
@@ -287,6 +299,10 @@
     "checkoutLearnings": []
   },
   "shadow_decisions": [
+    {
+      "actionId": "ACT_SHADOW_1",
+      "reason": "Simulação"
+    },
     {
       "actionId": "ACT_SHADOW_1",
       "reason": "Simulação"

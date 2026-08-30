@@ -229,6 +229,14 @@ class DashboardApp {
             }
         });
 
+        document.querySelectorAll('.mobile-dock-btn').forEach(btn => {
+            if (btn.getAttribute('data-dock-view') === viewName) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
         document.querySelectorAll('.view-section').forEach(sec => {
             if (sec.id === `view-${viewName}`) {
                 sec.classList.remove('hidden');
@@ -1106,6 +1114,7 @@ class DashboardApp {
                 `;
             }).join('');
         }
+        this.setupTableStickyScrollDepth();
     }
 
     // ─── CONTROLADOR DO COLUMN MANAGER DRAWER ─────────────────────────────────
@@ -2056,6 +2065,7 @@ class DashboardApp {
                 `;
             }).join('');
         }
+        this.setupTableStickyScrollDepth();
     }
 
     async toggleAdSetStatus(adsetId, currentStatus, inputEl = null) {
@@ -2331,6 +2341,7 @@ class DashboardApp {
                 `;
             }).join('');
         }
+        this.setupTableStickyScrollDepth();
     }
 
     async toggleAdStatus(adId, currentStatus, inputEl = null) {
@@ -3877,7 +3888,24 @@ class DashboardApp {
         }
 
         this.renderAutopilotView();
-        this.updateSidebarAndFooterStatus();
+        this.setupTableStickyScrollDepth();
+        if (!window.commandMenu) {
+            window.commandMenu = new CommandMenuEngine(this);
+        }
+    }
+
+    setupTableStickyScrollDepth() {
+        document.querySelectorAll('.data-table-container, .table-container').forEach(container => {
+            if (container._hasScrollListener) return;
+            container._hasScrollListener = true;
+            container.addEventListener('scroll', () => {
+                if (container.scrollLeft > 2) {
+                    container.classList.add('is-scrolled');
+                } else {
+                    container.classList.remove('is-scrolled');
+                }
+            }, { passive: true });
+        });
     }
 
     triggerEmergencyStop() {
@@ -3893,6 +3921,238 @@ class DashboardApp {
             await window.authGate.handleLogout();
         } else {
             window.location.reload();
+        }
+    }
+}
+
+// ─── COMMAND MENU GLOBAL ENGINE (⌘K / CTRL+K) ──────────────────────────────
+
+class CommandMenuEngine {
+    constructor(dashboard) {
+        this.dashboard = dashboard;
+        this.modal = null;
+        this.input = null;
+        this.resultsEl = null;
+        this.isOpen = false;
+        this.selectedIndex = 0;
+        this.currentItems = [];
+        this.init();
+    }
+
+    init() {
+        this.modal = document.getElementById('command-menu-modal');
+        this.input = document.getElementById('command-menu-search-input');
+        this.resultsEl = document.getElementById('command-menu-results');
+
+        if (!this.modal || !this.input || !this.resultsEl) return;
+
+        // Global Keydown Listener (Ctrl+K / Cmd+K / Esc)
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                this.toggle();
+            } else if (e.key === 'Escape' && this.isOpen) {
+                e.preventDefault();
+                this.close();
+            }
+        });
+
+        this.input.addEventListener('input', () => this.handleSearch(this.input.value));
+        this.input.addEventListener('keydown', (e) => this.handleKeyNavigation(e));
+    }
+
+    toggle() {
+        if (this.isOpen) this.close();
+        else this.open();
+    }
+
+    open() {
+        if (!this.modal) return;
+        this.isOpen = true;
+        this.modal.classList.remove('hidden');
+        if (this.input) {
+            this.input.value = '';
+            setTimeout(() => this.input.focus(), 50);
+        }
+        this.handleSearch('');
+    }
+
+    close() {
+        if (!this.modal) return;
+        this.isOpen = false;
+        this.modal.classList.add('hidden');
+    }
+
+    handleSearch(query) {
+        const q = (query || '').trim().toLowerCase();
+        const items = [];
+
+        // 1. Atalhos de Navegação Principal
+        const navSections = [
+            { id: 'home', title: 'Ir para Home (Visão Geral)', icon: '📊', category: 'Navegação' },
+            { id: 'campaigns', title: 'Ir para Campanhas', icon: '📢', category: 'Navegação' },
+            { id: 'adsets', title: 'Ir para Conjuntos de Anúncios', icon: '📁', category: 'Navegação' },
+            { id: 'ads', title: 'Ir para Anúncios Individuais', icon: '🎯', category: 'Navegação' },
+            { id: 'creatives', title: 'Ir para Central de Criativos', icon: '🎨', category: 'Navegação' },
+            { id: 'orders', title: 'Ir para Pedidos & Conversões', icon: '🛒', category: 'Navegação' },
+            { id: 'site-intelligence', title: 'Ir para Site Intelligence (Funil & CAPI)', icon: '🧠', category: 'Navegação' },
+            { id: 'autopilot', title: 'Ir para Modo Automático & Autonomia', icon: '🤖', category: 'Navegação' },
+            { id: 'settings', title: 'Ir para Configurações', icon: '⚙️', category: 'Navegação' }
+        ];
+
+        navSections.forEach(nav => {
+            if (!q || nav.title.toLowerCase().includes(q) || nav.id.includes(q)) {
+                items.push({
+                    type: 'nav',
+                    title: nav.title,
+                    subtitle: nav.category,
+                    icon: nav.icon,
+                    action: () => {
+                        this.close();
+                        if (nav.id === 'adsets' || nav.id === 'ads') {
+                            this.dashboard.switchView('campaigns');
+                            this.dashboard.switchCampaignTab(nav.id);
+                        } else {
+                            this.dashboard.switchView(nav.id);
+                        }
+                    }
+                });
+            }
+        });
+
+        // 2. Ações do Sistema & Governança
+        const actions = [
+            {
+                title: 'Sincronizar Dados da Meta Agora',
+                subtitle: 'Atualização forçada de métricas',
+                icon: '🔄',
+                action: () => { this.close(); this.dashboard.syncAllData(true); }
+            },
+            {
+                title: 'Alternar Parada de Segurança (Kill Switch)',
+                subtitle: 'Bloqueio de emergência de 100% das mutações',
+                icon: '🛑',
+                action: () => { this.close(); this.dashboard.toggleEmergencyStop(); }
+            },
+            {
+                title: 'Filtrar Campanhas: Somente Ativas',
+                subtitle: 'Exibir apenas campanhas em veiculação',
+                icon: '⚡',
+                action: () => { this.close(); this.dashboard.switchView('campaigns'); this.dashboard.setCampaignFilter('active'); }
+            },
+            {
+                title: 'Filtrar Campanhas: Com Vendas',
+                subtitle: 'Exibir campanhas que geraram compras',
+                icon: '💰',
+                action: () => { this.close(); this.dashboard.switchView('campaigns'); this.dashboard.setCampaignFilter('sales'); }
+            },
+            {
+                title: 'Filtrar Campanhas: Requer Atenção',
+                subtitle: 'Exibir campanhas com alto gasto sem retorno',
+                icon: '⚠️',
+                action: () => { this.close(); this.dashboard.switchView('campaigns'); this.dashboard.setCampaignFilter('attention'); }
+            }
+        ];
+
+        actions.forEach(act => {
+            if (!q || act.title.toLowerCase().includes(q) || act.subtitle.toLowerCase().includes(q)) {
+                items.push({
+                    type: 'action',
+                    title: act.title,
+                    subtitle: act.subtitle,
+                    icon: act.icon,
+                    action: act.action
+                });
+            }
+        });
+
+        // 3. Busca de Entidades (Campanhas cacheadas)
+        const campaigns = this.dashboard.cachedCampaigns || [];
+        campaigns.forEach(camp => {
+            const name = camp.name || 'Campanha';
+            const id = camp.id || '';
+            const status = camp.status === 'ACTIVE' ? 'Ativa' : 'Pausada';
+            const ins = this.dashboard.cachedInsights?.get(id);
+            const spendFormatted = ins ? (window.analyticsEngine?.formatMoney(ins.spend) || `R$ ${ins.spend}`) : '–';
+
+            if (!q || name.toLowerCase().includes(q) || id.includes(q)) {
+                items.push({
+                    type: 'campaign',
+                    title: name,
+                    subtitle: `Campanha ${status} • Investido: ${spendFormatted} • ID: ${id}`,
+                    icon: camp.status === 'ACTIVE' ? '🟢' : '⏸️',
+                    action: () => {
+                        this.close();
+                        this.dashboard.openRadwanAnalysisModal(id);
+                    }
+                });
+            }
+        });
+
+        this.currentItems = items;
+        this.selectedIndex = 0;
+        this.renderResults();
+    }
+
+    renderResults() {
+        if (!this.resultsEl) return;
+
+        if (this.currentItems.length === 0) {
+            this.resultsEl.innerHTML = `
+                <div class="py-8 text-center text-[#6E6E73] italic">
+                    Nenhum resultado encontrado para o termo pesquisado.
+                </div>
+            `;
+            return;
+        }
+
+        this.resultsEl.innerHTML = this.currentItems.map((item, idx) => `
+            <div class="command-menu-item ${idx === this.selectedIndex ? 'selected' : ''}" data-cmd-index="${idx}" onclick="window.commandMenu.executeItem(${idx})">
+                <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                    <span class="command-item-icon text-sm flex-shrink-0">${item.icon}</span>
+                    <div class="min-w-0">
+                        <span class="font-semibold text-[#F5F5F7] block truncate">${escapeHTML(item.title)}</span>
+                        <span class="text-[10px] text-[#6E6E73] block truncate font-mono">${escapeHTML(item.subtitle)}</span>
+                    </div>
+                </div>
+                <span class="text-[10px] text-[#6E6E73] font-mono flex-shrink-0">↵</span>
+            </div>
+        `).join('');
+    }
+
+    handleKeyNavigation(e) {
+        if (this.currentItems.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.selectedIndex = (this.selectedIndex + 1) % this.currentItems.length;
+            this.updateSelection();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.selectedIndex = (this.selectedIndex - 1 + this.currentItems.length) % this.currentItems.length;
+            this.updateSelection();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            this.executeItem(this.selectedIndex);
+        }
+    }
+
+    updateSelection() {
+        const items = this.resultsEl?.querySelectorAll('.command-menu-item') || [];
+        items.forEach((el, idx) => {
+            if (idx === this.selectedIndex) {
+                el.classList.add('selected');
+                el.scrollIntoView({ block: 'nearest' });
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+    }
+
+    executeItem(index) {
+        const item = this.currentItems[index];
+        if (item && typeof item.action === 'function') {
+            item.action();
         }
     }
 }
