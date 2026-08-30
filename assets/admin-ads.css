@@ -1495,3 +1495,28 @@ tbody tr.is-selected .sticky-col-status {
     }
 }
 
+/* ==============================================================================
+   WORKSPACE SAFE AREA & HOURLY INTELLIGENCE POLISH
+   ============================================================================== */
+
+.workspace-content {
+    padding-bottom: max(4.5rem, calc(3rem + env(safe-area-inset-bottom)));
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#hourly-chart-container {
+    width: 100%;
+    min-height: 190px;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#hourly-chart-container svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+

@@ -427,6 +427,7 @@ class DashboardApp {
 
             // 5. Renderizar Visões
             this.renderOverviewMetrics();
+            this.renderHourlyVisualIntelligence();
             this.renderWhatShouldIDoNow();
             this.renderCampaignsTable();
             if (typeof this.renderFunnelView === 'function') this.renderFunnelView();
@@ -436,6 +437,7 @@ class DashboardApp {
 
             // 6. Pedidos no período
             await this.loadOrdersData(true);
+            this.renderHourlyVisualIntelligence();
 
             const syncEl = document.getElementById('topbar-last-sync');
             if (syncEl) syncEl.textContent = new Date().toLocaleTimeString('pt-BR');
@@ -520,6 +522,348 @@ class DashboardApp {
                 </div>
             </div>
         `).join('');
+    }
+
+    // ─── CENTRAL DE INTELIGÊNCIA VISUAL HORÁRIA (HOME HOURLY ENGINE) ─────────
+
+    setHourlyChartMetric(metric) {
+        this.hourlyChartMetric = metric || 'profit';
+        ['profit', 'revenue', 'spend', 'sales'].forEach(m => {
+            const btn = document.getElementById(`btn-chart-metric-${m}`);
+            if (btn) {
+                if (m === this.hourlyChartMetric) btn.classList.add('active');
+                else btn.classList.remove('active');
+            }
+        });
+
+        const titles = {
+            profit: 'Lucro Líquido Real por Horário',
+            revenue: 'Faturamento por Horário',
+            spend: 'Investimento em Anúncios por Horário',
+            sales: 'Vendas Confirmadas por Horário'
+        };
+        const titleEl = document.getElementById('hourly-chart-title');
+        if (titleEl) titleEl.textContent = titles[this.hourlyChartMetric] || 'Desempenho por Faixa Horária';
+
+        this.renderHourlyVisualIntelligence();
+    }
+
+    calculateHourlyData() {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false });
+        const currentHour = parseInt(formatter.format(now), 10) || 0;
+
+        const isToday = !window.periodStore || window.periodStore.globalRange?.preset === 'today';
+
+        const hours = Array.from({ length: 24 }, (_, h) => ({
+            hour: h,
+            hourLabel: `${String(h).padStart(2, '0')}h`,
+            timeRangeLabel: `${String(h).padStart(2, '0')}:00 – ${String(h).padStart(2, '0')}:59`,
+            revenue: 0,
+            spend: 0,
+            profit: 0,
+            sales: 0,
+            isFuture: isToday && h > currentHour,
+            isCurrent: isToday && h === currentHour
+        }));
+
+        const unitEco = window.analyticsEngine?.unitEconomics || { productPrice: 89.90, cogs: 38.00, shippingCost: 15.00, gatewayFeePercent: 0.0399, taxPercent: 0.04, refundRatePercent: 0.015 };
+        const unitDeduction = unitEco.cogs + unitEco.shippingCost + (unitEco.productPrice * (unitEco.gatewayFeePercent + unitEco.taxPercent + unitEco.refundRatePercent));
+
+        let totalConfirmedRevenue = 0;
+        let totalPaidOrders = 0;
+
+        if (Array.isArray(this.cachedOrders)) {
+            this.cachedOrders.forEach(p => {
+                const st = (p.status || '').toUpperCase();
+                const isPaid = (st === 'PAID' || st === 'PAGO' || st === 'APROVADO');
+                if (isPaid) {
+                    const rawDate = p.paid_at || p.created_at;
+                    if (rawDate) {
+                        const d = new Date(rawDate);
+                        if (!isNaN(d.getTime())) {
+                            const hStr = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }).format(d);
+                            const h = parseInt(hStr, 10);
+                            if (h >= 0 && h < 24) {
+                                const amt = parseFloat(p.amount || unitEco.productPrice);
+                                hours[h].revenue += amt;
+                                hours[h].sales += 1;
+                                totalConfirmedRevenue += amt;
+                                totalPaidOrders += 1;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let totalMetaSpend = 0;
+        this.cachedCampaigns.forEach(camp => {
+            const ins = this.cachedInsights.get(camp.id);
+            if (ins && ins.spend) totalMetaSpend += ins.spend;
+        });
+
+        const activeHoursCount = isToday ? Math.max(1, currentHour + 1) : 24;
+        const hourlySpendBase = totalMetaSpend > 0 ? (totalMetaSpend / activeHoursCount) : 0;
+
+        hours.forEach((slot) => {
+            if (!slot.isFuture) {
+                slot.spend = hourlySpendBase;
+                const deductions = slot.sales * unitDeduction;
+                slot.profit = slot.revenue - slot.spend - deductions;
+            } else {
+                slot.spend = 0;
+                slot.profit = 0;
+            }
+        });
+
+        let bestSlot = null;
+        let worstSlot = null;
+        let accumulatedProfit = 0;
+
+        hours.forEach(slot => {
+            if (!slot.isFuture) {
+                accumulatedProfit += slot.profit;
+                if (!bestSlot || slot.profit > bestSlot.profit) {
+                    bestSlot = slot;
+                }
+                if (!worstSlot || slot.profit < worstSlot.profit) {
+                    worstSlot = slot;
+                }
+            }
+        });
+
+        return {
+            hours,
+            currentHour,
+            isToday,
+            bestSlot,
+            worstSlot,
+            accumulatedProfit,
+            totalConfirmedRevenue,
+            totalMetaSpend,
+            totalPaidOrders
+        };
+    }
+
+    renderHourlyVisualIntelligence() {
+        const container = document.getElementById('hourly-chart-container');
+        if (!container) return;
+
+        const data = this.calculateHourlyData();
+        const activeMetric = this.hourlyChartMetric || 'profit';
+
+        this.renderHourlyWidgets(data);
+        this.renderHourlySVGChart(container, data, activeMetric);
+    }
+
+    renderHourlyWidgets(data) {
+        const { hours, currentHour, bestSlot, worstSlot, accumulatedProfit } = data;
+
+        const bestHourEl = document.getElementById('widget-best-hour');
+        const bestHourMeta = document.getElementById('widget-best-hour-meta');
+        if (bestHourEl && bestSlot) {
+            bestHourEl.textContent = bestSlot.timeRangeLabel;
+            const profStr = window.analyticsEngine.formatMoney(bestSlot.profit);
+            bestHourMeta.textContent = `${bestSlot.profit >= 0 ? '+' : ''}${profStr} (${bestSlot.sales} vendas)`;
+            bestHourMeta.className = `text-[11px] truncate font-semibold ${bestSlot.profit >= 0 ? 'text-[#1FC16B]' : 'text-[#FF453A]'}`;
+        }
+
+        const worstHourEl = document.getElementById('widget-worst-hour');
+        const worstHourMeta = document.getElementById('widget-worst-hour-meta');
+        if (worstHourEl && worstSlot) {
+            worstHourEl.textContent = worstSlot.timeRangeLabel;
+            const profStr = window.analyticsEngine.formatMoney(worstSlot.profit);
+            worstHourMeta.textContent = `${worstSlot.profit >= 0 ? '+' : ''}${profStr} (${worstSlot.sales} vendas)`;
+            worstHourMeta.className = `text-[11px] truncate font-semibold ${worstSlot.profit < 0 ? 'text-[#FF453A]' : 'text-[#A1A1A6]'}`;
+        }
+
+        const accProfitEl = document.getElementById('widget-accumulated-profit');
+        const accMeta = document.getElementById('widget-accumulated-meta');
+        if (accProfitEl) {
+            accProfitEl.textContent = window.analyticsEngine.formatMoney(accumulatedProfit);
+            accProfitEl.className = `text-base sm:text-lg font-bold font-mono truncate ${accumulatedProfit >= 0 ? 'text-[#1FC16B]' : 'text-[#FF453A]'}`;
+            if (accMeta) accMeta.textContent = `Apurado até às ${String(currentHour).padStart(2, '0')}:59`;
+        }
+
+        const paceValEl = document.getElementById('widget-pace-value');
+        const paceMeta = document.getElementById('widget-pace-meta');
+        if (paceValEl) {
+            paceValEl.textContent = `${data.totalPaidOrders} vendas`;
+            if (paceMeta) paceMeta.textContent = `Faturamento: ${window.analyticsEngine.formatMoney(data.totalConfirmedRevenue)}`;
+        }
+
+        const nowHourLabel = document.getElementById('widget-now-hour-label');
+        const nowProfitEl = document.getElementById('widget-now-profit');
+        const nowSalesEl = document.getElementById('widget-now-sales');
+        const nowBadge = document.getElementById('widget-now-status-badge');
+
+        const curSlot = hours[currentHour] || hours[0];
+        if (nowHourLabel) nowHourLabel.textContent = `Faixa das ${curSlot.hourLabel} (${curSlot.timeRangeLabel})`;
+        if (nowProfitEl) {
+            nowProfitEl.textContent = window.analyticsEngine.formatMoney(curSlot.profit);
+            nowProfitEl.className = `text-lg font-bold font-mono ${curSlot.profit >= 0 ? 'text-[#1FC16B]' : 'text-[#FF453A]'}`;
+        }
+        if (nowSalesEl) nowSalesEl.textContent = `${curSlot.sales} un`;
+        if (nowBadge) {
+            nowBadge.textContent = 'Parcial • Em andamento';
+            nowBadge.className = 'badge badge-warning text-[9px]';
+        }
+    }
+
+    renderHourlySVGChart(container, data, metricKey) {
+        const { hours } = data;
+
+        const width = 760;
+        const height = 190;
+        const padLeft = 45;
+        const padRight = 15;
+        const padTop = 20;
+        const padBottom = 30;
+
+        const chartW = width - padLeft - padRight;
+        const chartH = height - padTop - padBottom;
+
+        const values = hours.map(h => {
+            if (h.isFuture) return 0;
+            if (metricKey === 'profit') return h.profit;
+            if (metricKey === 'revenue') return h.revenue;
+            if (metricKey === 'spend') return h.spend;
+            if (metricKey === 'sales') return h.sales;
+            return 0;
+        });
+
+        const activeValues = hours.filter(h => !h.isFuture).map(h => {
+            if (metricKey === 'profit') return h.profit;
+            if (metricKey === 'revenue') return h.revenue;
+            if (metricKey === 'spend') return h.spend;
+            if (metricKey === 'sales') return h.sales;
+            return 0;
+        });
+
+        let maxVal = Math.max(10, ...activeValues);
+        let minVal = Math.min(0, ...activeValues);
+
+        if (metricKey === 'profit') {
+            const absMax = Math.max(Math.abs(maxVal), Math.abs(minVal), 10);
+            maxVal = absMax * 1.15;
+            minVal = -absMax * 1.15;
+        } else {
+            maxVal = maxVal * 1.2;
+            minVal = 0;
+        }
+
+        const range = (maxVal - minVal) || 1;
+        const getY = (val) => padTop + chartH - ((val - minVal) / range) * chartH;
+        const yZero = getY(0);
+
+        const slotW = chartW / 24;
+        const barW = Math.max(8, slotW * 0.65);
+
+        let svg = `
+            <svg viewBox="0 0 ${width} ${height}" class="w-full h-full overflow-visible" style="max-height: 220px;">
+                <defs>
+                    <linearGradient id="profitGradPos" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#1FC16B" stop-opacity="0.95"/>
+                        <stop offset="100%" stop-color="#1FC16B" stop-opacity="0.4"/>
+                    </linearGradient>
+                    <linearGradient id="profitGradNeg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#FF453A" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#FF453A" stop-opacity="0.95"/>
+                    </linearGradient>
+                    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#5DA9FF" stop-opacity="0.9"/>
+                        <stop offset="100%" stop-color="#5DA9FF" stop-opacity="0.4"/>
+                    </linearGradient>
+                </defs>
+
+                <line x1="${padLeft}" y1="${padTop}" x2="${width - padRight}" y2="${padTop}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
+                <line x1="${padLeft}" y1="${padTop + chartH / 2}" x2="${width - padRight}" y2="${padTop + chartH / 2}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
+                <line x1="${padLeft}" y1="${yZero}" x2="${width - padRight}" y2="${yZero}" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+                
+                <text x="${padLeft - 6}" y="${padTop + 4}" fill="#6E6E73" font-size="9" font-family="monospace" text-anchor="end">${metricKey === 'sales' ? Math.round(maxVal) : 'R$' + Math.round(maxVal)}</text>
+                <text x="${padLeft - 6}" y="${yZero + 3}" fill="#A1A1A6" font-size="9" font-family="monospace" font-weight="bold" text-anchor="end">0</text>
+                ${minVal < 0 ? `<text x="${padLeft - 6}" y="${padTop + chartH}" fill="#FF453A" font-size="9" font-family="monospace" text-anchor="end">-${Math.round(Math.abs(minVal))}</text>` : ''}
+        `;
+
+        hours.forEach((slot, i) => {
+            const x = padLeft + (i * slotW) + (slotW - barW) / 2;
+            const val = values[i];
+
+            if (slot.isFuture) {
+                svg += `
+                    <g class="cursor-pointer group" onclick="window.dashboard.showHourlyTooltip(${i}, ${x}, ${yZero})">
+                        <circle cx="${x + barW / 2}" cy="${yZero}" r="2" fill="rgba(255,255,255,0.15)"/>
+                        <text x="${x + barW / 2}" y="${height - 12}" fill="#48484A" font-size="8.5" font-family="monospace" text-anchor="middle">${i % 3 === 0 ? slot.hourLabel : ''}</text>
+                    </g>
+                `;
+            } else {
+                let barY, barH, fillStyle, strokeStyle = '';
+                
+                if (val >= 0) {
+                    barY = getY(val);
+                    barH = Math.max(3, yZero - barY);
+                    fillStyle = metricKey === 'profit' ? 'url(#profitGradPos)' : 'url(#blueGrad)';
+                } else {
+                    barY = yZero;
+                    barH = Math.max(3, getY(val) - yZero);
+                    fillStyle = 'url(#profitGradNeg)';
+                }
+
+                if (slot.isCurrent) {
+                    strokeStyle = 'stroke="#5DA9FF" stroke-width="1.2" stroke-dasharray="2,2"';
+                }
+
+                svg += `
+                    <g class="cursor-pointer transition-transform hover:scale-105 origin-bottom" onclick="window.dashboard.showHourlyTooltip(${i}, ${x}, ${barY})" onmouseenter="window.dashboard.showHourlyTooltip(${i}, ${x}, ${barY})">
+                        <rect x="${x}" y="${barY}" width="${barW}" height="${barH}" rx="2" ry="2" fill="${fillStyle}" ${strokeStyle}/>
+                        <text x="${x + barW / 2}" y="${height - 12}" fill="${slot.isCurrent ? '#5DA9FF' : '#8E8E93'}" font-size="8.5" font-family="monospace" font-weight="${slot.isCurrent ? 'bold' : 'normal'}" text-anchor="middle">
+                            ${i % 2 === 0 || slot.isCurrent ? slot.hourLabel : ''}
+                        </text>
+                    </g>
+                `;
+            }
+        });
+
+        svg += `</svg>`;
+        container.innerHTML = svg;
+    }
+
+    showHourlyTooltip(hourIndex) {
+        const data = this.calculateHourlyData();
+        const slot = data.hours[hourIndex];
+        if (!slot) return;
+
+        let statusText = slot.isCurrent ? '⚡ Em Andamento (Parcial)' : (slot.isFuture ? '⏳ Hora Futura' : '✓ Horário Concluído');
+
+        const toastContent = `
+            <div class="space-y-1">
+                <div class="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-1">
+                    <span class="font-bold text-xs text-[#F5F5F7]">⏰ ${slot.timeRangeLabel}</span>
+                    <span class="text-[9.5px] ${slot.isCurrent ? 'text-[#5DA9FF]' : 'text-[#6E6E73]'}">${statusText}</span>
+                </div>
+                <div class="text-xs space-y-0.5 pt-0.5">
+                    <div class="flex justify-between gap-3 font-mono">
+                        <span class="text-[#A1A1A6]">Lucro Líquido:</span>
+                        <b class="${slot.profit >= 0 ? 'text-[#1FC16B]' : 'text-[#FF453A]'}">${window.analyticsEngine.formatMoney(slot.profit)}</b>
+                    </div>
+                    <div class="flex justify-between gap-3 font-mono">
+                        <span class="text-[#A1A1A6]">Faturamento:</span>
+                        <span class="text-[#F5F5F7]">${window.analyticsEngine.formatMoney(slot.revenue)}</span>
+                    </div>
+                    <div class="flex justify-between gap-3 font-mono">
+                        <span class="text-[#A1A1A6]">Investimento:</span>
+                        <span class="text-[#A1A1A6]">${window.analyticsEngine.formatMoney(slot.spend)}</span>
+                    </div>
+                    <div class="flex justify-between gap-3 font-mono">
+                        <span class="text-[#A1A1A6]">Vendas:</span>
+                        <span class="text-[#5DA9FF]">${slot.sales} un</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.showToast(toastContent, 'info', 4000);
     }
 
     // ─── CONSOLE OPERACIONAL DE CAMPANHAS COM METRICS & COLUMNS MASTER ───────
@@ -1749,6 +2093,7 @@ class DashboardApp {
 
             this.updateOrdersMetrics();
             this.renderOrdersTable();
+            this.renderHourlyVisualIntelligence();
 
         } catch (err) {
             console.error('[Orders Error]', err);

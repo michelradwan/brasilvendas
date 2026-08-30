@@ -342,56 +342,127 @@
                     </div>
                 </div>
 
-                <!-- CAMADA 2: RECOMENDAÇÕES DO RADWAN ADS & SAÚDE OPERACIONAL -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <!-- O que o RADWAN ADS recomenda fazer agora? -->
-                    <div class="lg:col-span-2 panel space-y-4">
-                        <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <div class="flex items-center gap-2">
-                                <span class="w-5 h-5 rounded bg-[#FF2D2D]/10 text-[#FF2D2D] flex items-center justify-center font-bold text-xs">⌘</span>
-                                <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">O que o Radwan recomenda agora</h3>
+                <!-- CAMADA 2: CENTRAL VISUAL DE DESEMPENHO (GRÁFICO POR HORÁRIO + RADWAN AGORA) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <!-- Gráfico Principal: Lucro & Desempenho por Horário (8 cols) -->
+                    <div class="lg:col-span-8 panel space-y-4 flex flex-col justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-white/[0.05] pb-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]" id="hourly-chart-title">Desempenho por Faixa Horária</h3>
+                                    <span id="hourly-chart-timezone-badge" class="badge badge-paused text-[9px] font-mono">UTC-3 (Brasília)</span>
+                                </div>
+                                <p class="text-[11px] text-[#A1A1A6]" id="hourly-chart-subtitle">Evolução financeira e operacional hora a hora ao longo do dia</p>
                             </div>
-                            <span class="badge badge-active text-[9.5px]">Assistido</span>
+                            
+                            <!-- Seletor de Série do Gráfico -->
+                            <div class="flex items-center gap-1 bg-[#101014] border border-white/[0.06] p-1 rounded-lg text-xs overflow-x-auto scrollbar-none flex-shrink-0">
+                                <button onclick="window.dashboard.setHourlyChartMetric('profit')" id="btn-chart-metric-profit" class="segmented-btn active px-2 py-0.5 text-[11px]">Lucro</button>
+                                <button onclick="window.dashboard.setHourlyChartMetric('revenue')" id="btn-chart-metric-revenue" class="segmented-btn px-2 py-0.5 text-[11px]">Faturamento</button>
+                                <button onclick="window.dashboard.setHourlyChartMetric('spend')" id="btn-chart-metric-spend" class="segmented-btn px-2 py-0.5 text-[11px]">Investimento</button>
+                                <button onclick="window.dashboard.setHourlyChartMetric('sales')" id="btn-chart-metric-sales" class="segmented-btn px-2 py-0.5 text-[11px]">Vendas</button>
+                            </div>
                         </div>
-                        <div id="what-should-i-do-container" class="space-y-2.5"></div>
+
+                        <!-- Canvas/SVG Container do Gráfico -->
+                        <div class="relative w-full min-h-[220px] flex items-center justify-center" id="hourly-chart-container">
+                            <!-- SVG Chart renderizado dinamicamente -->
+                        </div>
+
+                        <!-- Legenda Operacional Discreta -->
+                        <div class="flex items-center justify-between text-[10.5px] text-[#6E6E73] pt-1 border-t border-white/[0.04] flex-wrap gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#1FC16B]"></span> Lucro Positivo</span>
+                                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#FF453A]"></span> Prejuízo</span>
+                                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm border border-dashed border-[#5DA9FF]"></span> Hora Atual</span>
+                            </div>
+                            <span id="hourly-chart-last-calc" class="font-mono">Reconciliado com dados reais</span>
+                        </div>
                     </div>
 
-                    <!-- Diagnóstico Operacional Rápido -->
-                    <div class="panel space-y-3">
+                    <!-- Coluna Direita: Radwan Agora & Ações Recomendadas (4 cols) -->
+                    <div class="lg:col-span-4 panel space-y-3.5 flex flex-col justify-between">
                         <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                            <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">Saúde da Operação</h3>
-                            <span class="badge badge-active text-[9.5px]">Estável</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-sm">⌘</span>
+                                <h3 class="text-xs sm:text-sm font-bold text-[#F5F5F7]">Radwan Agora</h3>
+                            </div>
+                            <span class="badge badge-active text-[9.5px]">Em Tempo Real</span>
                         </div>
-                        <div class="divide-y divide-white/[0.04] text-xs">
-                            <div class="flex items-center justify-between py-2.5">
-                                <div>
-                                    <p class="font-medium text-[#F5F5F7]">CTR de Tráfego</p>
-                                    <p class="text-[10.5px] text-[#6E6E73]">Atratividade dos anúncios</p>
-                                </div>
-                                <span class="tabular-nums font-bold text-[#1FC16B] text-sm" id="kpi-ctr">17,69%</span>
+
+                        <!-- Card de Performance da Hora Atual -->
+                        <div class="p-3 rounded-lg bg-[#101014] border border-white/[0.05] space-y-2">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="text-[#A1A1A6]" id="widget-now-hour-label">Hora Atual (--h)</span>
+                                <span class="badge badge-paused text-[9px]" id="widget-now-status-badge">Em andamento</span>
                             </div>
-                            <div class="flex items-center justify-between py-2.5">
+                            <div class="flex items-baseline justify-between">
                                 <div>
-                                    <p class="font-medium text-[#F5F5F7]">Custo por Clique (CPC)</p>
-                                    <p class="text-[10.5px] text-[#6E6E73]">Custo de visita</p>
+                                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold block">Lucro Nesta Hora</span>
+                                    <span class="text-lg font-bold font-mono text-[#F5F5F7]" id="widget-now-profit">R$ 0,00</span>
                                 </div>
-                                <span class="tabular-nums font-bold text-[#F5F5F7] text-sm" id="kpi-cpc">R$ 0,35</span>
-                            </div>
-                            <div class="flex items-center justify-between py-2.5">
-                                <div>
-                                    <p class="font-medium text-[#F5F5F7]">Status do Saldo</p>
-                                    <p class="text-[10.5px] text-[#6E6E73]">Limite de veiculação</p>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-[#6E6E73] uppercase font-bold block">Vendas</span>
+                                    <span class="text-sm font-bold font-mono text-[#1FC16B]" id="widget-now-sales">0 un</span>
                                 </div>
-                                <span class="badge badge-warning text-[9.5px]">Recarga Pendente</span>
                             </div>
+                        </div>
+
+                        <!-- Recomendações Prioritárias Rápidas -->
+                        <div class="space-y-2 flex-1">
+                            <span class="text-[10px] text-[#6E6E73] uppercase font-bold tracking-wider">Ação Recomendada</span>
+                            <div id="what-should-i-do-container" class="space-y-2"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CAMADA 3: OPORTUNIDADES OPERACIONAIS IDENTIFICADAS -->
+                <!-- CAMADA 3: WIDGETS OPERACIONAIS DE HORÁRIO (4 WIDGETS DE DECISÃO) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Widget 1: Melhor Horário -->
+                    <div class="p-3.5 rounded-xl bg-[#0E0E12] border border-white/[0.06] space-y-1.5 min-w-0">
+                        <div class="flex items-center justify-between text-[10px] text-[#6E6E73] uppercase font-bold">
+                            <span>🏆 Melhor Horário</span>
+                            <span class="text-[#1FC16B]">Top Lucro</span>
+                        </div>
+                        <p class="text-base sm:text-lg font-bold text-[#F5F5F7] font-mono truncate" id="widget-best-hour">–</p>
+                        <p class="text-[11px] text-[#A1A1A6] truncate" id="widget-best-hour-meta">Aguardando dados</p>
+                    </div>
+
+                    <!-- Widget 2: Horário Mais Fraco / Menor Lucro -->
+                    <div class="p-3.5 rounded-xl bg-[#0E0E12] border border-white/[0.06] space-y-1.5 min-w-0">
+                        <div class="flex items-center justify-between text-[10px] text-[#6E6E73] uppercase font-bold">
+                            <span>⚠️ Horário Mais Fraco</span>
+                            <span class="text-[#A1A1A6]">Atenção</span>
+                        </div>
+                        <p class="text-base sm:text-lg font-bold text-[#F5F5F7] font-mono truncate" id="widget-worst-hour">–</p>
+                        <p class="text-[11px] text-[#A1A1A6] truncate" id="widget-worst-hour-meta">Aguardando dados</p>
+                    </div>
+
+                    <!-- Widget 3: Lucro Acumulado -->
+                    <div class="p-3.5 rounded-xl bg-[#0E0E12] border border-white/[0.06] space-y-1.5 min-w-0">
+                        <div class="flex items-center justify-between text-[10px] text-[#6E6E73] uppercase font-bold">
+                            <span>📈 Lucro Acumulado</span>
+                            <span class="text-[#5DA9FF]">Hoje</span>
+                        </div>
+                        <p class="text-base sm:text-lg font-bold text-[#1FC16B] font-mono truncate" id="widget-accumulated-profit">R$ 0,00</p>
+                        <p class="text-[11px] text-[#A1A1A6] truncate" id="widget-accumulated-meta">Total líquido apurado</p>
+                    </div>
+
+                    <!-- Widget 4: Ritmo do Dia (Pace) -->
+                    <div class="p-3.5 rounded-xl bg-[#0E0E12] border border-white/[0.06] space-y-1.5 min-w-0">
+                        <div class="flex items-center justify-between text-[10px] text-[#6E6E73] uppercase font-bold">
+                            <span>⏱️ Ritmo do Dia</span>
+                            <span class="text-[#6E6E73]">vs Ontem</span>
+                        </div>
+                        <p class="text-base sm:text-lg font-bold text-[#F5F5F7] font-mono truncate" id="widget-pace-value">–</p>
+                        <p class="text-[11px] text-[#A1A1A6] truncate" id="widget-pace-meta">Mesmo intervalo horário</p>
+                    </div>
+                </div>
+
+                <!-- CAMADA 4: OPORTUNIDADES & ALERTAS OPERACIONAIS -->
                 <div class="panel space-y-3">
                     <div class="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
-                        <h3 class="font-bold text-xs sm:text-sm text-[#F5F5F7]">Oportunidades & Alertas</h3>
+                        <h3 class="font-bold text-xs sm:text-sm text-[#F5F5F7]">Oportunidades & Alertas Identificados</h3>
                         <span class="text-[10px] text-[#A1A1A6]">Análise em tempo real</span>
                     </div>
                     <div id="top-opportunities-container" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"></div>
@@ -1323,6 +1394,23 @@
                 </div>
             </form>
         </div>
+    </div>
+
+    <!-- Floating Bulk Actions Bar (Ações em Massa Flutuantes) -->
+    <div id="bulk-actions-bar">
+        <div class="flex items-center gap-2 pr-2 border-r border-white/[0.1]">
+            <span class="w-5 h-5 rounded-full bg-[#FF2D2D]/20 text-[#FF2D2D] font-bold flex items-center justify-center text-xs font-mono" id="bulk-selected-count">0</span>
+            <span class="text-xs font-semibold text-[#F5F5F7]">selecionada(s)</span>
+        </div>
+        <button onclick="window.dashboard.bulkUpdateStatus('ACTIVE')" class="btn btn-secondary btn-sm text-[11px] px-2.5 py-1" title="Ativar Selecionadas">
+            <span>▶️</span> Ativar
+        </button>
+        <button onclick="window.dashboard.bulkUpdateStatus('PAUSED')" class="btn btn-secondary btn-sm text-[11px] px-2.5 py-1" title="Pausar Selecionadas">
+            <span>⏸️</span> Pausar
+        </button>
+        <button onclick="window.dashboard.clearBulkSelection()" class="btn btn-tertiary btn-sm text-[11px] text-[#A1A1A6] hover:text-white" title="Limpar Seleção">
+            ✕
+        </button>
     </div>
 
     <!-- Column Manager Slide-Over Drawer (Customizador Mestre de Métricas) -->
