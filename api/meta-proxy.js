@@ -8,11 +8,11 @@ const GRAPH_VERSION = metaConstants.GRAPH_VERSION || metaConstants.META_GRAPH_VE
 const GRAPH_BASE_URL = metaConstants.GRAPH_BASE_URL || metaConstants.META_GRAPH_BASE_URL || 'https://graph.facebook.com/v21.0';
 const { ALLOWED_AD_ACCOUNT_ID, ALLOWED_OPERATIONS, RATE_LIMIT_ERROR_CODES } = metaConstants;
 const serverState = require('../lib/meta-state.js');
+const authGuard = require('../lib/auth-guard.js');
 
 // Token Oficial Ativo e Autenticado
 const NEW_VALID_TOKEN = 'EAA6kKz1qBV8BScqZAG8mVrcPD4ICruA1t9WqObGj21tgmjSmOz5w2ngISSd2m9LSgETqq8zZCrfBERBmbSwMzTJaAxUvwSFnlZCOY0lK0CDZAihxtzHieFl6dyDAQdM9xJVpXBT8Ya6KpWnVctmTqUugUUaaujxfpAu7J7ZBKkx17UN2o0BbWjyUQ8lR38UDnagZDZD';
 const META_ACCESS_TOKEN = NEW_VALID_TOKEN;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'mraa2004';
 
 function validateEnvironment(customToken) {
     if (!customToken && !META_ACCESS_TOKEN) {
@@ -126,28 +126,16 @@ module.exports = async (req, res) => {
         });
     }
 
-    // 1. Autenticação Administrativa Rigorosa
-    const authHeader = req.headers['x-admin-auth'] || req.headers['authorization'];
-    const providedSecret = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
-
-    // Lista de senhas administrativas válidas (mraa2004 principal)
-    const validPasswords = Array.from(new Set(['mraa2004', 'patriota2026', 'patriota2025', 'admin', ADMIN_PASSWORD].filter(Boolean)));
-
-    // Se for rota de login / verificação de credencial
-    if (req.query.action === 'login' && req.method === 'POST') {
-        const { password } = req.body || {};
-        if (password && validPasswords.includes(password.trim())) {
-            // Define cookie de sessão HttpOnly
-            res.setHeader('Set-Cookie', `meta_admin_session=${Buffer.from(password.trim()).toString('base64')}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=86400`);
-            return res.status(200).json({ success: true, message: 'Autenticado com sucesso.' });
-        }
-        return res.status(401).json({ error: { message: 'Senha administrativa incorreta.', code: 401 } });
-    }
-
-    // Se for rota de Logout
-    if (req.query.action === 'logout') {
-        res.setHeader('Set-Cookie', `meta_admin_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`);
-        return res.status(200).json({ success: true, message: 'Sessão encerrada com sucesso.' });
+    // 1. Autenticação Administrativa Rigorosa via Auth Guard
+    const authCheck = authGuard.validateAdminSession(req);
+    if (!authCheck.authenticated) {
+        return res.status(401).json({
+            error: {
+                message: 'Acesso negado: Autenticação administrativa ausente ou inválida.',
+                type: 'UNAUTHORIZED',
+                code: 401
+            }
+        });
     }
 
     // Se for rota de Teste de Novo Token Meta
@@ -185,28 +173,6 @@ module.exports = async (req, res) => {
         } catch (tokErr) {
             return res.status(500).json({ error: { message: tokErr.message } });
         }
-    }
-
-    // Validação de Sessão ou Token no Header
-    const cookies = (req.headers.cookie || '').split(';').reduce((acc, cookie) => {
-        const [k, v] = cookie.trim().split('=');
-        if (k) acc[k] = v;
-        return acc;
-    }, {});
-
-    const sessionCookie = cookies['meta_admin_session'];
-    const sessionPass = sessionCookie ? Buffer.from(sessionCookie, 'base64').toString('utf8') : '';
-    const isSessionValid = validPasswords.includes(sessionPass);
-    const isHeaderValid = validPasswords.includes(providedSecret);
-
-    if (!isSessionValid && !isHeaderValid) {
-        return res.status(401).json({
-            error: {
-                message: 'Acesso negado: Credencial administrativa ausente ou inválida.',
-                type: 'UNAUTHORIZED',
-                code: 401
-            }
-        });
     }
 
     // 2. Extração e Sanitização de Parâmetros

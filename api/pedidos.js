@@ -6,6 +6,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { storage } = require('../lib/storage-adapter.js');
+const authGuard = require('../lib/auth-guard.js');
 
 const API_KEY = process.env.DUTTYFY_KEY || 'b8ae99391cf645b2af25b66eef4b99d3';
 const TMP_FILE = path.join('/tmp', 'pedidos.json');
@@ -31,23 +32,20 @@ function saveDiskOrders(orders) {
 let globalPedidosCache = loadDiskOrders();
 
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Auth');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
-    const ALLOWED_PASSWORDS = ['mraa2004', 'patriota2026', 'patriota2025', 'admin'];
-    const token = (req.query && (req.query.token || req.query.password || req.query.admin_token)) ||
-                  (req.headers && req.headers.authorization ? req.headers.authorization.replace(/^Bearer\s+/i, '') : '');
-    const isAuthorized = ALLOWED_PASSWORDS.includes(token);
-
     // DELETE ou POST com action=clear: Limpar todo o histórico de pedidos e leads falsos
     if (req.method === 'DELETE' || (req.method === 'POST' && req.query.action === 'clear')) {
-        if (!isAuthorized) {
-            return res.status(401).json({ success: false, error: 'Acesso negado. Autenticação de administrador necessária.' });
+        const authCheck = authGuard.validateAdminSession(req);
+        if (!authCheck.authenticated) {
+            return res.status(401).json({ success: false, error: 'Acesso negado: Autenticação administrativa necessária.' });
         }
         try {
             globalPedidosCache = [];
@@ -69,7 +67,7 @@ module.exports = async (req, res) => {
         }
     }
 
-    // POST: Salvar novo pedido gerado
+    // POST: Salvar novo pedido gerado (Público durante checkout com sanitização)
     if (req.method === 'POST') {
         try {
             const pedido = req.body;
@@ -88,8 +86,16 @@ module.exports = async (req, res) => {
         }
     }
 
-    // GET: Listar pedidos com checagem ao vivo de status na Duttyfy
+    // GET: Listar pedidos com checagem ao vivo de status na Duttyfy (EXIGE AUTENTICAÇÃO ADMINISTRATIVA)
     if (req.method === 'GET') {
+        const authCheck = authGuard.validateAdminSession(req);
+        if (!authCheck.authenticated) {
+            return res.status(401).json({
+                success: false,
+                error: 'Acesso negado: Visualização de pedidos restrita a administradores autenticados.'
+            });
+        }
+
         try {
             // Checar status de uma transação específica na Duttyfy
             const txToCheck = req.query.check_tx;
@@ -130,11 +136,6 @@ module.exports = async (req, res) => {
                     status: statusData.status || 'pending',
                     raw: statusData
                 });
-            }
-
-            // Proteção estrita contra vazamento de dados de clientes (PII)
-            if (!isAuthorized) {
-                return res.status(401).json({ success: false, error: 'Acesso negado. Autenticação de administrador necessária para listar pedidos.' });
             }
 
             // Buscar todos os pedidos persistentes no storage

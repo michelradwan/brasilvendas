@@ -95,6 +95,40 @@
 
 <body class="bg-[#050506] text-[#F5F5F7] min-h-screen antialiased flex flex-col selection:bg-[#FF2D2D] selection:text-white">
 
+    <!-- AUTH GATE PRIVADO (ZERO-TRUST SECURITY BOUNDARY) -->
+    <div id="auth-gate-screen" class="fixed inset-0 z-[9999] bg-[#050506] flex items-center justify-center p-4">
+        <div class="w-full max-w-sm bg-[#0E0E12] border border-white/[0.08] rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div class="text-center space-y-1.5">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#FF2D2D]/10 border border-[#FF2D2D]/20 text-xl mb-1 text-[#FF2D2D]">
+                    🔒
+                </div>
+                <h2 class="text-lg font-bold tracking-tight text-[#F5F5F7]">RADWAN ADS</h2>
+                <p class="text-xs text-[#A1A1A6]">Console Operacional Privado</p>
+            </div>
+
+            <form id="auth-gate-form" onsubmit="window.authGate.handleLogin(event)" class="space-y-4 pt-1">
+                <div>
+                    <label for="auth-gate-password" class="block text-[10.5px] font-bold text-[#A1A1A6] mb-1.5 uppercase tracking-wider">Senha de Acesso</label>
+                    <input type="password" id="auth-gate-password" placeholder="Digite a senha administrativa..." autocomplete="current-password" required
+                           class="w-full bg-[#15151A] border border-white/[0.1] rounded-xl px-3.5 py-2.5 text-sm text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D] transition-colors">
+                </div>
+
+                <div id="auth-gate-error" class="text-xs text-[#FF453A] bg-[#FF453A]/10 border border-[#FF453A]/20 p-2.5 rounded-lg hidden"></div>
+
+                <button type="submit" id="auth-gate-submit-btn" class="btn btn-primary w-full py-2.5 text-xs font-bold justify-center rounded-xl">
+                    <span>Entrar no Console</span>
+                </button>
+            </form>
+
+            <div class="text-center text-[10px] text-[#6E6E73] font-mono pt-2 border-t border-white/[0.04]">
+                Acesso institucional criptografado • Sessão HttpOnly
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL DO SISTEMA (BLOQUEADO ATÉ AUTENTICAÇÃO REAL) -->
+    <div id="app-main-layout" class="min-h-screen flex flex-col transition-opacity duration-200 opacity-0 pointer-events-none">
+
     <!-- BACKDROP DA SIDEBAR (OFF-CANVAS OVERLAY MOBILE) -->
     <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="window.dashboard.closeSidebar()"></div>
 
@@ -1708,22 +1742,23 @@
                 <button onclick="document.getElementById('si-session-modal').classList.add('hidden')" class="btn btn-secondary text-xs">Fechar</button>
             </div>
         </div>
-    </div>
+    </div><!-- /#app-main-layout -->
 
     <!-- Toast Notifications Container -->
     <div id="toast-container"></div>
 
-    <!-- SCRIPTS DA APLICAÇÃO (ORDEM RIGOROSA - CACHE BUSTER V7.2) -->
-    <script src="js/period-store.js?v=7.2-hardened"></script>
-    <script src="js/metrics-registry.js?v=7.2-hardened"></script>
-    <script src="js/meta-adapter.js?v=7.2-hardened"></script>
-    <script src="js/analytics.js?v=7.2-hardened"></script>
-    <script src="js/guardrails.js?v=7.2-hardened"></script>
-    <script src="js/decisions.js?v=7.2-hardened"></script>
-    <script src="js/execution.js?v=7.2-hardened"></script>
-    <script src="js/audit.js?v=7.2-hardened"></script>
-    <script src="js/autopilot.js?v=7.2-hardened"></script>
-    <script src="js/dashboard.js?v=7.2-hardened"></script>
+    <!-- SCRIPTS DA APLICAÇÃO (ORDEM RIGOROSA - CACHE BUSTER V7.3) -->
+    <script src="js/auth-gate.js?v=7.3-auth"></script>
+    <script src="js/period-store.js?v=7.3-hardened"></script>
+    <script src="js/metrics-registry.js?v=7.3-hardened"></script>
+    <script src="js/meta-adapter.js?v=7.3-hardened"></script>
+    <script src="js/analytics.js?v=7.3-hardened"></script>
+    <script src="js/guardrails.js?v=7.3-hardened"></script>
+    <script src="js/decisions.js?v=7.3-hardened"></script>
+    <script src="js/execution.js?v=7.3-hardened"></script>
+    <script src="js/audit.js?v=7.3-hardened"></script>
+    <script src="js/autopilot.js?v=7.3-hardened"></script>
+    <script src="js/dashboard.js?v=7.3-hardened"></script>
 </body>
 
 </html>

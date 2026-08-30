@@ -9,11 +9,13 @@ const funnelEngine = require('../site-intelligence/server/funnel-engine');
 const frictionEngine = require('../site-intelligence/server/friction-engine');
 const bottleneckEngine = require('../site-intelligence/server/bottleneck-engine');
 const aiDiagnosisEngine = require('../site-intelligence/server/ai-diagnosis');
+const authGuard = require('../lib/auth-guard.js');
 
 module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Auth');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -21,6 +23,15 @@ module.exports = async function handler(req, res) {
 
     if (req.method !== 'GET') {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
+    }
+
+    // Validação de Autenticação Administrativa
+    const authCheck = authGuard.validateAdminSession(req);
+    if (!authCheck.authenticated) {
+        return res.status(401).json({
+            success: false,
+            error: 'Acesso negado: Autenticação necessária para consultar dados de Site Intelligence.'
+        });
     }
 
     try {

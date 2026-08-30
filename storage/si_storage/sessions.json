@@ -7,7 +7,7 @@
     "utm_medium": "none",
     "utm_campaign": "black_friday",
     "start_time": "2026-08-30T03:42:11.748Z",
-    "last_seen": "2026-08-30T03:42:27.003Z",
+    "last_seen": "2026-08-30T04:40:30.541Z",
     "max_scroll": 90,
     "dwell_sec": 45,
     "rage_clicks": 0,
@@ -16,9 +16,9 @@
     "generated_pix": false,
     "purchased": false,
     "status": "abandoned_checkout",
-    "events_count": 4,
+    "events_count": 8,
     "created_at": "2026-08-30T03:42:11.750Z",
-    "updated_at": "2026-08-30T03:43:28.776Z"
+    "updated_at": "2026-08-30T04:40:30.545Z"
   },
   {
     "session_id": "test_sim_sess_1788061408703",
@@ -39,6 +39,6 @@
     "status": "converted",
     "events_count": 4,
     "created_at": "2026-08-30T03:43:28.751Z",
-    "updated_at": "2026-08-30T03:43:28.778Z"
+    "updated_at": "2026-08-30T04:40:30.547Z"
   }
 ]

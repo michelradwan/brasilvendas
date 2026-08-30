@@ -57,13 +57,13 @@ console.log('✔ Test 2: CSS Styles and Safe Area verified successfully (Dock pr
 const jsPath = path.join(__dirname, '..', 'js', 'dashboard.js');
 const js = fs.readFileSync(jsPath, 'utf8');
 
-assert(js.includes('renderOverviewMetrics()'), 'Missing renderOverviewMetrics in dashboard.js');
-assert(js.includes('renderWhatShouldIDoNow()'), 'Missing renderWhatShouldIDoNow in dashboard.js');
+assert(js.includes('renderOverviewMetrics'), 'Missing renderOverviewMetrics in dashboard.js');
+assert(js.includes('renderWhatShouldIDoNow'), 'Missing renderWhatShouldIDoNow in dashboard.js');
 
-assert(!js.includes('renderHourlyVisualIntelligence()'), 'renderHourlyVisualIntelligence must not exist in dashboard.js');
-assert(!js.includes('setHourlyChartMetric('), 'setHourlyChartMetric must not exist in dashboard.js');
-assert(!js.includes('calculateHourlyData()'), 'calculateHourlyData must not exist in dashboard.js');
-assert(!js.includes('showHourlyTooltip('), 'showHourlyTooltip must not exist in dashboard.js');
+assert(!js.includes('renderHourlyVisualIntelligence'), 'renderHourlyVisualIntelligence must not exist in dashboard.js');
+assert(!js.includes('setHourlyChartMetric'), 'setHourlyChartMetric must not exist in dashboard.js');
+assert(!js.includes('calculateHourlyData'), 'calculateHourlyData must not exist in dashboard.js');
+assert(!js.includes('showHourlyTooltip'), 'showHourlyTooltip must not exist in dashboard.js');
 
 console.log('✔ Test 3: JavaScript Engine verified successfully (Clean Overview methods active, dead chart code purged).');
 

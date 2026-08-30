@@ -233,7 +233,7 @@ async function runSiteIntelligenceTests() {
     let queryResData = null;
     const mockReqQuery = {
         method: 'GET',
-        headers: {},
+        headers: { 'x-admin-auth': 'mraa2004' },
         query: { since: '2026-08-01', until: '2026-08-30' }
     };
     const mockResQuery = {

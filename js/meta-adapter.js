@@ -6,26 +6,8 @@
 class MetaDataProvider {
     constructor() {
         this.cache = new Map();
-        this.proxyEndpoint = (typeof window !== 'undefined' && window.location?.protocol === 'file:') ? 'https://brasilvendas.vercel.app/api/meta-proxy' : '/api/meta-proxy';
-        this.adminPassword = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('meta_admin_token') || localStorage.getItem('meta_admin_token') || 'mraa2004') : 'mraa2004';
-    }
-
-    setAdminPassword(password) {
-        this.adminPassword = password;
-        sessionStorage.setItem('meta_admin_token', password);
-        localStorage.setItem('meta_admin_token', password);
-        this.cache.clear();
-    }
-
-    clearAdminSession() {
-        this.adminPassword = '';
-        sessionStorage.removeItem('meta_admin_token');
-        localStorage.removeItem('meta_admin_token');
-        this.cache.clear();
-    }
-
-    isAuthenticated() {
-        return !!this.adminPassword;
+        this.cacheTTL = 30000; // 30s
+        this.proxyEndpoint = '/api/meta-proxy';
     }
 
     async request(endpoint, method = 'GET', params = {}, payload = null, bypassCache = false, actionId = null) {
@@ -42,27 +24,29 @@ class MetaDataProvider {
         let responseData = null;
 
         try {
-            // Limpa tokens antigos legados do localStorage para usar sempre o backend seguro
-            if (typeof localStorage !== 'undefined' && localStorage.getItem('meta_user_token')) {
+            // Limpa tokens antigos legados do localStorage
+            if (typeof localStorage !== 'undefined') {
                 localStorage.removeItem('meta_user_token');
+                localStorage.removeItem('meta_admin_token');
             }
 
             const headers = {
-                'Content-Type': 'application/json',
-                'X-Admin-Auth': this.adminPassword
+                'Content-Type': 'application/json'
             };
 
+            let res;
             if (method === 'GET') {
                 const q = new URLSearchParams({ endpoint, ...params }).toString();
-                const res = await fetch(`${this.proxyEndpoint}?${q}`, {
+                res = await fetch(`${this.proxyEndpoint}?${q}`, {
                     method: 'GET',
-                    headers: headers
+                    headers: headers,
+                    credentials: 'include'
                 });
-                responseData = await res.json();
             } else {
-                const res = await fetch(this.proxyEndpoint, {
+                res = await fetch(this.proxyEndpoint, {
                     method: 'POST',
                     headers: headers,
+                    credentials: 'include',
                     body: JSON.stringify({
                         endpoint,
                         method,
@@ -71,8 +55,16 @@ class MetaDataProvider {
                         action_id: actionId
                     })
                 });
-                responseData = await res.json();
             }
+
+            if (res.status === 401) {
+                if (window.authGate && typeof window.authGate.show === 'function') {
+                    window.authGate.show('Sessão expirada. Faça login novamente.');
+                }
+                throw { message: 'Sessão administrativa expirada ou não autenticada.', code: 401 };
+            }
+
+            responseData = await res.json();
 
             if (responseData && responseData.error) {
                 throw responseData.error;

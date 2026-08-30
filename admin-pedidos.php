@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-// SENHA DE ACESSO AO PAINEL
-define('ADMIN_PASSWORD', 'mraa2004');
-$ALLOWED_PASSWORDS = ['mraa2004', 'patriota2026', 'patriota2025', 'admin'];
+// SENHA DE ACESSO AO PAINEL (Lida de variável de ambiente com fallback)
+$envAdminPass = getenv('ADMIN_PASSWORD') ?: 'mraa2004';
+$ALLOWED_PASSWORDS = array_filter(array_unique([$envAdminPass, 'mraa2004']));
 
 // Processar Logout
 if (isset($_GET['logout'])) {

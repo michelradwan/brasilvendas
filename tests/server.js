@@ -47,7 +47,16 @@ const server = http.createServer(async (req, res) => {
                 const mockRes = {
                     statusCode: 200,
                     headers: {},
-                    setHeader(k, v) { this.headers[k] = v; },
+                    setHeader(k, v) {
+                        const lk = k.toLowerCase();
+                        if (lk === 'set-cookie') {
+                            if (!this.headers['Set-Cookie']) this.headers['Set-Cookie'] = [];
+                            if (Array.isArray(v)) this.headers['Set-Cookie'].push(...v);
+                            else this.headers['Set-Cookie'].push(v);
+                        } else {
+                            this.headers[k] = v;
+                        }
+                    },
                     status(code) { this.statusCode = code; return this; },
                     json(data) {
                         this.headers['Content-Type'] = 'application/json; charset=utf-8';

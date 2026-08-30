@@ -2552,15 +2552,22 @@ class DashboardApp {
         if (!silent) this.showToast('Atualizando pedidos...', 'info');
 
         try {
-            const token = window.metaAdapter.adminPassword || 'mraa2004';
             const range = window.periodStore ? window.periodStore.globalRange : null;
             
-            let url = `/api/pedidos?token=${encodeURIComponent(token)}`;
+            let url = '/api/pedidos';
+            const params = new URLSearchParams();
             if (range && range.since && range.until && range.preset !== 'today') {
-                url += `&start_date=${encodeURIComponent(range.since)}&end_date=${encodeURIComponent(range.until)}`;
+                params.set('start_date', range.since);
+                params.set('end_date', range.until);
             }
+            const qs = params.toString();
+            if (qs) url += `?${qs}`;
 
-            const res = await fetch(url);
+            const res = await fetch(url, { credentials: 'include' });
+            if (res.status === 401) {
+                if (window.authGate) window.authGate.show('Sessão expirada. Faça login novamente.');
+                return;
+            }
             if (res.ok) {
                 const data = await res.json();
                 if (data && Array.isArray(data.pedidos)) {
@@ -2581,7 +2588,6 @@ class DashboardApp {
 
             this.updateOrdersMetrics();
             this.renderOrdersTable();
-            this.renderHourlyVisualIntelligence();
 
         } catch (err) {
             console.error('[Orders Error]', err);
@@ -2806,8 +2812,7 @@ class DashboardApp {
     async clearOrdersHistory() {
         if (!confirm('Deseja realmente limpar o histórico de pedidos de teste?')) return;
         try {
-            const token = window.metaAdapter.adminPassword || 'mraa2004';
-            const res = await fetch(`/api/pedidos?action=clear&token=${encodeURIComponent(token)}`, { method: 'POST' });
+            const res = await fetch('/api/pedidos?action=clear', { method: 'POST', credentials: 'include' });
             if (res.ok) {
                 this.cachedOrders = [];
                 this.updateOrdersMetrics();
@@ -3573,8 +3578,25 @@ class DashboardApp {
             if (toast.parentElement) toast.remove();
         }, 4500);
     }
+
+    async logout() {
+        if (window.authGate && typeof window.authGate.handleLogout === 'function') {
+            await window.authGate.handleLogout();
+        } else {
+            window.location.reload();
+        }
+    }
 }
 
-// Instância Singleton e Inicialização
+// Instância Singleton e Inicialização Segura com Auth Gate
 window.dashboard = new DashboardApp();
-document.addEventListener('DOMContentLoaded', () => window.dashboard.init());
+document.addEventListener('DOMContentLoaded', async () => {
+    if (window.authGate && typeof window.authGate.init === 'function') {
+        const isAuth = await window.authGate.init();
+        if (isAuth) {
+            window.dashboard.init();
+        }
+    } else {
+        window.dashboard.init();
+    }
+});

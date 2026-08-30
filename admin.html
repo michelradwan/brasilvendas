@@ -838,36 +838,76 @@
 
 <script>
     // ============================================================
-    // LÓGICA — IDÊNTICA AO ORIGINAL, APENAS UI REDESENHADA
+    // LÓGICA — AUTENTICAÇÃO REAL SERVER-SIDE COM SESSÃO HTTPONLY
     // ============================================================
-    const SENHAS_VALIDAS = ["mraa2004", "patriota2026", "patriota2025", "admin"];
     let pedidos = [];
 
-    // Auto-login via URL token ou sessão
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const sessionAuth = sessionStorage.getItem('admin_logged');
-        if (SENHAS_VALIDAS.includes(token)) {
-            sessionStorage.setItem('admin_token', token);
-            mostrarDashboard();
-        } else if (sessionAuth === 'true') {
-            mostrarDashboard();
-        }
+    // Checagem segura de sessão no servidor ao carregar a página
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const res = await fetch('/api/auth?action=check', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.authenticated) {
+                    mostrarDashboard();
+                }
+            }
+        } catch (e) {}
     });
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
         e.preventDefault();
         const pass = document.getElementById('admin-pass').value.trim();
-        if (SENHAS_VALIDAS.includes(pass)) {
-            sessionStorage.setItem('admin_logged', 'true');
-            sessionStorage.setItem('admin_token', pass);
-            mostrarDashboard();
-        } else {
-            const err = document.getElementById('login-error');
-            err.classList.add('visible');
-            setTimeout(() => err.classList.remove('visible'), 3500);
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const err = document.getElementById('login-error');
+
+        if (!pass) return;
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verificando...';
         }
+
+        try {
+            const res = await fetch('/api/auth?action=login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ password: pass })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                mostrarDashboard();
+            } else {
+                err.textContent = data.error || 'Senha incorreta.';
+                err.classList.add('visible');
+                setTimeout(() => err.classList.remove('visible'), 4000);
+            }
+        } catch (errNet) {
+            err.textContent = 'Erro ao conectar ao servidor.';
+            err.classList.add('visible');
+            setTimeout(() => err.classList.remove('visible'), 4000);
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Acessar Painel';
+            }
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await fetch('/api/auth?action=logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (e) {}
+        window.location.reload();
     }
 
     function logout() {
@@ -888,7 +928,7 @@
     // ── Visitantes ao vivo ──
     async function carregarVisitantesAoVivo() {
         try {
-            const res = await fetch('/api/visitantes');
+            const res = await fetch('/api/visitantes', { credentials: 'include' });
             if (!res.ok) return;
             const data = await res.json();
             const total = data.total_online || 0;
@@ -946,7 +986,7 @@
                     `;
                     list.appendChild(card);
                 });
-            } else if (container && subtitle) {
+            } else if (subtitle && container) {
                 subtitle.textContent = 'Aguardando novos cliques do Meta Ads...';
                 container.style.display = 'none';
             }
@@ -958,8 +998,7 @@
         let combined = [];
 
         try {
-            const token = sessionStorage.getItem('admin_token') || new URLSearchParams(window.location.search).get('token') || 'mraa2004';
-            const resApi = await fetch(`/api/pedidos?token=${encodeURIComponent(token)}`);
+            const resApi = await fetch('/api/pedidos', { credentials: 'include' });
             if (resApi.ok) {
                 const dataApi = await resApi.json();
                 if (dataApi && Array.isArray(dataApi.pedidos)) {
@@ -1163,9 +1202,8 @@
         if (!confirm('⚠️ ATENÇÃO: Deseja realmente ZERAR e LIMPAR todo o histórico de pedidos e PIX gerados no painel?')) return;
         
         try {
-            const token = sessionStorage.getItem('admin_token') || new URLSearchParams(window.location.search).get('token') || 'mraa2004';
             localStorage.removeItem('pedidos_brasilvendas');
-            await fetch(`/api/pedidos?action=clear&token=${encodeURIComponent(token)}`, { method: 'POST' });
+            await fetch(`/api/pedidos?action=clear`, { method: 'POST', credentials: 'include' });
             pedidos = [];
             renderizarTabela();
             alert('Histórico de pedidos zerado com sucesso.');

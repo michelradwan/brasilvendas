@@ -2,13 +2,16 @@
 // VERCEL SERVERLESS BACKEND - MONITOR DE VISITANTES AO VIVO (REALTIME VISITOR TRACKER)
 // ==============================================================================
 
+const authGuard = require('../lib/auth-guard.js');
+
 // Armazenamento em memória dos visitantes ativos nos últimos 45 segundos
 let visitantesAtivos = new Map();
 
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Auth');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -23,7 +26,7 @@ module.exports = async (req, res) => {
         }
     }
 
-    // POST: Registrar Heartbeat / Ping do Visitante
+    // POST: Registrar Heartbeat / Ping do Visitante (Público durante navegação no site)
     if (req.method === 'POST') {
         try {
             const body = req.body || {};
@@ -62,8 +65,16 @@ module.exports = async (req, res) => {
         }
     }
 
-    // GET: Retornar lista de visitantes online para o admin.html
+    // GET: Retornar lista de visitantes online para o admin.html (EXIGE AUTENTICAÇÃO ADMINISTRATIVA)
     if (req.method === 'GET') {
+        const authCheck = authGuard.validateAdminSession(req);
+        if (!authCheck.authenticated) {
+            return res.status(401).json({
+                success: false,
+                error: 'Acesso negado: Visualização de visitantes online restrita a administradores autenticados.'
+            });
+        }
+
         const lista = Array.from(visitantesAtivos.values()).map(v => ({
             ...v,
             tempo_online_segundos: Math.round((agora - v.criado_em) / 1000)
