@@ -206,7 +206,7 @@ class TrackingGateway {
                     event_name: 'Purchase',
                     event_time: Math.floor(Date.now() / 1000),
                     event_id: order.transaction_id, // Deduplicação estrita com o frontend
-                    event_source_url: process.env.SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://brasilvendas.vercel.app'),
+                    event_source_url: process.env.SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://radwanads.vercel.app'),
                     action_source: 'website',
                     user_data: userData,
                     custom_data: {
@@ -383,7 +383,7 @@ class TrackingGateway {
                         event_name: 'InitiateCheckout',
                         event_time: Math.floor(Date.now() / 1000),
                         event_id: intentId,
-                        event_source_url: process.env.SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://brasilvendas.vercel.app'),
+                        event_source_url: process.env.SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://radwanads.vercel.app'),
                         action_source: 'website',
                         user_data: userData,
                         custom_data: {
