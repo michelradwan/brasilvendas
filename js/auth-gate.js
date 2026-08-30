@@ -1,6 +1,6 @@
 // ==============================================================================
 // RADWAN ADS — SUPABASE AUTH GATE & SAAS INITIALIZATION (VANILLA JS)
-// Zero External Framework • Scan Grid Micro-interaction • Session Context
+// Zero External Framework • Splash Screen • Multi-Tenant Context
 // ==============================================================================
 
 (function () {
@@ -24,10 +24,13 @@
         }
 
         initEvents() {
-            // Botão Iniciar RADWAN (Scan Grid)
-            const scanBtn = document.getElementById('btn-start-radwan');
-            if (scanBtn) {
-                scanBtn.addEventListener('click', () => this.handleScanBtnClick(scanBtn));
+            // Botão Iniciar RADWAN (Launch Button de Luxo)
+            const launchBtn = document.getElementById('btn-start-radwan');
+            if (launchBtn) {
+                launchBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleLaunchBtnClick(launchBtn);
+                });
             }
 
             // Alternadores de aba Login / Cadastro / Reset
@@ -39,16 +42,16 @@
             });
         }
 
-        // ─── 1. RITUAL DE ENTRADA: SCAN GRID BUTTON (350ms MICROINTERAÇÃO) ───────
-        handleScanBtnClick(btn) {
+        // ─── 1. RITUAL DE ENTRADA: BOTAO INICIAR RADWAN (350ms MICROINTERAÇÃO) ────
+        handleLaunchBtnClick(btn) {
             btn.classList.add('is-activating');
 
             setTimeout(() => {
                 if (this.currentUser && this.currentWorkspace) {
-                    // Usuário já autenticado: abre direto o dashboard
+                    // Usuário já possui sessão e workspace: entra no dashboard
                     this.revealDashboard();
                 } else {
-                    // Abre o card de autenticação
+                    // Novo usuário ou sem sessão: abre card de login / cadastro
                     this.splashScreen?.classList.add('is-hidden');
                     this.authModal?.classList.remove('is-hidden');
                 }
@@ -62,6 +65,7 @@
             const nameField = document.getElementById('auth-name-container');
             const passwordField = document.getElementById('auth-password-container');
             const loginOptions = document.getElementById('auth-login-options');
+            const backOption = document.getElementById('auth-back-option');
             const errorEl = document.getElementById('auth-error-msg');
 
             if (errorEl) errorEl.classList.add('hidden');
@@ -72,26 +76,29 @@
                 if (nameField) nameField.classList.remove('hidden');
                 if (passwordField) passwordField.classList.remove('hidden');
                 if (loginOptions) loginOptions.classList.add('hidden');
+                if (backOption) backOption.classList.remove('hidden');
             } else if (mode === 'reset') {
                 if (titleEl) titleEl.textContent = 'Recuperar senha';
                 if (submitBtn) submitBtn.textContent = 'Enviar link de recuperação';
                 if (nameField) nameField.classList.add('hidden');
                 if (passwordField) passwordField.classList.add('hidden');
                 if (loginOptions) loginOptions.classList.add('hidden');
+                if (backOption) backOption.classList.remove('hidden');
             } else {
                 if (titleEl) titleEl.textContent = 'Acessar o RADWAN ADS';
                 if (submitBtn) submitBtn.textContent = 'Entrar';
                 if (nameField) nameField.classList.add('hidden');
                 if (passwordField) passwordField.classList.remove('hidden');
                 if (loginOptions) loginOptions.classList.remove('hidden');
+                if (backOption) backOption.classList.add('hidden');
             }
         }
 
-        // ─── 2. AUTENTICAÇÃO COM GOOGLE (OAUTH PKCE) ─────────────────────────────
+        // ─── 2. AUTENTICAÇÃO COM GOOGLE (OAUTH PKCE REAL VIA SUPABASE) ───────────
         async loginWithGoogle() {
             try {
                 const supabaseUrl = 'https://jlgjbycncurgmsbqughp.supabase.co';
-                const redirectUri = `${window.location.origin}/#auth-callback`;
+                const redirectUri = `${window.location.origin}/`;
                 window.location.href = `${supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectUri)}`;
             } catch (err) {
                 this.showError('Não foi possível iniciar o login com o Google.');
