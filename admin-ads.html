@@ -109,8 +109,11 @@
             <form id="auth-gate-form" onsubmit="window.authGate.handleLogin(event)" class="space-y-4 pt-1">
                 <div>
                     <label for="auth-gate-password" class="block text-[10.5px] font-bold text-[#A1A1A6] mb-1.5 uppercase tracking-wider">Senha de Acesso</label>
-                    <input type="password" id="auth-gate-password" placeholder="Digite a senha administrativa..." autocomplete="current-password" required
-                           class="w-full bg-[#15151A] border border-white/[0.1] rounded-xl px-3.5 py-2.5 text-sm text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D] transition-colors">
+                    <div class="relative">
+                        <input type="password" id="auth-gate-password" placeholder="Digite a senha administrativa..." autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required
+                               class="w-full bg-[#15151A] border border-white/[0.1] rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-[#F5F5F7] placeholder-[#6E6E73] focus:outline-none focus:border-[#FF2D2D] transition-colors font-mono">
+                        <button type="button" onclick="const p=document.getElementById('auth-gate-password'); p.type = p.type === 'password' ? 'text' : 'password';" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs" title="Ver / Ocultar Senha">👁️</button>
+                    </div>
                 </div>
 
                 <div id="auth-gate-error" class="text-xs text-[#FF453A] bg-[#FF453A]/10 border border-[#FF453A]/20 p-2.5 rounded-lg hidden"></div>
