@@ -647,14 +647,14 @@ body.sidebar-open {
 
 #toast-container {
     position: fixed;
-    bottom: 1.25rem;
-    right: 1.25rem;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    right: max(1.25rem, env(safe-area-inset-right));
     z-index: 1100;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     pointer-events: none;
-    max-width: calc(100vw - 2.5rem);
+    max-width: min(calc(100% - 2.5rem), 380px);
 }
 
 .toast {
@@ -923,9 +923,13 @@ body.sidebar-open {
    FLOATING BULK ACTION BAR
    ============================================================================== */
 
+/* ==============================================================================
+   FLOATING BULK ACTION BAR
+   ============================================================================== */
+
 #bulk-actions-bar {
     position: fixed;
-    bottom: 1.5rem;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%) translateY(120%);
     background: var(--surface-1);
@@ -938,30 +942,13 @@ body.sidebar-open {
     align-items: center;
     gap: 0.75rem;
     transition: transform var(--transition-smooth);
-    max-width: calc(100vw - 2rem);
+    max-width: min(calc(100% - 2rem), 680px);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
 
 #bulk-actions-bar.active {
     transform: translateX(-50%) translateY(0);
-}
-
-/* ==============================================================================
-   CAMPAIGN MOBILE CARDS
-   ============================================================================== */
-
-.campaign-mobile-card {
-    background: var(--surface-1);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 1rem;
-    transition: all var(--transition-fast);
-}
-
-.campaign-mobile-card:hover {
-    border-color: var(--border-hover);
-    background: var(--surface-elevated);
 }
 
 /* ==============================================================================
@@ -976,7 +963,7 @@ body.sidebar-open {
         top: 0;
         bottom: 0;
         z-index: 50;
-        width: 280px !important;
+        width: min(280px, 85vw) !important;
         transform: translateX(-100%);
         box-shadow: none;
     }
@@ -991,14 +978,14 @@ body.sidebar-open {
     }
 
     .snapshot-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-/* Telas Extremamente Pequenas (< 480px) */
-@media (max-width: 479px) {
+/* Viewports Médias & Mobile (< 768px) */
+@media (max-width: 767px) {
     .snapshot-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     
     .status-strip {
@@ -1006,7 +993,18 @@ body.sidebar-open {
     }
 
     .workspace-content {
-        padding: 12px 10px 32px 10px;
+        padding: 12px 10px 60px 10px;
+    }
+}
+
+/* Telas Extremamente Pequenas (< 360px) */
+@media (max-width: 359px) {
+    .snapshot-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mobile-card-actions-bar {
+        grid-template-columns: repeat(3, 1fr) !important;
     }
 }
 
@@ -1195,6 +1193,8 @@ tbody tr.is-selected .sticky-col-status {
     border-radius: 12px;
     padding: 14px;
     transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    min-width: 0;
+    word-break: break-word;
 }
 
 .campaign-mobile-card:hover {
@@ -1227,9 +1227,10 @@ tbody tr.is-selected .sticky-col-status {
     color: #F5F5F7;
     font-size: 10px;
     font-weight: 500;
-    min-height: 42px;
+    min-height: 44px;
     cursor: pointer;
     transition: all var(--transition-fast);
+    touch-action: manipulation;
 }
 
 .mobile-card-action-btn:hover {
@@ -1271,6 +1272,8 @@ tbody tr.is-selected .sticky-col-status {
     flex-direction: column;
     justify-content: space-between;
     min-height: 70px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .metric-stat-label {
@@ -1283,6 +1286,9 @@ tbody tr.is-selected .sticky-col-status {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .metric-stat-val {
@@ -1291,13 +1297,14 @@ tbody tr.is-selected .sticky-col-status {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     color: #F5F5F7;
     letter-spacing: -0.02em;
+    word-break: break-word;
 }
 
 /* Responsividade Mobile para Drawer de Métricas (< 640px) */
 @media (max-width: 639px) {
     #campaign-drawer {
-        width: 100vw !important;
-        max-width: 100vw !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     .metric-stat-grid {

@@ -209,6 +209,10 @@ class DashboardApp {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    navigateTo(viewName) {
+        this.switchView(viewName);
+    }
+
     // ─── CONTROLE DE SIDEBAR & BACKDROP (STATE MACHINE) ──────────────────────
 
     toggleSidebar() {

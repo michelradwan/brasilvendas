@@ -3,7 +3,7 @@
 // ==============================================================================
 
 const assert = require('assert');
-const serverState = require('../api/meta-state.js');
+const serverState = require('../lib/meta-state.js');
 const { ALLOWED_OPERATIONS, ALLOWED_AD_ACCOUNT_ID } = require('../config/meta-constants.js');
 
 console.log('🧪 [EXPANDED AUDIT TEST SUITE] Iniciando validação de segurança e robustez...\n');

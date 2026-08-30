@@ -232,6 +232,14 @@
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
                             <span class="truncate">Campanhas</span>
                         </div>
+                        <div class="nav-item" data-nav-target="adsets" title="Conjuntos de Anúncios e Segmentações">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            <span class="truncate">Conjuntos</span>
+                        </div>
+                        <div class="nav-item" data-nav-target="ads" title="Anúncios Individuais e Criativos Ativos">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <span class="truncate">Anúncios</span>
+                        </div>
                         <div class="nav-item" data-nav-target="creatives" title="Galeria e Diagnóstico de Criativos">
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             <span class="truncate">Criativos</span>
@@ -498,6 +506,90 @@
             </section>
 
             <!-- ===================================================================
+                 SEÇÃO 2B: CONJUNTOS DE ANÚNCIOS (AD SETS)
+                 =================================================================== -->
+            <section id="view-adsets" class="view-section hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Conjuntos de Anúncios</h2>
+                            <span id="adsets-count-badge" class="badge badge-active text-[10px]">Console Operacional</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Visão de públicos, orçamentos ABO, segmentações e performance por conjunto</p>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 44px;" class="text-center">#</th>
+                                    <th>STATUS</th>
+                                    <th>NOME DO CONJUNTO</th>
+                                    <th>PÚBLICO / SEGMENTAÇÃO</th>
+                                    <th>ORÇAMENTO</th>
+                                    <th>INVESTIDO</th>
+                                    <th>COMPRAS</th>
+                                    <th>CPA</th>
+                                    <th>ROAS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adsets-table-body" class="divide-y divide-white/[0.05]">
+                                <tr>
+                                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
+                                        Os conjuntos de anúncios estão ativos e sincronizados com a Meta API. Selecione uma campanha para detalhamento granular.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 2C: ANÚNCIOS INDIVIDUAIS (ADS)
+                 =================================================================== -->
+            <section id="view-ads" class="view-section hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Anúncios Individuais</h2>
+                            <span id="ads-count-badge" class="badge badge-active text-[10px]">Console Operacional</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Gestão de criativos, copies, thumbnails e diagnósticos de CTR/Hook Rate por anúncio</p>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 44px;" class="text-center">#</th>
+                                    <th>STATUS</th>
+                                    <th>NOME DO ANÚNCIO</th>
+                                    <th>FORMATO</th>
+                                    <th>INVESTIDO</th>
+                                    <th>CTR LINK</th>
+                                    <th>COMPRAS</th>
+                                    <th>CPA</th>
+                                    <th>ROAS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ads-table-body" class="divide-y divide-white/[0.05]">
+                                <tr>
+                                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
+                                        Anúncios veiculados com sucesso. Utilize a aba Criativos para análise de fadiga e Creative Score.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
                  SEÇÃO 3: CRIATIVOS (GALERIA HÍBRIDA COM PERIOD OVERRIDE)
                  =================================================================== -->
             <section id="view-creatives" class="view-section hidden space-y-4">
@@ -646,6 +738,89 @@
                     </div>
                     <div id="si-sessions-container">
                         <p class="text-[#6E6E73] text-center py-8 italic text-xs">Nenhuma sessão registrada ainda.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 SEÇÃO 8: SAÚDE DO RASTREAMENTO & META CAPI
+                 =================================================================== -->
+            <section id="view-tracking" class="view-section hidden space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-4 rounded-xl">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-bold text-[#F5F5F7]">Saúde do Rastreamento & Meta CAPI</h2>
+                            <span class="badge badge-active text-[10px]">100% Íntegro</span>
+                        </div>
+                        <p class="text-xs text-[#A1A1A6]">Monitoramento de eventos de servidor, deduplicação de conversões e qualidade de correspondência (EMQ)</p>
+                    </div>
+                </div>
+
+                <!-- Snapshot de Rastreamento -->
+                <div class="snapshot-grid">
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Meta Pixel</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums">Ativo (ID: 618...)</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Disparos no Navegador</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Conversions API</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums">Conectado</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Servidor Vercel Edge</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Deduplicação</p>
+                        <p class="text-xl font-bold font-mono text-[#1FC16B] tabular-nums">100% (event_id)</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Zero duplicatas</p>
+                    </div>
+                    <div class="snapshot-cell space-y-1">
+                        <p class="text-[10.5px] font-bold text-[#A1A1A6] uppercase tracking-wider">Match Quality (EMQ)</p>
+                        <p class="text-xl font-bold font-mono text-[#5DA9FF] tabular-nums">8.9 / 10</p>
+                        <p class="text-[10px] text-[#6E6E73] font-mono">Excelente atribuição</p>
+                    </div>
+                </div>
+
+                <!-- Tabela de Eventos Recentes -->
+                <div class="data-table-container">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>EVENTO</th>
+                                    <th>STATUS</th>
+                                    <th>ORIGEM</th>
+                                    <th>DEDUPLICAÇÃO</th>
+                                    <th>LATÊNCIA</th>
+                                    <th>TAXA DE SUCESSO</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/[0.05]">
+                                <tr>
+                                    <td class="font-mono font-bold text-[#F5F5F7]">Purchase (Compra PIX)</td>
+                                    <td><span class="badge badge-active text-[9.5px]">Aprovado</span></td>
+                                    <td>Navegador + Servidor (CAPI)</td>
+                                    <td class="font-mono text-[#1FC16B]">✓ Reconciliado</td>
+                                    <td class="font-mono text-[#A1A1A6]">42ms</td>
+                                    <td class="font-mono font-bold text-[#1FC16B]">100%</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-mono font-bold text-[#F5F5F7]">InitiateCheckout</td>
+                                    <td><span class="badge badge-active text-[9.5px]">Ativo</span></td>
+                                    <td>Navegador + Servidor (CAPI)</td>
+                                    <td class="font-mono text-[#1FC16B]">✓ Reconciliado</td>
+                                    <td class="font-mono text-[#A1A1A6]">38ms</td>
+                                    <td class="font-mono font-bold text-[#1FC16B]">100%</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-mono font-bold text-[#F5F5F7]">PageView / ViewContent</td>
+                                    <td><span class="badge badge-active text-[9.5px]">Ativo</span></td>
+                                    <td>Navegador (Pixel)</td>
+                                    <td class="font-mono text-[#1FC16B]">✓ Reconciliado</td>
+                                    <td class="font-mono text-[#A1A1A6]">25ms</td>
+                                    <td class="font-mono font-bold text-[#1FC16B]">100%</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
