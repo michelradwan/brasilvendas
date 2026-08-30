@@ -7,6 +7,9 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
+process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-suite-admin-secret-2026';
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-suite-session-secret-2026';
+
 console.log('═══════════════════════════════════════════════════════════════════════');
 console.log('🔒 INICIANDO BATERIA DE TESTES DE SEGURANÇA E AUTHENTICATION GATE (P0)');
 console.log('═══════════════════════════════════════════════════════════════════════\n');
@@ -92,7 +95,7 @@ function makeRequest(options, postData = null) {
             path: '/api/auth?action=login',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
-        }, { password: 'mraa2004' });
+        }, { password: process.env.ADMIN_PASSWORD || 'test-suite-admin-secret-2026' });
 
         assert.strictEqual(loginRes.statusCode, 200, `Login falhou com código ${loginRes.statusCode}`);
         assert(loginRes.body.success, 'Login retornou success: false');
@@ -193,7 +196,7 @@ function makeRequest(options, postData = null) {
 
         for (const file of frontendFiles) {
             const content = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
-            assert(!content.includes("'mraa2004'") && !content.includes('"mraa2004"'), `SENHA HARDCODED ENCONTRADA EM ${file}!`);
+            assert(!content.includes('ADMIN_PASSWORD') && !content.includes('SESSION_SECRET'), `SEGREDOS ENCONTRADOS EM ${file}!`);
             assert(!content.includes('EAA6kKz1q'), `META ACCESS TOKEN ENCONTRADO EM ${file}!`);
             console.log(`   ✅ PASS: ${file} limpo (0 senhas, 0 tokens expostos).`);
         }

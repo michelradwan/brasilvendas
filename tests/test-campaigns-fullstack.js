@@ -8,7 +8,7 @@ async function proxyRequest(endpoint, params = {}) {
     const q = new URLSearchParams({ endpoint, ...params }).toString();
     return new Promise((resolve, reject) => {
         http.get(`http://localhost:3333/api/meta-proxy?${q}`, {
-            headers: { 'X-Admin-Auth': 'mraa2004' }
+            headers: { 'X-Admin-Auth': process.env.ADMIN_PASSWORD || 'test-suite-admin-secret-2026' }
         }, (res) => {
             let data = '';
             res.on('data', chunk => data += chunk);

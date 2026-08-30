@@ -5,7 +5,7 @@
 const https = require('https');
 
 const API_URL = 'https://www.links-pagamentos.online/api-pix/Akc4K4Bs4Q9sBfbGv3Kuh-9i39GvsmiE2IjP1IuCrdIlrDHCdCHF3UQ7zMlW-QmQa7KAfnDqL6QDvKX0kG2AHg';
-const API_KEY = process.env.DUTTYFY_KEY || 'b8ae99391cf645b2af25b66eef4b99d3';
+const API_KEY = process.env.DUTTYFY_KEY;
 
 // ALLOWLIST OFICIAL DE PREÇOS NO SERVIDOR (EM CENTAVOS)
 const ORDER_BUMP_PRICES = {
@@ -25,6 +25,14 @@ module.exports = async (req, res) => {
 
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Método não permitido' });
+    }
+
+    if (!API_KEY) {
+        console.error('[Payment Gateway Error] DUTTYFY_KEY não configurada no servidor.');
+        return res.status(500).json({
+            success: false,
+            error: 'CONFIGURATION_ERROR: DUTTYFY_KEY obrigatória não configurada no servidor (Fail-Closed).'
+        });
     }
 
     try {

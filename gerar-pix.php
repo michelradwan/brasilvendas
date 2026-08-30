@@ -16,7 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Configurações da API Duttyfy
 $apiUrl = 'https://www.links-pagamentos.online/api-pix/Akc4K4Bs4Q9sBfbGv3Kuh-9i39GvsmiE2IjP1IuCrdIlrDHCdCHF3UQ7zMlW-QmQa7KAfnDqL6QDvKX0kG2AHg';
-$apiKey = 'b8ae99391cf645b2af25b66eef4b99d3';
+$apiKey = getenv('DUTTYFY_KEY');
+
+if (!$apiKey) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'CONFIGURATION_ERROR: DUTTYFY_KEY não configurada']);
+    exit;
+}
 
 // ALLOWLIST OFICIAL DE PREÇOS NO SERVIDOR (EM CENTAVOS)
 $ORDER_BUMP_PRICES = [

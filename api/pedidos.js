@@ -8,7 +8,7 @@ const path = require('path');
 const { storage } = require('../lib/storage-adapter.js');
 const authGuard = require('../lib/auth-guard.js');
 
-const API_KEY = process.env.DUTTYFY_KEY || 'b8ae99391cf645b2af25b66eef4b99d3';
+const API_KEY = process.env.DUTTYFY_KEY;
 const TMP_FILE = path.join('/tmp', 'pedidos.json');
 
 // Carrega pedidos salvos em disco /tmp

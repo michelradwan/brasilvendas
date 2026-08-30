@@ -4,7 +4,7 @@
 
 const https = require('https');
 
-const API_KEY = process.env.DUTTYFY_KEY || 'b8ae99391cf645b2af25b66eef4b99d3';
+const API_KEY = process.env.DUTTYFY_KEY;
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,6 +13,14 @@ module.exports = async (req, res) => {
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+
+    if (!API_KEY) {
+        console.error('[Payment Gateway Error] DUTTYFY_KEY não configurada no servidor.');
+        return res.status(500).json({
+            success: false,
+            error: 'CONFIGURATION_ERROR: DUTTYFY_KEY obrigatória não configurada no servidor (Fail-Closed).'
+        });
     }
 
     const txId = req.query.id || (req.body && req.body.id);

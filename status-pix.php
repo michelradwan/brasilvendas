@@ -8,7 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$apiKey = 'b8ae99391cf645b2af25b66eef4b99d3';
+$apiKey = getenv('DUTTYFY_KEY');
+if (!$apiKey) {
+    echo json_encode(['success' => false, 'error' => 'CONFIGURATION_ERROR: DUTTYFY_KEY ausente']);
+    exit;
+}
 $txId = isset($_GET['id']) ? trim($_GET['id']) : '';
 
 if (empty($txId)) {

@@ -19,8 +19,8 @@ process.env.VERCEL = '1';
 process.env.VERCEL_ENV = 'preview';
 process.env.PREVIEW_MODE = 'true';
 process.env.VERCEL_GIT_COMMIT_REF = 'chore_radwan_vercel_production';
-process.env.ADMIN_PASSWORD = 'mraa2004';
-process.env.SESSION_SECRET = 'radwan-test-preview-secret-2026';
+process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-suite-admin-secret-2026';
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-suite-session-secret-2026';
 
 const authHandler = require('../api/auth.js');
 const metaProxyHandler = require('../api/meta-proxy.js');
@@ -88,8 +88,8 @@ async function runSimulation() {
     }
 
     // 1. AUTH LOGIN & SESSION CREATION
-    await stepAsync('1. Login com senha mraa2004 emite cookie radwan_session assinado', async () => {
-        const { req, res, getResult } = mockReqRes('POST', { action: 'login' }, { password: 'mraa2004' });
+    await stepAsync('1. Login com senha administrativa emite cookie radwan_session assinado', async () => {
+        const { req, res, getResult } = mockReqRes('POST', { action: 'login' }, { password: process.env.ADMIN_PASSWORD });
         await authHandler(req, res);
         const result = getResult();
         assert.strictEqual(result.statusCode, 200);
@@ -100,7 +100,7 @@ async function runSimulation() {
 
     // 2. AUTH REJECT INCORRECT PASSWORD
     await stepAsync('2. Login com senha incorreta é rejeitado com 401', async () => {
-        const { req, res, getResult } = mockReqRes('POST', { action: 'login' }, { password: 'senha_errada' });
+        const { req, res, getResult } = mockReqRes('POST', { action: 'login' }, { password: 'senha_incorreta_totalmente_invalida' });
         await authHandler(req, res);
         const result = getResult();
         assert.strictEqual(result.statusCode, 401);
@@ -139,7 +139,7 @@ async function runSimulation() {
     // 5. AUTOPILOT DRY-RUN ENFORCEMENT IN PREVIEW
     await stepAsync('5. Autopilot Worker no Preview opera obrigatoriamente com effectiveDryRun=true', async () => {
         const { req, res, getResult } = mockReqRes('POST', {}, { mode: 'AUTOPILOT', dry_run: false }, {
-            'x-cron-auth': 'mraa2004'
+            'x-cron-auth': process.env.ADMIN_PASSWORD
         });
         await autopilotHandler(req, res);
         const result = getResult();
