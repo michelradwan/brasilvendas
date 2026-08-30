@@ -2216,55 +2216,229 @@ tr:hover .row-quick-actions {
     to { transform: rotate(360deg); }
 }
 
-/* Legacy toggle-switch backwards-compatibility */
-.toggle-switch {
+/* ==============================================================================
+   9. SCAN GRID SPLASH SCREEN & AUTHENTICATION EXPERIENCE (APPLE / RAYCAST GRADE)
+   ============================================================================== */
+
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background-color: #050506;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+    transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#splash-screen.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.04);
+}
+
+/* ─── SCAN GRID BUTTON (VANILLA JS / CSS ACCELERATED) ───────────────────────── */
+.scan-grid-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #0E0E12;
+    color: #F5F5F7;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 16px 36px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    outline: none;
+    box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease, box-shadow 200ms ease;
+    overflow: hidden;
+}
+
+.scan-grid-btn:hover {
+    border-color: rgba(255, 45, 45, 0.4);
+    box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.95), 0 0 24px rgba(255, 45, 45, 0.15);
+    transform: translateY(-1px);
+}
+
+.scan-grid-btn:active {
+    transform: scale(0.96);
+}
+
+/* Brackets nos 4 cantos */
+.scan-bracket {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-color: #FF2D2D;
+    border-style: solid;
+    transition: all 240ms cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.scan-bracket-tl {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+}
+
+.scan-bracket-tr {
+    top: -1px;
+    right: -1px;
+    border-width: 2px 2px 0 0;
+}
+
+.scan-bracket-bl {
+    bottom: -1px;
+    left: -1px;
+    border-width: 0 0 2px 2px;
+}
+
+.scan-bracket-br {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+}
+
+.scan-grid-btn:hover .scan-bracket {
+    width: 14px;
+    height: 14px;
+    border-color: #FF453A;
+}
+
+/* Scanline horizontal vermelha */
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 45, 45, 0.25) 50%, rgba(255, 45, 45, 0.6) 80%, #FF2D2D 100%);
+    opacity: 0.7;
+    pointer-events: none;
+    animation: scanline-loop 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes scanline-loop {
+    0% { transform: translateX(0); opacity: 0; }
+    15% { opacity: 0.7; }
+    50% { transform: translateX(200%); opacity: 0.7; }
+    51% { opacity: 0; }
+    100% { transform: translateX(200%); opacity: 0; }
+}
+
+.scan-grid-btn.is-activating .scan-line {
+    animation: scanline-fast 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scanline-fast {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(200%); opacity: 1; }
+}
+
+/* ─── MODAL & CARD DE AUTENTICAÇÃO SAAS (SUPABASE AUTH) ────────────────────── */
+#auth-modal-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(5, 5, 6, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1), transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#auth-modal-screen.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.97);
+}
+
+.auth-card {
+    background: #0E0E12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 380px;
+    padding: 2rem;
+    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 42px;
+    background: #15151A;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    color: #F5F5F7;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 140ms ease-out;
+}
+
+.btn-google:hover {
+    background: #1C1C22;
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+}
+
+/* ─── WORKSPACE SWITCHER DROPDOWN ─────────────────────────────────────────── */
+.workspace-switcher {
     position: relative;
     display: inline-block;
-    width: 42px;
-    height: 24px;
+}
+
+.workspace-switcher-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #15151A;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 4px 10px;
+    color: #F5F5F7;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 140ms ease-out;
 }
 
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+.workspace-switcher-btn:hover {
+    background: #1C1C22;
+    border-color: rgba(255, 255, 255, 0.16);
 }
 
-.toggle-slider {
+.workspace-dropdown-menu {
     position: absolute;
-    cursor: pointer;
-    top: 0;
+    top: calc(100% + 6px);
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(120, 120, 128, 0.32);
-    border-radius: 24px;
-    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+    min-width: 220px;
+    background: #101014;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.9);
+    z-index: 60;
 }
 
-.toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-}
-
-.toggle-switch input:checked + .toggle-slider {
-    background-color: #34C759;
-    box-shadow: 0 0 10px rgba(52, 199, 89, 0.3);
-}
-
-.toggle-switch input:checked + .toggle-slider:before {
-    transform: translateX(18px);
-}
 
 
 
