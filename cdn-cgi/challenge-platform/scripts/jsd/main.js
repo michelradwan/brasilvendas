@@ -1,1 +1,0 @@
-No Content: https://kitpatriotabr.site/cdn-cgi/challenge-platform/scripts/jsd/main.js
