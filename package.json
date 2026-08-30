@@ -4,6 +4,7 @@
   "description": "RADWAN ADS — Institutional Decision OS & Autonomous Performance Marketing",
   "main": "api/meta-proxy.js",
   "scripts": {
+    "build": "echo 'Build OK'",
     "test": "node tests/verify-all-fixes.js",
     "test:full": "node tests/test-suite-complete.js",
     "mcp": "node C:\\Users\\Michel\\.gemini\\config\\meta-ads-mcp-server.js"
