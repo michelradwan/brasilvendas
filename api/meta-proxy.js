@@ -281,7 +281,7 @@ module.exports = async (req, res) => {
 
     // 7. Execução Segura via Graph API
     try {
-        const overrideToken = req.headers['x-meta-token'] || req.query.access_token || null;
+        const overrideToken = req.headers['x-meta-token'] || req.query.access_token || (req.body && req.body.access_token) || null;
         const result = await executeGraphRequestWithRetry(endpoint, method, params, payload, 3, overrideToken);
 
         // Se for uma mutação de orçamento bem-sucedida, registra o Cooldown no servidor
