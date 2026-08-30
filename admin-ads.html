@@ -430,18 +430,18 @@
             <section id="view-campaigns" class="view-section hidden space-y-4">
                 <!-- Barra de Abas Unificada [ Campanhas ] [ Conjuntos ] [ Anúncios ] -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0E0E12] border border-white/[0.06] p-3 sm:p-4 rounded-xl">
-                    <div class="flex items-center gap-1.5 bg-[#15151A] border border-white/[0.08] p-1 rounded-lg">
-                        <button onclick="window.dashboard.switchCampaignTab('campaigns')" id="tab-nav-campaigns" class="segmented-btn active px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5">
-                            <span>Campanhas</span>
-                            <span id="tab-count-campaigns" class="badge badge-active text-[9.5px] px-1.5 py-0.2">0</span>
+                    <div class="grid grid-cols-3 w-full sm:w-auto sm:flex items-center gap-1 sm:gap-1.5 bg-[#15151A] border border-white/[0.08] p-1 rounded-lg">
+                        <button onclick="window.dashboard.switchCampaignTab('campaigns')" id="tab-nav-campaigns" class="segmented-btn active w-full sm:w-auto px-2 sm:px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1 sm:gap-1.5 min-w-0" title="Ver Nível de Campanhas">
+                            <span class="truncate">Campanhas</span>
+                            <span id="tab-count-campaigns" class="badge badge-active text-[9.5px] px-1.5 py-0.2 flex-shrink-0">0</span>
                         </button>
-                        <button onclick="window.dashboard.switchCampaignTab('adsets')" id="tab-nav-adsets" class="segmented-btn px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5">
-                            <span>Conjuntos</span>
-                            <span id="tab-count-adsets" class="badge badge-paused text-[9.5px] px-1.5 py-0.2">0</span>
+                        <button onclick="window.dashboard.switchCampaignTab('adsets')" id="tab-nav-adsets" class="segmented-btn w-full sm:w-auto px-2 sm:px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1 sm:gap-1.5 min-w-0" title="Ver Nível de Conjuntos de Anúncios">
+                            <span class="truncate">Conjuntos</span>
+                            <span id="tab-count-adsets" class="badge badge-paused text-[9.5px] px-1.5 py-0.2 flex-shrink-0">0</span>
                         </button>
-                        <button onclick="window.dashboard.switchCampaignTab('ads')" id="tab-nav-ads" class="segmented-btn px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5">
-                            <span>Anúncios</span>
-                            <span id="tab-count-ads" class="badge badge-paused text-[9.5px] px-1.5 py-0.2">0</span>
+                        <button onclick="window.dashboard.switchCampaignTab('ads')" id="tab-nav-ads" class="segmented-btn w-full sm:w-auto px-2 sm:px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1 sm:gap-1.5 min-w-0" title="Ver Nível de Anúncios Individuais">
+                            <span class="truncate">Anúncios</span>
+                            <span id="tab-count-ads" class="badge badge-paused text-[9.5px] px-1.5 py-0.2 flex-shrink-0">0</span>
                         </button>
                     </div>
 
@@ -921,55 +921,55 @@
             <!-- ===================================================================
                  SEÇÃO 9: MODO AUTOMÁTICO & REGRAS AUTÔNOMAS
                  =================================================================== -->
-            <section id="view-autopilot" class="view-section hidden space-y-5">
-                <div>
-                    <h2 class="text-lg font-bold text-[#F5F5F7]">Modo Automático & Regras do RADWAN</h2>
-                    <p class="text-xs text-[#A1A1A6]">Otimização guiada por inteligência com limites de segurança e parada de emergência</p>
-                </div>
-
-                <!-- Segmented Control de Modos -->
-                <div class="panel space-y-3">
-                    <label class="block text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Nível de Autonomia Permitido</label>
-                    <div class="flex flex-wrap gap-2">
-                        <button class="segmented-btn active px-3.5 py-2 text-xs">🛡️ Somente Analisar (Modo Seguro)</button>
-                        <button class="segmented-btn px-3.5 py-2 text-xs">👻 Registrar Ações (Modo Sombra)</button>
-                        <button class="segmented-btn px-3.5 py-2 text-xs">🤝 Pedir Minha Aprovação (Assistido)</button>
-                        <button class="segmented-btn px-3.5 py-2 text-xs">⚡ Ajustes Leves Permitidos</button>
-                    </div>
-                </div>
-
-                <!-- Lista de Verificação de Segurança -->
-                <div class="panel space-y-3">
-                    <h3 class="font-bold text-sm text-[#F5F5F7]">Prontidão e Blindagem da Conta (98/100)</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Rastreamento Reconciliado</span> <span class="text-[#1FC16B] font-bold">✓ 100%</span>
-                        </div>
-                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Economia Unitária Real</span> <span class="text-[#1FC16B] font-bold">✓ Ativo</span>
-                        </div>
-                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Confiança dos Dados</span> <span class="text-[#1FC16B] font-bold">✓ Alta</span>
-                        </div>
-                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Limites e Cooldown</span> <span class="text-[#1FC16B] font-bold">✓ 12h Ativo</span>
-                        </div>
-                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Verificação Pós-Escrita</span> <span class="text-[#1FC16B] font-bold">✓ Ativo</span>
-                        </div>
-                        <div class="p-3 rounded-lg bg-[#0E0E12] border border-white/[0.05] flex items-center justify-between">
-                            <span>Parada de Segurança</span> <span class="text-[#1FC16B] font-bold">✓ Pronta</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Parada de Segurança Dedicada -->
-                <div class="p-5 rounded-xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <section id="view-autopilot" class="view-section hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h4 class="font-bold text-sm text-white">Parada de Segurança da Conta (Kill Switch)</h4>
-                        <p class="text-xs text-gray-300">Pausa imediatamente qualquer escrita, ajuste de orçamento ou automação em produção</p>
+                        <h2 class="text-lg font-bold text-[#F5F5F7]">Modo Automático & Regras do RADWAN</h2>
+                        <p class="text-xs text-[#A1A1A6]">Controle real do nível de autonomia com guardrails financeiros e parada de segurança</p>
                     </div>
-                    <button onclick="window.dashboard.triggerEmergencyStop()" class="btn btn-danger font-bold text-xs px-4 py-2 flex-shrink-0">
+                    <div id="autopilot-current-badge-container" class="flex items-center gap-2">
+                        <!-- Badge dinâmico gerado pelo dashboard -->
+                    </div>
+                </div>
+
+                <!-- 1. Segmented Cards de Nível de Autonomia -->
+                <div class="panel space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-[#A1A1A6] uppercase tracking-wider">Nível de Autonomia Permitido</label>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">Fonte Única de Verdade</span>
+                    </div>
+                    <div id="autopilot-modes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- Cards injetados dinamicamente com handlers e active states -->
+                    </div>
+                </div>
+
+                <!-- 2. Prontidão e Blindagem da Conta (Score Real Calculado) -->
+                <div class="panel space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+                        <div>
+                            <h3 class="font-bold text-sm text-[#F5F5F7]">Prontidão e Blindagem da Operação</h3>
+                            <p class="text-xs text-[#A1A1A6]">Auditoria contínua em tempo real dos 6 pilares de governança financeira</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-[#A1A1A6]">Índice de Blindagem:</span>
+                            <span id="readiness-score-display" class="font-mono text-sm sm:text-base font-black text-[#1FC16B] bg-[#1FC16B]/10 border border-[#1FC16B]/30 px-3 py-1 rounded-lg tabular-nums">--/100</span>
+                        </div>
+                    </div>
+                    <div id="readiness-components-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                        <!-- Componentes calculados dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- 3. Parada de Segurança Dedicada (Kill Switch) -->
+                <div id="kill-switch-banner" class="p-5 rounded-2xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🛑</span>
+                            <h4 id="kill-switch-title" class="font-bold text-sm text-white">Parada de Segurança da Conta (Kill Switch)</h4>
+                        </div>
+                        <p id="kill-switch-desc" class="text-xs text-gray-300">Pausa imediatamente qualquer escrita, ajuste de orçamento ou automação em produção.</p>
+                    </div>
+                    <button id="btn-toggle-kill-switch" onclick="window.dashboard.toggleEmergencyStop()" class="btn btn-danger font-bold text-xs px-5 py-2.5 flex-shrink-0 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-[0.98]">
                         🛑 ATIVAR PARADA DE SEGURANÇA
                     </button>
                 </div>
@@ -1225,14 +1225,34 @@
 
     <!-- Floating Bulk Actions Bar -->
     <div id="bulk-actions-bar">
-        <span class="text-xs font-bold text-[#F5F5F7] whitespace-nowrap"><span id="bulk-selected-count">0</span> selecionadas</span>
-        <div class="h-4 w-[1px] bg-white/[0.15]"></div>
-        <button onclick="window.dashboard.bulkAction('pause')" class="btn btn-secondary btn-sm text-[11px]">⏸️ Pausar</button>
-        <button onclick="window.dashboard.bulkAction('resume')" class="btn btn-secondary btn-sm text-[11px]">▶️ Reativar</button>
-        <button onclick="window.dashboard.openBulkBudgetModal()" class="btn btn-secondary btn-sm text-[11px]">💰 Orçamento</button>
-        <button onclick="window.dashboard.bulkAction('radwan')" class="btn btn-secondary btn-sm text-[11px]">🧠 Analisar</button>
-        <button onclick="window.dashboard.openBulkDuplicateModal()" class="btn btn-secondary btn-sm text-[11px]">📋 Duplicar</button>
-        <button onclick="window.dashboard.clearBulkSelection()" class="btn btn-tertiary btn-sm text-[11px] text-[#A1A1A6]">✕</button>
+        <div class="bulk-bar-header">
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-[#FF2D2D]/20 text-[#FF2D2D] font-bold flex items-center justify-center text-xs font-mono" id="bulk-selected-count">0</span>
+                <span id="bulk-selected-label" class="text-xs font-semibold text-[#F5F5F7] whitespace-nowrap">selecionadas</span>
+            </div>
+            <button onclick="window.dashboard.clearBulkSelection()" class="text-xs text-gray-400 hover:text-white p-1 sm:hidden" title="Limpar Seleção">✕</button>
+        </div>
+        <div class="bulk-bar-divider"></div>
+        <div class="bulk-bar-actions">
+            <button onclick="window.dashboard.bulkAction('pause')" class="btn btn-secondary btn-sm text-[11px]" title="Pausar Selecionadas">
+                <span>⏸️</span> <span>Pausar</span>
+            </button>
+            <button onclick="window.dashboard.bulkAction('resume')" class="btn btn-secondary btn-sm text-[11px]" title="Reativar Selecionadas">
+                <span>▶️</span> <span>Reativar</span>
+            </button>
+            <button onclick="window.dashboard.openBulkBudgetModal()" class="btn btn-secondary btn-sm text-[11px]" title="Editar Orçamento">
+                <span>💰</span> <span>Orçamento</span>
+            </button>
+            <button onclick="window.dashboard.bulkAction('radwan')" class="btn btn-secondary btn-sm text-[11px] hidden sm:inline-flex" title="Análise Rápida">
+                <span>🧠</span> <span>Analisar</span>
+            </button>
+            <button onclick="window.dashboard.openBulkDuplicateModal()" class="btn btn-secondary btn-sm text-[11px] hidden sm:inline-flex" title="Duplicar Selecionadas">
+                <span>📋</span> <span>Duplicar</span>
+            </button>
+            <button onclick="window.dashboard.clearBulkSelection()" class="btn btn-tertiary btn-sm text-[11px] text-[#A1A1A6] hidden sm:inline-flex" title="Limpar Seleção">
+                ✕
+            </button>
+        </div>
     </div>
 
     <!-- Modal Orçamento (Console de Ajuste Rápido & CBO/ABO) -->
@@ -1388,22 +1408,7 @@
         </div>
     </div>
 
-    <!-- Floating Bulk Actions Bar (Ações em Massa Flutuantes) -->
-    <div id="bulk-actions-bar">
-        <div class="flex items-center gap-2 pr-2 border-r border-white/[0.1]">
-            <span class="w-5 h-5 rounded-full bg-[#FF2D2D]/20 text-[#FF2D2D] font-bold flex items-center justify-center text-xs font-mono" id="bulk-selected-count">0</span>
-            <span class="text-xs font-semibold text-[#F5F5F7]">selecionada(s)</span>
-        </div>
-        <button onclick="window.dashboard.bulkUpdateStatus('ACTIVE')" class="btn btn-secondary btn-sm text-[11px] px-2.5 py-1" title="Ativar Selecionadas">
-            <span>▶️</span> Ativar
-        </button>
-        <button onclick="window.dashboard.bulkUpdateStatus('PAUSED')" class="btn btn-secondary btn-sm text-[11px] px-2.5 py-1" title="Pausar Selecionadas">
-            <span>⏸️</span> Pausar
-        </button>
-        <button onclick="window.dashboard.clearBulkSelection()" class="btn btn-tertiary btn-sm text-[11px] text-[#A1A1A6] hover:text-white" title="Limpar Seleção">
-            ✕
-        </button>
-    </div>
+
 
     <!-- Column Manager Slide-Over Drawer (Customizador Mestre de Métricas) -->
     <div id="column-manager-drawer" class="drawer drawer-wide flex flex-col">

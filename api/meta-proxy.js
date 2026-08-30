@@ -175,6 +175,16 @@ module.exports = async (req, res) => {
         }
     }
 
+    // Suporte ao Kill Switch / Emergency Stop Server-Side
+    if (req.query.action === 'emergency_stop') {
+        if (req.method === 'POST') {
+            const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+            serverState.setEmergencyStop(!!body.enabled);
+            return res.status(200).json({ success: true, emergency_stop: serverState.isEmergencyStopped() });
+        }
+        return res.status(200).json({ success: true, emergency_stop: serverState.isEmergencyStopped() });
+    }
+
     // 2. Extração e Sanitização de Parâmetros
     let endpoint = '';
     let method = req.method;

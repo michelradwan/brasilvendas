@@ -1106,25 +1106,26 @@ body.sidebar-open {
 
 #bulk-actions-bar {
     position: fixed;
-    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem));
     left: 50%;
     transform: translateX(-50%) translateY(180%);
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
-    background: var(--surface-1);
+    background: rgba(16, 16, 20, 0.95);
     border: 1px solid var(--border-hover);
-    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.9), 0 0 0 1px var(--border-subtle);
-    border-radius: 9999px;
-    padding: 0.5rem 1rem;
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.95), 0 0 0 1px var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 0.65rem 1rem;
     z-index: 55;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    transition: transform var(--transition-smooth), opacity var(--transition-smooth), visibility var(--transition-smooth);
-    max-width: min(calc(100% - 2rem), 680px);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, visibility 200ms ease;
+    max-width: calc(100vw - 1.5rem);
+    width: max-content;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 #bulk-actions-bar.active {
@@ -1132,6 +1133,109 @@ body.sidebar-open {
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
+}
+
+.bulk-bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.bulk-bar-divider {
+    width: 1px;
+    height: 1.25rem;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.bulk-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+@media (max-width: 639px) {
+    #bulk-actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+        border-radius: var(--radius-lg);
+        padding: 0.75rem;
+        gap: 0.5rem;
+        width: calc(100vw - 1.5rem);
+        max-width: calc(100vw - 1.5rem);
+    }
+    .bulk-bar-divider {
+        display: none;
+    }
+    .bulk-bar-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+        gap: 0.35rem;
+    }
+    .bulk-bar-actions .btn {
+        width: 100%;
+        min-height: 40px;
+        font-size: 11px;
+        padding: 0 0.5rem;
+        justify-content: center;
+    }
+}
+
+/* ==============================================================================
+   AUTONOMY LEVEL CARDS
+   ============================================================================== */
+
+.autonomy-card {
+    background: #0E0E12;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.75rem;
+    position: relative;
+    user-select: none;
+}
+
+.autonomy-card:hover {
+    background: #14141A;
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.autonomy-card.active {
+    background: rgba(255, 45, 45, 0.08);
+    border-color: rgba(255, 45, 45, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 45, 45, 0.3), 0 8px 24px -6px rgba(255, 45, 45, 0.15);
+}
+
+.autonomy-card.active-safe {
+    background: rgba(31, 193, 107, 0.08);
+    border-color: rgba(31, 193, 107, 0.5);
+    box-shadow: 0 0 0 1px rgba(31, 193, 107, 0.3), 0 8px 24px -6px rgba(31, 193, 107, 0.15);
+}
+
+.autonomy-card.active-shadow {
+    background: rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.3), 0 8px 24px -6px rgba(168, 85, 247, 0.15);
+}
+
+.autonomy-card.active-assisted {
+    background: rgba(93, 169, 255, 0.08);
+    border-color: rgba(93, 169, 255, 0.5);
+    box-shadow: 0 0 0 1px rgba(93, 169, 255, 0.3), 0 8px 24px -6px rgba(93, 169, 255, 0.15);
+}
+
+.autonomy-card.active-guarded {
+    background: rgba(255, 159, 10, 0.08);
+    border-color: rgba(255, 159, 10, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 159, 10, 0.3), 0 8px 24px -6px rgba(255, 159, 10, 0.15);
 }
 
 /* ==============================================================================

@@ -39,35 +39,57 @@ class ExecutionEngine {
     }
 
     // Protocolo Write -> Read -> Verify para Alteração de Status
-    async executeStatusChange(campaignId, newStatus, reason = 'Ação manual do operador', mode = 'ASSISTED', isDryRun = false) {
-        if (isDryRun || mode === 'SAFE') {
+    async executeStatusChange(campaignId, newStatus, reason = 'Ação manual do operador', mode = null, isDryRun = false) {
+        // 1. Trava Absoluta de Kill Switch
+        if (window.guardrailEngine?.isEmergencyStopped()) {
+            throw new Error('EMERGENCY_STOP_BLOCKED: Mutações bloqueadas pela Parada de Segurança (Kill Switch).');
+        }
+
+        const activeMode = mode || window.autopilotEngine?.mode || 'ASSISTED';
+
+        // 2. Trava de Modo Somente Analisar
+        if (activeMode === 'ANALYSIS_ONLY') {
+            throw new Error('BLOCKED_BY_AUTONOMY_POLICY: O RADWAN está em Modo "Somente Analisar". Nenhuma alteração é permitida.');
+        }
+
+        // 3. Trava de Modo Sombra (Simulação)
+        if (isDryRun || activeMode === 'SHADOW') {
+            window.auditEngine?.logAction({
+                action: 'SHADOW_SIMULATION',
+                objectId: campaignId,
+                before: 'STATUS_UNKNOWN',
+                after: newStatus,
+                reason: `[MODO SOMBRA] ${reason}`,
+                risk: 'ZERO_RISK',
+                verification: 'SIMULATED_SUCCESS'
+            });
             return {
                 success: true,
                 dryRun: true,
-                message: `[DRY RUN] Status da campanha ${campaignId} seria alterado para ${newStatus}.`,
+                message: `[MODO SOMBRA] Status da campanha ${campaignId} seria alterado para ${newStatus}.`,
                 verification: 'SIMULATED_SUCCESS'
             };
         }
 
-        // 1. Snapshot para Rollback
+        // 4. Snapshot para Rollback
         const currentData = await window.metaAdapter.request(campaignId, 'GET', { fields: 'id,name,status' });
         this.rollbackSnapshots.set(campaignId, { type: 'STATUS', before: currentData.status, timestamp: Date.now() });
 
-        // 2. WRITE
+        // 5. WRITE
         const writeRes = await window.metaAdapter.updateStatus(campaignId, newStatus);
         if (!writeRes || writeRes.error || writeRes.success === false) {
             throw new Error(writeRes.error?.message || 'Falha na escrita de status na Meta.');
         }
 
-        // 3. READ (Bypass Cache)
+        // 6. READ (Bypass Cache)
         const readBack = await window.metaAdapter.request(campaignId, 'GET', { fields: 'id,name,status' }, null, true);
 
-        // 4. VERIFY
+        // 7. VERIFY
         if (readBack.status !== newStatus) {
             throw new Error(`Verificação falhou: Status esperado era "${newStatus}", mas a Meta retornou "${readBack.status}".`);
         }
 
-        // 5. Registrar no Audit Log
+        // 8. Registrar no Audit Log
         window.auditEngine?.logAction({
             action: 'STATUS_CHANGE',
             objectId: campaignId,
@@ -87,32 +109,54 @@ class ExecutionEngine {
     }
 
     // Protocolo Write -> Read -> Verify para Alteração de Orçamento
-    async executeBudgetChange(campaignId, budgetField, newBudgetCents, reason = 'Ajuste de escala/otimização', mode = 'ASSISTED', isDryRun = false) {
-        if (isDryRun || mode === 'SAFE') {
+    async executeBudgetChange(campaignId, budgetField, newBudgetCents, reason = 'Ajuste de escala/otimização', mode = null, isDryRun = false) {
+        // 1. Trava Absoluta de Kill Switch
+        if (window.guardrailEngine?.isEmergencyStopped()) {
+            throw new Error('EMERGENCY_STOP_BLOCKED: Mutações bloqueadas pela Parada de Segurança (Kill Switch).');
+        }
+
+        const activeMode = mode || window.autopilotEngine?.mode || 'ASSISTED';
+
+        // 2. Trava de Modo Somente Analisar
+        if (activeMode === 'ANALYSIS_ONLY') {
+            throw new Error('BLOCKED_BY_AUTONOMY_POLICY: O RADWAN está em Modo "Somente Analisar". Nenhuma alteração é permitida.');
+        }
+
+        // 3. Trava de Modo Sombra (Simulação)
+        if (isDryRun || activeMode === 'SHADOW') {
+            window.auditEngine?.logAction({
+                action: 'SHADOW_SIMULATION',
+                objectId: campaignId,
+                before: 'BUDGET_UNKNOWN',
+                after: `R$ ${(newBudgetCents / 100).toFixed(2)}`,
+                reason: `[MODO SOMBRA] ${reason}`,
+                risk: 'ZERO_RISK',
+                verification: 'SIMULATED_SUCCESS'
+            });
             return {
                 success: true,
                 dryRun: true,
-                message: `[DRY RUN] Orçamento da campanha ${campaignId} seria alterado para R$ ${(newBudgetCents / 100).toFixed(2)}.`,
+                message: `[MODO SOMBRA] Orçamento da campanha ${campaignId} seria alterado para R$ ${(newBudgetCents / 100).toFixed(2)}.`,
                 verification: 'SIMULATED_SUCCESS'
             };
         }
 
-        // 1. Snapshot para Rollback
+        // 4. Snapshot para Rollback
         const currentData = await window.metaAdapter.request(campaignId, 'GET', { fields: 'id,name,daily_budget,lifetime_budget' });
         const oldBudgetCents = currentData[budgetField] || 0;
         this.rollbackSnapshots.set(campaignId, { type: 'BUDGET', field: budgetField, before: oldBudgetCents, timestamp: Date.now() });
 
-        // 2. WRITE
+        // 5. WRITE
         const writeRes = await window.metaAdapter.updateBudget(campaignId, budgetField, newBudgetCents);
         if (!writeRes || writeRes.error || writeRes.success === false) {
             throw new Error(writeRes.error?.message || 'Falha ao atualizar orçamento na Meta.');
         }
 
-        // 3. READ (Bypass Cache)
+        // 6. READ (Bypass Cache)
         const readBack = await window.metaAdapter.request(campaignId, 'GET', { fields: `id,name,${budgetField}` }, null, true);
 
-        // 4. VERIFY
-        const readBackCents = parseInt(readBack[budgetField]);
+        // 7. VERIFY
+        const readBackCents = parseInt(readBack[budgetField], 10);
         if (readBackCents !== newBudgetCents) {
             throw new Error(`Verificação de orçamento falhou: Esperado R$ ${(newBudgetCents / 100).toFixed(2)}, Meta retornou R$ ${(readBackCents / 100).toFixed(2)}.`);
         }
@@ -120,7 +164,7 @@ class ExecutionEngine {
         // Registrar cooldown no Guardrail
         window.guardrailEngine?.registerBudgetChange(campaignId);
 
-        // 5. Registrar no Audit Log
+        // 8. Registrar no Audit Log
         window.auditEngine?.logAction({
             action: 'BUDGET_CHANGE',
             objectId: campaignId,

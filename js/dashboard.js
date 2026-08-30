@@ -75,6 +75,17 @@ class DashboardApp {
             }
         });
 
+        // Atualiza status do rodapé e sidebar
+        this.updateSidebarAndFooterStatus();
+        window.addEventListener('radwan_autonomy_mode_changed', () => {
+            this.updateSidebarAndFooterStatus();
+            if (this.currentView === 'autopilot') this.renderAutopilotView();
+        });
+        window.addEventListener('radwan_kill_switch_changed', () => {
+            this.updateSidebarAndFooterStatus();
+            if (this.currentView === 'autopilot') this.renderAutopilotView();
+        });
+
         // Verifica autenticação
         if (!window.metaAdapter.isAuthenticated()) {
             this.showLoginModal();
@@ -234,6 +245,8 @@ class DashboardApp {
             this.renderCreativesView();
         } else if (viewName === 'campaigns') {
             this.switchCampaignTab(this.activeCampaignTab || 'campaigns');
+        } else if (viewName === 'autopilot') {
+            this.renderAutopilotView();
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -764,15 +777,21 @@ class DashboardApp {
     updateBulkBarUI() {
         const bar = document.getElementById('bulk-actions-bar');
         const countEl = document.getElementById('bulk-selected-count');
+        const labelEl = document.getElementById('bulk-selected-label');
         const selectAllCheckbox = document.getElementById('select-all-campaigns');
+        const count = this.selectedCampaigns.size;
         
-        if (countEl) countEl.textContent = this.selectedCampaigns.size;
+        if (countEl) countEl.textContent = count;
+        if (labelEl) labelEl.textContent = count === 1 ? 'selecionada' : 'selecionadas';
         
         if (bar) {
-            if (this.selectedCampaigns.size > 0) {
+            if (count > 0) {
                 bar.classList.add('active');
+                // Compensação para não sobrepor o último card na visualização
+                document.getElementById('view-campaigns')?.style.setProperty('padding-bottom', '100px');
             } else {
                 bar.classList.remove('active');
+                document.getElementById('view-campaigns')?.style.removeProperty('padding-bottom');
             }
         }
 
@@ -3577,6 +3596,196 @@ class DashboardApp {
         setTimeout(() => {
             if (toast.parentElement) toast.remove();
         }, 4500);
+    }
+
+    // ─── GESTÃO DO MODO AUTOMÁTICO, AUTONOMIA E KILL SWITCH ─────────────────
+
+    updateSidebarAndFooterStatus() {
+        const isStopped = window.guardrailEngine?.isEmergencyStopped() || false;
+        const currentModeId = window.autopilotEngine?.mode || 'ASSISTED';
+        const modeDetails = window.autopilotEngine?.getModeDetails?.(currentModeId) || { name: 'Assistido' };
+
+        const emStatusEl = document.getElementById('sidebar-emergency-status');
+        if (emStatusEl) {
+            if (isStopped) {
+                emStatusEl.textContent = '🛑 ATIVA (Bloqueado)';
+                emStatusEl.className = 'text-[#FF453A] font-bold';
+            } else {
+                emStatusEl.textContent = 'Inativa (Normal)';
+                emStatusEl.className = 'text-[#1FC16B] font-semibold';
+            }
+        }
+
+        const modeEl = document.getElementById('sidebar-ai-mode');
+        if (modeEl) {
+            modeEl.textContent = `${modeDetails.icon || ''} ${modeDetails.name}`;
+        }
+    }
+
+    renderAutopilotView() {
+        const grid = document.getElementById('autopilot-modes-grid');
+        const currentBadgeContainer = document.getElementById('autopilot-current-badge-container');
+        const scoreDisplay = document.getElementById('readiness-score-display');
+        const compGrid = document.getElementById('readiness-components-grid');
+        const killBanner = document.getElementById('kill-switch-banner');
+        const killTitle = document.getElementById('kill-switch-title');
+        const killDesc = document.getElementById('kill-switch-desc');
+        const killBtn = document.getElementById('btn-toggle-kill-switch');
+
+        if (!grid) return;
+
+        const currentMode = window.autopilotEngine?.mode || 'ASSISTED';
+        const modes = window.autopilotEngine?.modes || {};
+        const isStopped = window.guardrailEngine?.isEmergencyStopped() || false;
+
+        // 1. Badge Atual Superior
+        const currentDetails = window.autopilotEngine?.getModeDetails(currentMode);
+        if (currentBadgeContainer && currentDetails) {
+            currentBadgeContainer.innerHTML = `
+                <span class="badge ${currentMode === 'GUARDED_AUTOMATION' ? 'badge-warning' : (currentMode === 'ANALYSIS_ONLY' ? 'badge-active' : 'badge-primary')} text-xs px-3 py-1 font-bold">
+                    ${currentDetails.icon} Modo Ativo: ${currentDetails.name}
+                </span>
+            `;
+        }
+
+        // 2. Renderizar os 4 Cards de Autonomia
+        grid.innerHTML = Object.keys(modes).map(modeKey => {
+            const m = modes[modeKey];
+            const isActive = m.id === currentMode;
+            
+            let activeClass = '';
+            if (isActive) {
+                if (m.id === 'ANALYSIS_ONLY') activeClass = 'active active-safe';
+                else if (m.id === 'SHADOW') activeClass = 'active active-shadow';
+                else if (m.id === 'ASSISTED') activeClass = 'active active-assisted';
+                else if (m.id === 'GUARDED_AUTOMATION') activeClass = 'active active-guarded';
+            }
+
+            return `
+                <div class="autonomy-card ${activeClass}" onclick="window.dashboard.setAutonomyMode('${m.id}')" role="button" tabindex="0" title="Clique para ativar ${m.name}">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl">${m.icon}</span>
+                            ${isActive ? `<span class="badge badge-active text-[10px] px-2 py-0.5 font-bold">✓ Selecionado</span>` : `<span class="text-[10px] text-[#6E6E73] font-mono">Disponível</span>`}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-[#F5F5F7]">${escapeHTML(m.name)}</h4>
+                            <span class="text-[10.5px] text-[#A1A1A6] font-semibold">${escapeHTML(m.badge)}</span>
+                        </div>
+                        <p class="text-xs text-[#8E8E93] leading-relaxed">${escapeHTML(m.description)}</p>
+                    </div>
+
+                    <div class="pt-2 border-t border-white/[0.05] flex items-center justify-between text-[10px]">
+                        <span class="text-[#6E6E73]">Risco:</span>
+                        <span class="font-mono ${m.riskLevel === 'ZERO_RISK' ? 'text-[#1FC16B]' : (m.riskLevel === 'GUARDED' ? 'text-[#FF9F0A]' : 'text-[#5DA9FF]')} font-bold">
+                            ${m.riskLevel}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // 3. Score Real Calculado
+        const readiness = window.autopilotEngine?.calculateReadinessScore?.({
+            trackingHealth: this.cachedSIHealth || {},
+            dataTrustScore: window.analyticsEngine?.dataConfidenceScore
+        }) || { totalScore: 95, components: [] };
+
+        if (scoreDisplay) {
+            scoreDisplay.textContent = `${readiness.totalScore}/100`;
+            if (readiness.totalScore >= 80) {
+                scoreDisplay.className = 'font-mono text-sm sm:text-base font-black text-[#1FC16B] bg-[#1FC16B]/10 border border-[#1FC16B]/30 px-3 py-1 rounded-lg tabular-nums';
+            } else if (readiness.totalScore >= 50) {
+                scoreDisplay.className = 'font-mono text-sm sm:text-base font-black text-[#FF9F0A] bg-[#FF9F0A]/10 border border-[#FF9F0A]/30 px-3 py-1 rounded-lg tabular-nums';
+            } else {
+                scoreDisplay.className = 'font-mono text-sm sm:text-base font-black text-[#FF453A] bg-[#FF453A]/10 border border-[#FF453A]/30 px-3 py-1 rounded-lg tabular-nums';
+            }
+        }
+
+        // 4. Componentes Reais
+        if (compGrid) {
+            compGrid.innerHTML = (readiness.components || []).map(c => `
+                <div class="p-3 rounded-lg bg-[#0E0E12] border ${c.isOk ? 'border-white/[0.05]' : 'border-[#FF453A]/30 bg-[#FF453A]/5'} flex items-center justify-between">
+                    <div>
+                        <span class="text-[#F5F5F7] font-medium block">${escapeHTML(c.name)}</span>
+                        <span class="text-[10px] text-[#6E6E73] font-mono">${c.score}/${c.maxScore} pts</span>
+                    </div>
+                    <span class="${c.isOk ? 'text-[#1FC16B]' : 'text-[#FF453A]'} font-bold text-right">${escapeHTML(c.status)}</span>
+                </div>
+            `).join('');
+        }
+
+        // 5. Parada de Segurança (Kill Switch Banner & Botão)
+        if (killBanner && killBtn && killTitle && killDesc) {
+            if (isStopped) {
+                killBanner.className = 'p-5 rounded-2xl bg-[#FF453A]/20 border border-[#FF453A] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all shadow-xl shadow-red-500/10';
+                killTitle.textContent = '🛑 PARADA DE SEGURANÇA ATIVADA';
+                killDesc.textContent = 'Todas as mutações na Meta, automações e edições de orçamento estão BLOQUEADAS no servidor.';
+                killBtn.textContent = '✅ REATIVAR OPERAÇÃO (DESATIVAR PARADA)';
+                killBtn.className = 'btn btn-secondary font-bold text-xs px-5 py-2.5 flex-shrink-0 rounded-xl transition-all border border-[#1FC16B]/50 text-[#1FC16B] hover:bg-[#1FC16B]/20';
+            } else {
+                killBanner.className = 'p-5 rounded-2xl bg-[#C91818]/15 border border-[#FF2D2D]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all';
+                killTitle.textContent = 'Parada de Segurança da Conta (Kill Switch)';
+                killDesc.textContent = 'Pausa imediatamente qualquer escrita, ajuste de orçamento ou automação em produção.';
+                killBtn.textContent = '🛑 ATIVAR PARADA DE SEGURANÇA';
+                killBtn.className = 'btn btn-danger font-bold text-xs px-5 py-2.5 flex-shrink-0 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-[0.98]';
+            }
+        }
+    }
+
+    async setAutonomyMode(modeId) {
+        const modes = window.autopilotEngine?.modes || {};
+        const targetMode = modes[modeId];
+        if (!targetMode) return;
+
+        // Se for subir autonomia para Ajustes Leves, exige confirmação explícita
+        if (modeId === 'GUARDED_AUTOMATION') {
+            const confirmed = confirm(
+                "⚡ ATENÇÃO — ELEVAÇÃO DE AUTONOMIA:\n\n" +
+                "O RADWAN ADS terá permissão para executar pequenos ajustes de escala (até ±15%) e stop-loss em campanhas não protegidas, sob cooldown de 12 horas.\n\n" +
+                "Deseja realmente autorizar este nível de automação?"
+            );
+            if (!confirmed) return;
+        }
+
+        try {
+            window.autopilotEngine.setMode(modeId);
+            this.renderAutopilotView();
+            this.updateSidebarAndFooterStatus();
+            this.showToast(`Modo alterado para: ${targetMode.name} (${targetMode.badge})`, 'success');
+        } catch (err) {
+            this.showToast(`Erro ao alterar modo: ${err.message}`, 'error');
+        }
+    }
+
+    async toggleEmergencyStop() {
+        const isCurrentlyStopped = window.guardrailEngine?.isEmergencyStopped() || false;
+
+        if (!isCurrentlyStopped) {
+            const confirmed = confirm(
+                "🛑 CONFIRMAÇÃO DE PARADA DE SEGURANÇA (KILL SWITCH):\n\n" +
+                "Isso pausará IMEDIATAMENTE qualquer escrita, alteração de orçamento e automação em produção no servidor.\n\n" +
+                "Deseja ativar a Parada de Segurança agora?"
+            );
+            if (!confirmed) return;
+
+            await window.guardrailEngine?.triggerEmergencyStop?.();
+            this.showToast('🛑 PARADA DE SEGURANÇA ATIVADA! Mutações bloqueadas.', 'error');
+        } else {
+            await window.guardrailEngine?.resumeEmergencyStop?.();
+            this.showToast('✅ Operação reativada com sucesso.', 'success');
+        }
+
+        this.renderAutopilotView();
+        this.updateSidebarAndFooterStatus();
+    }
+
+    triggerEmergencyStop() {
+        return this.toggleEmergencyStop();
+    }
+
+    resumeEmergencyStop() {
+        return this.toggleEmergencyStop();
     }
 
     async logout() {

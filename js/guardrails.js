@@ -31,14 +31,56 @@ class GuardrailEngine {
     }
 
     // Emergency Stop / Kill Switch
-    triggerEmergencyStop() {
+    async triggerEmergencyStop() {
         this.config.emergencyStop = true;
         this.saveConfig({ emergencyStop: true });
+
+        // Log de Auditoria
+        window.auditEngine?.logAction({
+            action: 'KILL_SWITCH_ACTIVATED',
+            reason: 'PARADA DE SEGURANÇA ATIVADA PELO OPERADOR. Todas as mutações Meta e automações foram bloqueadas.',
+            risk: 'CRITICAL',
+            verification: 'KILL_SWITCH_ACTIVE'
+        });
+
+        // Sincroniza com o backend em background
+        try {
+            await fetch('/api/meta-proxy?action=emergency_stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ enabled: true })
+            });
+        } catch(e){}
+
+        window.dispatchEvent(new CustomEvent('radwan_kill_switch_changed', { detail: { active: true } }));
+        return true;
     }
 
-    resumeEmergencyStop() {
+    async resumeEmergencyStop() {
         this.config.emergencyStop = false;
         this.saveConfig({ emergencyStop: false });
+
+        // Log de Auditoria
+        window.auditEngine?.logAction({
+            action: 'KILL_SWITCH_DEACTIVATED',
+            reason: 'Parada de segurança desativada. Operação e mutações permitidas retornaram ao estado normal.',
+            risk: 'LOW',
+            verification: 'NORMAL_OPERATION'
+        });
+
+        // Sincroniza com o backend em background
+        try {
+            await fetch('/api/meta-proxy?action=emergency_stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ enabled: false })
+            });
+        } catch(e){}
+
+        window.dispatchEvent(new CustomEvent('radwan_kill_switch_changed', { detail: { active: false } }));
+        return false;
     }
 
     isEmergencyStopped() {
