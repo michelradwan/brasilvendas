@@ -3984,6 +3984,14 @@ class DashboardApp {
     }
 
     showToast(message, type = 'info') {
+        if (typeof message !== 'string' || !message.trim()) return;
+        
+        // Blindagem Defensiva: Toasts só aceitam texto simples institucional (rejeita qualquer HTML)
+        if (message.trim().startsWith('<') || message.includes('<div') || message.includes('<span') || message.includes('Horário Concluído')) {
+            console.warn('[Toast System] Rejeitada tentativa de exibir fragmento de DOM/Tooltip como notificação toast:', message);
+            return;
+        }
+
         const container = document.getElementById('toast-container');
         if (!container) return;
 
