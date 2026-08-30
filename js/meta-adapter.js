@@ -129,7 +129,7 @@ class MetaDataProvider {
         const endpoint = campaignId ? `${campaignId}/adsets` : 'act_846780837970771/adsets';
         let all = [];
         let params = {
-            fields: 'id,name,status,campaign_id,daily_budget,lifetime_budget,optimization_goal,bid_strategy,created_time',
+            fields: 'id,name,status,effective_status,campaign_id,daily_budget,lifetime_budget,optimization_goal,bid_strategy,created_time',
             limit: limit
         };
 
@@ -155,7 +155,7 @@ class MetaDataProvider {
         const endpoint = adSetId ? `${adSetId}/ads` : 'act_846780837970771/ads';
         let all = [];
         let params = {
-            fields: 'id,name,status,campaign_id,adset_id,creative{id,name,title,body,image_url,thumbnail_url},created_time',
+            fields: 'id,name,status,effective_status,campaign_id,adset_id,creative{id,name,title,body,image_url,thumbnail_url},created_time',
             limit: limit
         };
 
@@ -176,7 +176,7 @@ class MetaDataProvider {
         return { data: all };
     }
 
-    // Buscar Insights (Suporta Presets, Intervalos Customizados e Query Planner de Campos)
+    // Buscar Insights por Objeto Individual (Campanha, Conjunto ou Anúncio)
     async getInsights(objectId, periodParam = 'today', customFields = null) {
         const defaultFields = [
             'spend',
@@ -216,6 +216,52 @@ class MetaDataProvider {
         }
 
         return this.request(`${objectId}/insights`, 'GET', params);
+    }
+
+    // Buscar Insights da Conta Inteira Agrupados por Nível (level: 'campaign' | 'adset' | 'ad')
+    async getAccountLevelInsights(level = 'campaign', periodParam = 'today', limit = 100) {
+        let levelFields = 'spend,impressions,reach,clicks,cpc,cpm,ctr,frequency,inline_link_clicks,inline_link_click_ctr,cost_per_inline_link_click,actions,action_values';
+        if (level === 'campaign') {
+            levelFields = `campaign_id,campaign_name,${levelFields}`;
+        } else if (level === 'adset') {
+            levelFields = `adset_id,adset_name,campaign_id,${levelFields}`;
+        } else if (level === 'ad') {
+            levelFields = `ad_id,ad_name,adset_id,campaign_id,${levelFields}`;
+        }
+
+        const params = {
+            level: level,
+            fields: levelFields,
+            limit: limit
+        };
+
+        if (typeof periodParam === 'object' && periodParam !== null && periodParam.since && periodParam.until) {
+            params.time_range = JSON.stringify({
+                since: periodParam.since,
+                until: periodParam.until
+            });
+        } else if (typeof periodParam === 'string' && periodParam.startsWith('{')) {
+            params.time_range = periodParam;
+        } else {
+            params.date_preset = periodParam || 'today';
+        }
+
+        let all = [];
+        do {
+            const res = await this.request('act_846780837970771/insights', 'GET', params);
+            if (res && res.data) {
+                all = all.concat(res.data);
+                if (res.paging && res.paging.cursors && res.paging.cursors.after && res.data.length === limit) {
+                    params.after = res.paging.cursors.after;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        } while (all.length < 5000);
+
+        return { data: all };
     }
 
     // Mutação de Status

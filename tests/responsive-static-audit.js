@@ -22,13 +22,11 @@ function assert(condition, message) {
     }
 }
 
-// 1. Audit 12 View Sections
-console.log('1. AUDITING 12 CANONICAL VIEWS IN admin-ads.html:');
-const expectedViews = [
+// 1. Audit 10 Canonical Views + Consolidated Campaign Subviews
+console.log('1. AUDITING CANONICAL VIEWS & SUBVIEWS IN admin-ads.html:');
+const expectedSidebarViews = [
     'overview',
     'campaigns',
-    'adsets',
-    'ads',
     'creatives',
     'funnel',
     'orders',
@@ -39,11 +37,22 @@ const expectedViews = [
     'settings'
 ];
 
-expectedViews.forEach(view => {
+expectedSidebarViews.forEach(view => {
     const hasSection = htmlContent.includes(`id="view-${view}"`);
     const hasNavItem = htmlContent.includes(`data-nav-target="${view}"`);
     assert(hasSection, `View section "#view-${view}" exists in DOM`);
     assert(hasNavItem, `Sidebar nav item for "${view}" exists in DOM`);
+});
+
+const expectedCampaignSubviews = [
+    'campaigns-subview-campaigns',
+    'campaigns-subview-adsets',
+    'campaigns-subview-ads'
+];
+
+expectedCampaignSubviews.forEach(sub => {
+    const hasSubview = htmlContent.includes(`id="${sub}"`);
+    assert(hasSubview, `Campaign Subview "#${sub}" exists in DOM`);
 });
 
 // 2. Audit 100vw Prohibition in Nested Components

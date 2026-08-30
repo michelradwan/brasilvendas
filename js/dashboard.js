@@ -27,6 +27,8 @@ class DashboardApp {
         this.selectedCampaigns = new Set();
         this.isTopMoreMenuOpen = false;
         this.isSyncing = false;
+        this.activeCampaignTab = 'campaigns';
+
         // AdSets & Ads State
         this.cachedAdSets = [];
         this.adsetsCampaignFilter = 'all';
@@ -36,6 +38,7 @@ class DashboardApp {
 
         this.cachedAds = [];
         this.adsCampaignFilter = 'all';
+        this.adsAdSetFilter = 'all';
         this.adsFilter = 'all';
         this.adsSearchQuery = '';
         this.cachedAdInsights = new Map();
@@ -211,6 +214,18 @@ class DashboardApp {
     // ─── NAVEGAÇÃO ENTRE ABAS ────────────────────────────────────────────────
 
     switchView(viewName) {
+        // Redireciona sub-níveis de campanhas para as abas internas consolidadas
+        if (viewName === 'adsets') {
+            this.switchView('campaigns');
+            this.switchCampaignTab('adsets');
+            return;
+        }
+        if (viewName === 'ads') {
+            this.switchView('campaigns');
+            this.switchCampaignTab('ads');
+            return;
+        }
+
         this.currentView = viewName;
         document.querySelectorAll('.nav-item').forEach(item => {
             if (item.getAttribute('data-nav-target') === viewName) {
@@ -234,13 +249,49 @@ class DashboardApp {
             this.loadOrdersData();
         } else if (viewName === 'creatives') {
             this.renderCreativesView();
-        } else if (viewName === 'adsets') {
-            this.loadAdSetsData();
-        } else if (viewName === 'ads') {
-            this.loadAdsData();
+        } else if (viewName === 'campaigns') {
+            this.switchCampaignTab(this.activeCampaignTab || 'campaigns');
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    switchCampaignTab(tabName = 'campaigns') {
+        this.activeCampaignTab = tabName;
+
+        ['campaigns', 'adsets', 'ads'].forEach(t => {
+            const btn = document.getElementById(`tab-nav-${t}`);
+            const view = document.getElementById(`campaigns-subview-${t}`);
+            if (btn) {
+                if (t === tabName) {
+                    btn.classList.add('active');
+                    const badge = btn.querySelector('.badge');
+                    if (badge) {
+                        badge.classList.remove('badge-paused');
+                        badge.classList.add('badge-active');
+                    }
+                } else {
+                    btn.classList.remove('active');
+                    const badge = btn.querySelector('.badge');
+                    if (badge) {
+                        badge.classList.remove('badge-active');
+                        badge.classList.add('badge-paused');
+                    }
+                }
+            }
+            if (view) {
+                if (t === tabName) view.classList.remove('hidden');
+                else view.classList.add('hidden');
+            }
+        });
+
+        if (tabName === 'campaigns') {
+            this.renderCampaignsTable();
+        } else if (tabName === 'adsets') {
+            this.renderAdSetsTable();
+        } else if (tabName === 'ads') {
+            this.renderAdsTable();
+        }
     }
 
     navigateTo(viewName) {
@@ -427,47 +478,120 @@ class DashboardApp {
                 if (tzEl) tzEl.textContent = accInfo.timezone_name || 'America/Sao_Paulo';
             }
 
-            // 2. Lista de Campanhas
-            const campRes = await window.metaAdapter.getCampaigns(50);
+            // 2. Lista de Entidades da Conta (Campanhas, Conjuntos e Anúncios)
+            const [campRes, adsetRes, adsRes] = await Promise.all([
+                window.metaAdapter.getCampaigns(50).catch(() => ({ data: [] })),
+                window.metaAdapter.getAdSets(null, 100).catch(() => ({ data: [] })),
+                window.metaAdapter.getAds(null, 100).catch(() => ({ data: [] }))
+            ]);
             if (this.syncRequestId !== currentReqId) return;
-            this.cachedCampaigns = campRes.data || [];
 
-            // Popula os dropdowns de filtro de campanha
+            this.cachedCampaigns = campRes.data || [];
+            this.cachedAdSets = adsetRes.data || [];
+            this.cachedAds = adsRes.data || [];
+
+            // Popula os dropdowns de filtro de campanha e atualiza badges das abas
             this.populateCampaignFilterDropdowns();
 
-            // 3. Insights Atuais (com base no range real)
+            const campCountBadge = document.getElementById('campaigns-count-badge');
+            const tabCampCount = document.getElementById('tab-count-campaigns');
+            const tabAdsetCount = document.getElementById('tab-count-adsets');
+            const tabAdsCount = document.getElementById('tab-count-ads');
+            if (campCountBadge) campCountBadge.textContent = `${this.cachedCampaigns.length} Campanhas`;
+            if (tabCampCount) tabCampCount.textContent = `${this.cachedCampaigns.length}`;
+            if (tabAdsetCount) tabAdsetCount.textContent = `${this.cachedAdSets.length}`;
+            if (tabAdsCount) tabAdsCount.textContent = `${this.cachedAds.length}`;
+
+            // 3. Insights por Nível (level=campaign, level=adset, level=ad)
             const periodParam = (period.preset === 'custom' && period.since && period.until)
                 ? { since: period.since, until: period.until }
                 : period.preset;
 
-            const insightPromises = this.cachedCampaigns.map(camp =>
-                window.metaAdapter.getInsights(camp.id, periodParam)
-                    .then(res => ({ id: camp.id, data: res?.data?.[0] || null }))
-                    .catch(() => ({ id: camp.id, data: null }))
-            );
-
-            const insightsResults = await Promise.all(insightPromises);
+            const [campInsightsRes, adsetInsightsRes, adInsightsRes] = await Promise.all([
+                window.metaAdapter.getAccountLevelInsights('campaign', periodParam).catch(() => ({ data: [] })),
+                window.metaAdapter.getAccountLevelInsights('adset', periodParam).catch(() => ({ data: [] })),
+                window.metaAdapter.getAccountLevelInsights('ad', periodParam).catch(() => ({ data: [] }))
+            ]);
             if (this.syncRequestId !== currentReqId) return;
 
+            // Mapeia Insights de Campanhas
             this.cachedInsights.clear();
-            insightsResults.forEach(item => {
-                this.cachedInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
+            (campInsightsRes.data || []).forEach(item => {
+                if (item.campaign_id) {
+                    this.cachedInsights.set(item.campaign_id, window.analyticsEngine.parseInsights(item));
+                }
             });
+
+            // Fallback para campanhas se a busca em lote não retornar insights de campanha
+            if (this.cachedInsights.size === 0 && this.cachedCampaigns.length > 0) {
+                const indCampPromises = this.cachedCampaigns.map(camp =>
+                    window.metaAdapter.getInsights(camp.id, periodParam)
+                        .then(res => ({ id: camp.id, data: res?.data?.[0] || null }))
+                        .catch(() => ({ id: camp.id, data: null }))
+                );
+                const indResults = await Promise.all(indCampPromises);
+                if (this.syncRequestId !== currentReqId) return;
+                indResults.forEach(item => {
+                    this.cachedInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
+                });
+            }
+
+            // Mapeia Insights de Conjuntos (AdSets)
+            this.cachedAdSetInsights.clear();
+            (adsetInsightsRes.data || []).forEach(item => {
+                if (item.adset_id) {
+                    this.cachedAdSetInsights.set(item.adset_id, window.analyticsEngine.parseInsights(item));
+                }
+            });
+
+            // Fallback para conjuntos se a busca em lote não trouxer registros
+            if (this.cachedAdSetInsights.size === 0 && this.cachedAdSets.length > 0) {
+                const activeAdSets = this.cachedAdSets.filter(a => a.status === 'ACTIVE').slice(0, 15);
+                const indAdSetPromises = activeAdSets.map(adset =>
+                    window.metaAdapter.getInsights(adset.id, periodParam)
+                        .then(res => ({ id: adset.id, data: res?.data?.[0] || null }))
+                        .catch(() => ({ id: adset.id, data: null }))
+                );
+                const indAdSetResults = await Promise.all(indAdSetPromises);
+                if (this.syncRequestId !== currentReqId) return;
+                indAdSetResults.forEach(item => {
+                    this.cachedAdSetInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
+                });
+            }
+
+            // Mapeia Insights de Anúncios (Ads)
+            this.cachedAdInsights.clear();
+            (adInsightsRes.data || []).forEach(item => {
+                if (item.ad_id) {
+                    this.cachedAdInsights.set(item.ad_id, window.analyticsEngine.parseInsights(item));
+                }
+            });
+
+            // Fallback para anúncios se a busca em lote não trouxer registros
+            if (this.cachedAdInsights.size === 0 && this.cachedAds.length > 0) {
+                const activeAds = this.cachedAds.filter(a => a.status === 'ACTIVE').slice(0, 15);
+                const indAdsPromises = activeAds.map(ad =>
+                    window.metaAdapter.getInsights(ad.id, periodParam)
+                        .then(res => ({ id: ad.id, data: res?.data?.[0] || null }))
+                        .catch(() => ({ id: ad.id, data: null }))
+                );
+                const indAdsResults = await Promise.all(indAdsPromises);
+                if (this.syncRequestId !== currentReqId) return;
+                indAdsResults.forEach(item => {
+                    this.cachedAdInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
+                });
+            }
 
             // 4. Se Modo Comparação estiver ativo: buscar período anterior equivalente
             this.previousPeriodInsights.clear();
             if (isComparison && period.since && period.until) {
                 const prev = window.periodStore.calculatePreviousPeriod(period.since, period.until);
-                const prevInsightPromises = this.cachedCampaigns.map(camp =>
-                    window.metaAdapter.getInsights(camp.id, { since: prev.since, until: prev.until })
-                        .then(res => ({ id: camp.id, data: res?.data?.[0] || null }))
-                        .catch(() => ({ id: camp.id, data: null }))
-                );
-                const prevResults = await Promise.all(prevInsightPromises);
+                const prevLevelRes = await window.metaAdapter.getAccountLevelInsights('campaign', { since: prev.since, until: prev.until }).catch(() => ({ data: [] }));
                 if (this.syncRequestId !== currentReqId) return;
-
-                prevResults.forEach(item => {
-                    this.previousPeriodInsights.set(item.id, window.analyticsEngine.parseInsights(item.data));
+                (prevLevelRes.data || []).forEach(item => {
+                    if (item.campaign_id) {
+                        this.previousPeriodInsights.set(item.campaign_id, window.analyticsEngine.parseInsights(item));
+                    }
                 });
             }
 
@@ -475,14 +599,15 @@ class DashboardApp {
             this.renderOverviewMetrics();
             this.renderHourlyVisualIntelligence();
             this.renderWhatShouldIDoNow();
-            this.renderCampaignsTable();
+            if (this.currentView === 'campaigns') {
+                this.switchCampaignTab(this.activeCampaignTab || 'campaigns');
+            } else {
+                this.renderCampaignsTable();
+            }
             if (typeof this.renderFunnelView === 'function') this.renderFunnelView();
             if (typeof this.renderCreativesView === 'function') this.renderCreativesView();
             if (typeof this.renderAuditLogs === 'function') this.renderAuditLogs();
             if (typeof this.renderTopOpportunities === 'function') this.renderTopOpportunities();
-
-            if (this.currentView === 'adsets') this.loadAdSetsData(true);
-            if (this.currentView === 'ads') this.loadAdsData(true);
 
             // 6. Pedidos no período
             await this.loadOrdersData(true);
@@ -2237,6 +2362,11 @@ class DashboardApp {
             list = list.filter(a => a.status === 'ACTIVE');
         } else if (this.adsetsFilter === 'paused') {
             list = list.filter(a => a.status === 'PAUSED');
+        } else if (this.adsetsFilter === 'sales') {
+            list = list.filter(a => {
+                const ins = this.cachedAdSetInsights.get(a.id);
+                return ins && ins.purchases > 0;
+            });
         }
 
         // 3. Filtro por Busca
@@ -2247,16 +2377,14 @@ class DashboardApp {
             );
         }
 
-        // Calcular totais resumidos
+        // Totais resumidos diretamente das métricas reais de cada conjunto
         let totalSpend = 0;
         let totalPurchases = 0;
 
         list.forEach(adset => {
-            const campIns = this.cachedInsights.get(adset.campaign_id);
-            if (campIns) {
-                totalSpend += (campIns.spend || 0) / Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length);
-                totalPurchases += Math.round((campIns.purchases || 0) / Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length));
-            }
+            const adsetIns = this.cachedAdSetInsights.get(adset.id) || window.analyticsEngine.parseInsights(null);
+            totalSpend += (adsetIns.spend || 0);
+            totalPurchases += (adsetIns.purchases || 0);
         });
 
         const spendSummary = document.getElementById('adsets-summary-spend');
@@ -2267,7 +2395,7 @@ class DashboardApp {
         if (list.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="9">
+                    <td class="p-8 text-center text-[#6E6E73] italic text-xs" colspan="10">
                         Nenhum conjunto encontrado para os filtros selecionados.
                     </td>
                 </tr>
@@ -2278,19 +2406,13 @@ class DashboardApp {
 
         tbody.innerHTML = list.map(adset => {
             const parentCamp = this.cachedCampaigns.find(c => c.id === adset.campaign_id);
-            const parentIns = this.cachedInsights.get(adset.campaign_id) || window.analyticsEngine.parseInsights(null);
-            const isCBO = parentCamp?.daily_budget || parentCamp?.lifetime_budget;
+            const adsetIns = this.cachedAdSetInsights.get(adset.id) || window.analyticsEngine.parseInsights(null);
+            const isCBO = Boolean(parentCamp?.daily_budget || parentCamp?.lifetime_budget);
             const adsetBudget = adset.daily_budget ? (adset.daily_budget / 100) : 0;
             const safeName = escapeHTML(adset.name || 'Conjunto');
             const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
             const safeId = escapeHTML(adset.id);
             const isChecked = adset.status === 'ACTIVE';
-
-            const numSiblings = Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length);
-            const estSpend = (parentIns.spend || 0) / numSiblings;
-            const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
-            const estCpa = estPurchases > 0 ? (estSpend / estPurchases) : null;
-            const estRoas = parentIns.roas;
 
             return `
                 <tr class="hover:bg-white/[0.02] transition-colors group">
@@ -2313,20 +2435,21 @@ class DashboardApp {
                         ${isCBO ? `
                             <span class="badge badge-paused text-[9.5px]" title="Orçamento gerenciado no nível da campanha (CBO)">CBO Campanha</span>
                         ` : `
-                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center gap-1" title="Clique para editar orçamento do conjunto">
+                            <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="hover:underline text-[#F5F5F7] font-semibold inline-flex items-center gap-1" title="Clique para editar orçamento do conjunto (ABO)">
                                 <span>R$ ${adsetBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 <span class="text-[10px] text-[#6E6E73]">✏️</span>
                             </button>
                         `}
                     </td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</td>
-                    <td class="text-right text-xs font-mono font-bold ${estPurchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${estPurchases}</td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${estCpa ? window.analyticsEngine.formatMoney(estCpa) : '–'}</td>
-                    <td class="text-right text-xs font-mono font-bold ${estRoas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${estRoas ? `${estRoas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adsetIns.spend)}</td>
+                    <td class="text-right text-xs font-mono font-bold ${adsetIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adsetIns.purchases}</td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${adsetIns.cpa ? window.analyticsEngine.formatMoney(adsetIns.cpa) : '–'}</td>
+                    <td class="text-right text-xs font-mono font-bold ${adsetIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adsetIns.roas ? `${adsetIns.roas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-right text-xs font-mono font-semibold ${adsetIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#A1A1A6]'}">${adsetIns.link_ctr ? `${adsetIns.link_ctr.toFixed(2)}%` : '–'}</td>
                     <td class="text-center py-2">
                         <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                             <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-secondary btn-sm text-[10.5px] px-2 py-1" title="Ver Anúncios deste conjunto">
-                                <span>Anúncios</span>
+                                <span>Anúncios ➔</span>
                             </button>
                             <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[10.5px] px-1.5 py-1" title="Duplicar Conjunto">
                                 <span>📋</span>
@@ -2340,17 +2463,13 @@ class DashboardApp {
         if (mobileContainer) {
             mobileContainer.innerHTML = list.map(adset => {
                 const parentCamp = this.cachedCampaigns.find(c => c.id === adset.campaign_id);
-                const parentIns = this.cachedInsights.get(adset.campaign_id) || window.analyticsEngine.parseInsights(null);
-                const isCBO = parentCamp?.daily_budget || parentCamp?.lifetime_budget;
+                const adsetIns = this.cachedAdSetInsights.get(adset.id) || window.analyticsEngine.parseInsights(null);
+                const isCBO = Boolean(parentCamp?.daily_budget || parentCamp?.lifetime_budget);
                 const adsetBudget = adset.daily_budget ? (adset.daily_budget / 100) : 0;
                 const safeName = escapeHTML(adset.name || 'Conjunto');
                 const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
                 const safeId = escapeHTML(adset.id);
                 const isChecked = adset.status === 'ACTIVE';
-
-                const numSiblings = Math.max(1, this.cachedAdSets.filter(a => a.campaign_id === adset.campaign_id).length);
-                const estSpend = (parentIns.spend || 0) / numSiblings;
-                const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
 
                 return `
                     <div class="mobile-campaign-card space-y-3">
@@ -2374,16 +2493,16 @@ class DashboardApp {
                             </div>
                             <div>
                                 <span class="text-[10px] text-[#6E6E73] block">Investido</span>
-                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</span>
+                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adsetIns.spend)}</span>
                             </div>
                             <div>
                                 <span class="text-[10px] text-[#6E6E73] block">Vendas</span>
-                                <span class="font-bold text-[#1FC16B]">${estPurchases}</span>
+                                <span class="font-bold text-[#1FC16B]">${adsetIns.purchases}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 pt-1 border-t border-white/[0.04]">
                             <button onclick="window.dashboard.filterAdsByAdSet('${safeId}')" class="btn btn-secondary btn-sm flex-1 text-[11px] py-1.5">
-                                Ver Anúncios
+                                Ver Anúncios ➔
                             </button>
                             ${!isCBO ? `
                                 <button onclick="window.dashboard.openBudgetModal('${safeId}', ${adsetBudget}, '${safeName}', false, 'adset')" class="btn btn-secondary btn-sm text-[11px] py-1.5 px-3">
@@ -2460,17 +2579,25 @@ class DashboardApp {
 
     filterAdsByCampaign(campId) {
         this.adsCampaignFilter = campId || 'all';
+        this.adsAdSetFilter = 'all';
         const selectEl = document.getElementById('ads-campaign-filter-select');
         if (selectEl) selectEl.value = this.adsCampaignFilter;
         this.renderAdsTable();
     }
 
     filterAdsByAdSet(adsetId) {
-        this.switchView('ads');
+        this.switchView('campaigns');
+        this.switchCampaignTab('ads');
         const adset = this.cachedAdSets.find(a => a.id === adsetId);
         if (adset) {
-            this.filterAdsByCampaign(adset.campaign_id);
+            this.adsCampaignFilter = adset.campaign_id;
+            const selectEl = document.getElementById('ads-campaign-filter-select');
+            if (selectEl) selectEl.value = this.adsCampaignFilter;
+            this.adsAdSetFilter = adsetId;
+        } else {
+            this.adsAdSetFilter = adsetId;
         }
+        this.renderAdsTable();
     }
 
     setAdFilter(filter) {
@@ -2502,14 +2629,24 @@ class DashboardApp {
             list = list.filter(a => a.campaign_id === this.adsCampaignFilter);
         }
 
-        // 2. Filtro por Status
+        // 2. Filtro por Conjunto (se especificado)
+        if (this.adsAdSetFilter && this.adsAdSetFilter !== 'all') {
+            list = list.filter(a => a.adset_id === this.adsAdSetFilter);
+        }
+
+        // 3. Filtro por Status
         if (this.adsFilter === 'active') {
             list = list.filter(a => a.status === 'ACTIVE');
         } else if (this.adsFilter === 'paused') {
             list = list.filter(a => a.status === 'PAUSED');
+        } else if (this.adsFilter === 'sales') {
+            list = list.filter(a => {
+                const ins = this.cachedAdInsights.get(a.id);
+                return ins && ins.purchases > 0;
+            });
         }
 
-        // 3. Filtro por Busca
+        // 4. Filtro por Busca
         if (this.adsSearchQuery) {
             list = list.filter(a => 
                 (a.name || '').toLowerCase().includes(this.adsSearchQuery) ||
@@ -2517,16 +2654,14 @@ class DashboardApp {
             );
         }
 
-        // Totais resumidos
+        // Totais resumidos diretamente das métricas reais de cada anúncio
         let totalSpend = 0;
         let totalPurchases = 0;
 
         list.forEach(ad => {
-            const campIns = this.cachedInsights.get(ad.campaign_id);
-            if (campIns) {
-                totalSpend += (campIns.spend || 0) / Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length);
-                totalPurchases += Math.round((campIns.purchases || 0) / Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length));
-            }
+            const adIns = this.cachedAdInsights.get(ad.id) || window.analyticsEngine.parseInsights(null);
+            totalSpend += (adIns.spend || 0);
+            totalPurchases += (adIns.purchases || 0);
         });
 
         const spendSummary = document.getElementById('ads-summary-spend');
@@ -2548,18 +2683,13 @@ class DashboardApp {
 
         tbody.innerHTML = list.map(ad => {
             const parentCamp = this.cachedCampaigns.find(c => c.id === ad.campaign_id);
-            const parentIns = this.cachedInsights.get(ad.campaign_id) || window.analyticsEngine.parseInsights(null);
+            const parentAdSet = this.cachedAdSets.find(s => s.id === ad.adset_id);
+            const adIns = this.cachedAdInsights.get(ad.id) || window.analyticsEngine.parseInsights(null);
             const safeName = escapeHTML(ad.name || 'Anúncio');
             const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
+            const safeAdSetName = escapeHTML(parentAdSet?.name || 'Conjunto');
             const safeId = escapeHTML(ad.id);
             const isChecked = ad.status === 'ACTIVE';
-
-            const numSiblings = Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length);
-            const estSpend = (parentIns.spend || 0) / numSiblings;
-            const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
-            const estCpa = estPurchases > 0 ? (estSpend / estPurchases) : null;
-            const estRoas = parentIns.roas;
-            const estCtr = parentIns.link_ctr;
 
             const thumb = ad.creative?.thumbnail_url || ad.creative?.image_url;
 
@@ -2587,13 +2717,14 @@ class DashboardApp {
                         </div>
                     </td>
                     <td class="text-xs text-[#A1A1A6] max-w-[180px]">
-                        <div class="truncate" title="${safeCampName}">${safeCampName}</div>
+                        <div class="truncate text-[#F5F5F7]" title="${safeCampName}">${safeCampName}</div>
+                        <div class="text-[10px] text-[#6E6E73] truncate" title="${safeAdSetName}">${safeAdSetName}</div>
                     </td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</td>
-                    <td class="text-right text-xs font-mono font-semibold ${estCtr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${estCtr ? `${estCtr.toFixed(2)}%` : '–'}</td>
-                    <td class="text-right text-xs font-mono font-bold ${estPurchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${estPurchases}</td>
-                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${estCpa ? window.analyticsEngine.formatMoney(estCpa) : '–'}</td>
-                    <td class="text-right text-xs font-mono font-bold ${estRoas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${estRoas ? `${estRoas.toFixed(2)}x` : '–'}</td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adIns.spend)}</td>
+                    <td class="text-right text-xs font-mono font-semibold ${adIns.link_ctr >= 1.5 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.link_ctr ? `${adIns.link_ctr.toFixed(2)}%` : '–'}</td>
+                    <td class="text-right text-xs font-mono font-bold ${adIns.purchases > 0 ? 'text-[#1FC16B]' : 'text-[#6E6E73]'}">${adIns.purchases}</td>
+                    <td class="text-right text-xs font-mono text-[#F5F5F7]">${adIns.cpa ? window.analyticsEngine.formatMoney(adIns.cpa) : '–'}</td>
+                    <td class="text-right text-xs font-mono font-bold ${adIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.roas ? `${adIns.roas.toFixed(2)}x` : '–'}</td>
                     <td class="text-center py-2">
                         <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                             <button onclick="window.dashboard.openDuplicateModal('${safeId}', '${safeName}')" class="btn btn-secondary btn-sm text-[10.5px] px-2 py-1" title="Duplicar Anúncio">
@@ -2608,15 +2739,13 @@ class DashboardApp {
         if (mobileContainer) {
             mobileContainer.innerHTML = list.map(ad => {
                 const parentCamp = this.cachedCampaigns.find(c => c.id === ad.campaign_id);
-                const parentIns = this.cachedInsights.get(ad.campaign_id) || window.analyticsEngine.parseInsights(null);
+                const parentAdSet = this.cachedAdSets.find(s => s.id === ad.adset_id);
+                const adIns = this.cachedAdInsights.get(ad.id) || window.analyticsEngine.parseInsights(null);
                 const safeName = escapeHTML(ad.name || 'Anúncio');
                 const safeCampName = escapeHTML(parentCamp?.name || 'Campanha');
+                const safeAdSetName = escapeHTML(parentAdSet?.name || 'Conjunto');
                 const safeId = escapeHTML(ad.id);
                 const isChecked = ad.status === 'ACTIVE';
-
-                const numSiblings = Math.max(1, this.cachedAds.filter(a => a.campaign_id === ad.campaign_id).length);
-                const estSpend = (parentIns.spend || 0) / numSiblings;
-                const estPurchases = Math.round((parentIns.purchases || 0) / numSiblings);
                 const thumb = ad.creative?.thumbnail_url || ad.creative?.image_url;
 
                 return `
@@ -2631,7 +2760,7 @@ class DashboardApp {
                                 <div class="min-w-0 flex-1">
                                     <span class="badge ${isChecked ? 'badge-active' : 'badge-paused'} text-[9px] mb-1 inline-block">${ad.status}</span>
                                     <h4 class="font-bold text-xs text-[#F5F5F7] truncate">${safeName}</h4>
-                                    <p class="text-[10px] text-[#A1A1A6] truncate">${safeCampName}</p>
+                                    <p class="text-[10px] text-[#A1A1A6] truncate">${safeCampName} • ${safeAdSetName}</p>
                                 </div>
                             </div>
                             <label class="toggle-switch cursor-pointer flex-shrink-0">
@@ -2641,14 +2770,18 @@ class DashboardApp {
                                 </div>
                             </label>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-[#141418] text-xs">
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#141418] text-xs">
                             <div>
                                 <span class="text-[10px] text-[#6E6E73] block">Investido</span>
-                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(estSpend)}</span>
+                                <span class="font-bold text-[#F5F5F7]">${window.analyticsEngine.formatMoney(adIns.spend)}</span>
                             </div>
                             <div>
                                 <span class="text-[10px] text-[#6E6E73] block">Vendas</span>
-                                <span class="font-bold text-[#1FC16B]">${estPurchases} un</span>
+                                <span class="font-bold text-[#1FC16B]">${adIns.purchases}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6E6E73] block">ROAS</span>
+                                <span class="font-bold ${adIns.roas >= 2.2 ? 'text-[#1FC16B]' : 'text-[#F5F5F7]'}">${adIns.roas ? `${adIns.roas.toFixed(2)}x` : '–'}</span>
                             </div>
                         </div>
                     </div>

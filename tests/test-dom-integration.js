@@ -31,14 +31,12 @@ function test(name, fn) {
     }
 }
 
-// ─── TESTE 1: Integridade Estrutural das 12 Views no HTML ─────────────────────
-test('1. Todas as 12 seções do painel estão presentes com IDs corretos', () => {
+// ─── TESTE 1: Integridade Estrutural das Visões e Subviews no HTML ─────────────
+test('1. Todas as visões principais e subviews consolidadas estão presentes com IDs corretos', () => {
     const html = fs.readFileSync(path.join(__dirname, '../admin-ads.html'), 'utf-8');
     const requiredViews = [
         'view-overview',
         'view-campaigns',
-        'view-adsets',
-        'view-ads',
         'view-creatives',
         'view-funnel',
         'view-orders',
@@ -51,6 +49,16 @@ test('1. Todas as 12 seções do painel estão presentes com IDs corretos', () =
 
     requiredViews.forEach(v => {
         assert.ok(html.includes(`id="${v}"`), `Seção #${v} deve existir no HTML`);
+    });
+
+    const requiredSubviews = [
+        'campaigns-subview-campaigns',
+        'campaigns-subview-adsets',
+        'campaigns-subview-ads'
+    ];
+
+    requiredSubviews.forEach(sv => {
+        assert.ok(html.includes(`id="${sv}"`), `Subview #${sv} deve existir no HTML`);
     });
 });
 
